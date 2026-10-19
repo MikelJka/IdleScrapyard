@@ -2,6 +2,14 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Menos parpadeo en el móvil (Pixel 10)
+
+- Mikel avisa: en su Google Pixel 10 la escena se ve «glitch» y las animaciones parpadean. No se puede reproducir sin el móvil (Chromium sin pantalla no usa la GPU), así que se atacan las causas probables.
+- Los vehículos (carretillas, AGV, camión de chatarra) destruían y recreaban sus nodos SVG cada vez que cambiaban de ángulo (~430 nodos nuevos por segundo, midiendo en Chromium). Ahora cada variante se dibuja una sola vez y solo se enseña u oculta (`showVariant` en `yard.ts`); bajan los nodos creados a casi la mitad y los cambios del DOM de 700 a 560 cada 3 s.
+- La reordenación de profundidad solo mueve los nodos que no están en su sitio, y las imágenes estáticas piden decodificación síncrona.
+- Qué probar en el Pixel: si el parpadeo se ha ido. Si no, decir qué parpadea exactamente (máquinas, carretillas, fondo, al mover la cámara o al hacer zoom).
+- Siguiente: si sigue, es la GPU con las imágenes estáticas enormes (se partirían en trozos) o el número de nodos animados.
+
 ## 2026-10-19 — Decorado nuevo, día y noche y anuncios al volver
 
 - Mikel envía un vídeo de la web y elige D1, D3, D4 y D5 (fondo) y A3 y A4 (anuncios al volver). En el vídeo se ve un parpadeo en el que desaparecen máquinas y ayudantes durante un fotograma y mucho espacio vacío; para aligerar, lo estático (ciudad, terreno, suelo, nave y puerto) pasa a imágenes que se dibujan una vez y las animaciones ocultas se apagan (de ~3000 a ~2000 nodos).

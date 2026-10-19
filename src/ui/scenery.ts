@@ -29,7 +29,7 @@ function mix(hex: string, into: string, f: number): string {
 /** Dibujo estático convertido en imagen (se rasteriza una vez). */
 export function staticImage(markup: string, x: number, y: number, w: number, h: number): string {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${w} ${h}" width="${w}" height="${h}">${markup}</svg>`;
-  return `<image x="${x}" y="${y}" width="${w}" height="${h}" pointer-events="none" href="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}"/>`;
+  return `<image decoding="sync" x="${x}" y="${y}" width="${w}" height="${h}" pointer-events="none" href="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}"/>`;
 }
 
 // ---- Hora del día ----

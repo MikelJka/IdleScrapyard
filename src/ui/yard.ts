@@ -266,6 +266,26 @@ export function createYard(container: HTMLElement): Yard {
     return g;
   };
 
+  /** Muestra la variante `key` de un objeto móvil. Cada variante se dibuja una sola vez y luego solo se enseña u oculta:
+   * así no se destruyen y recrean nodos en cada fotograma (eso hacía parpadear los vehículos en el móvil). */
+  const variants = new WeakMap<SVGGElement, { cur: SVGGElement | null; map: Map<string, SVGGElement> }>();
+  const showVariant = (g: SVGGElement, key: string, html: () => string): void => {
+    let v = variants.get(g);
+    if (!v) variants.set(g, (v = { cur: null, map: new Map() }));
+    let el = v.map.get(key);
+    if (!el) {
+      el = document.createElementNS(NS, 'g');
+      el.innerHTML = html();
+      g.appendChild(el);
+      v.map.set(key, el);
+    }
+    if (v.cur === el) return;
+    // Primero se enseña la nueva y luego se oculta la anterior.
+    el.removeAttribute('display');
+    v.cur?.setAttribute('display', 'none');
+    v.cur = el;
+  };
+
   // Nubes y pájaros del cielo.
   const cloudEls = [0, 1, 2, 3].map((i) => mk(clouds, `<g opacity="${0.5 + (i % 2) * 0.15}" fill="#fff6e6"><ellipse rx="${60 + i * 8}" ry="${14 + (i % 2) * 4}"/><ellipse cx="${-26 + i * 4}" cy="-10" rx="30" ry="14"/><ellipse cx="22" cy="-12" rx="34" ry="15"/></g>`));
   const birdEls = [0, 1, 2, 3, 4].map(() => mk(birds, '<path class="bird" d="M-7 0 Q-3.5 -5 0 0 Q3.5 -5 7 0" fill="none" stroke="#2a1d14" stroke-width="1.6" stroke-linecap="round"/>'));
@@ -582,7 +602,7 @@ export function createYard(container: HTMLElement): Yard {
       const key = `${Math.round(tilt * 30)}|${Math.round(slide * 12)}|${Math.round(dust * 6)}|${loaded ? 1 : 0}`;
       if (scrapKey[i] !== key) {
         scrapKey[i] = key;
-        g.innerHTML = scrapTruckIso(tilt, true, slide, dust);
+        showVariant(g, key, () => scrapTruckIso(tilt, true, slide, dust));
       }
       g.setAttribute('visibility', 'visible');
       g.setAttribute('transform', at(x, y));
@@ -683,9 +703,11 @@ export function createYard(container: HTMLElement): Yard {
       const key = `${src.z.id}|${Math.round((pose.ang * 18) / Math.PI)}|${carrying}`;
       if (key !== c.key) {
         c.key = key;
-        c.g.innerHTML = forkliftIso(
-          pose.ang,
-          Array.from({ length: carrying }, () => propIso(src.z.id)),
+        showVariant(c.g, key, () =>
+          forkliftIso(
+            pose.ang,
+            Array.from({ length: carrying }, () => propIso(src.z.id)),
+          ),
         );
       }
       c.g.setAttribute('visibility', 'visible');
@@ -779,7 +801,7 @@ export function createYard(container: HTMLElement): Yard {
       const key = `${Math.round((ang * 18) / Math.PI)}|${loaded ? 1 : 0}`;
       if (key !== r.key) {
         r.key = key;
-        r.g.innerHTML = agvIso(ang, loaded);
+        showVariant(r.g, key, () => agvIso(ang, loaded));
       }
       r.g.setAttribute('transform', at(x, y));
       r.o.depth = x + y + 0.3;
@@ -790,7 +812,11 @@ export function createYard(container: HTMLElement): Yard {
     const order = sorted.map((o) => objs.indexOf(o)).join(',');
     if (order !== lastDepthOrder) {
       lastDepthOrder = order;
-      for (const o of sorted) objectsG.appendChild(o.el);
+      // Solo se mueven los nodos que no están ya en su sitio (menos cambios del DOM = menos parpadeo).
+      sorted.forEach((o, i) => {
+        const at = objectsG.children[i];
+        if (at !== o.el) objectsG.insertBefore(o.el, at ?? null);
+      });
     }
   }
 
