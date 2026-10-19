@@ -6,7 +6,7 @@ Idioma: el código (nombres de variables, funciones, tipos) en inglés; comentar
 
 ## Tecnología
 
-- TypeScript estricto + Vite. Tests con Vitest. Dibujado en **2D vectorial (SVG) hecho por código**, estilo dibujo animado, que tiene que ser muy bonito y atractivo (decidido por Mikel el 2026-10-19; sustituye al 3D con Three.js). Si se usan recursos gráficos de terceros, CC0 (p. ej. Kenney). **Nada de pixel art**.
+- TypeScript estricto + Vite. Tests con Vitest. Dibujado en **2D isométrico (SVG) hecho por código**: bloques que parecen 3D low-poly, como los idle de fábrica (p. ej. el de serrería que enseñó Mikel); tiene que ser muy bonito y atractivo (decidido por Mikel el 2026-10-19; sustituye al 3D con Three.js). Mapa a pantalla completa que se arrastra y se pellizca, con botones flotantes. Si se usan recursos gráficos de terceros, CC0 (p. ej. Kenney). **Nada de pixel art**.
 - **Política de coste cero** (orden de Mikel del 2026-10-19): no se compra nada. Solo herramientas gratuitas y recursos con licencia que permita uso comercial sin pagar (preferible CC0). Cada recurso de terceros se apunta en `docs/CREDITOS.md` con su autor, su enlace y su licencia.
 - Versión web de prueba en GitHub Pages al subir a `main` (`.github/workflows/deploy.yml`). URL: https://mikeljka.github.io/IdleScrapyard/
 - Android: más adelante, la web empaquetada con Capacitor (una tarea del roadmap). Sin backend propio.

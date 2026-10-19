@@ -81,7 +81,7 @@ En un primer juego, lo sensato es empezar solo con «quitar anuncios» y añadir
 
 Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 
-- **Estilo visual** (2026-10-19, cambiado el mismo día): 2D de dibujo animado, muy bonito y atractivo, dibujado con SVG por código (el 3D no aporta nada en este juego). Nada de pixel art; coste cero.
+- **Estilo visual** (2026-10-19, cambiado el mismo día): 2D isométrico con bloques de aspecto low-poly, muy bonito y atractivo, dibujado con SVG por código, como el idle de serrería que enseñó Mikel: puestos marcados con líneas amarillas, máquinas que cambian con el nivel, trabajadores, palés, carretillas, camiones de chatarra detrás y de expedición delante. Mapa a pantalla completa con botones flotantes. Nada de pixel art; coste cero.
 - **Lo que nos diferencia** (2026-10-19): **ayudantes con nombre y rasgos que suben de nivel**. Cómo se consiguen, qué rasgos hay y cómo suben se decide en una parte posterior del diseño.
 - **Ambientación** (2026-10-19): postapocalíptico con tono ligero y de humor.
 - **Moneda y recurso** (2026-10-19): una sola moneda, el **dólar**, con la que se compran todas las mejoras. La **chatarra** es el único recurso de entrada. Todo lo fabricado se convierte en dólares al expedirlo.

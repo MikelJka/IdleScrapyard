@@ -16,7 +16,8 @@ import {
   type GameState,
 } from '../sim/game';
 import { HELPER_LOOKS } from './look';
-import { FORKLIFT, createScene, helperFace, productIcon, truck } from './scene';
+import { FORKLIFT, helperFace, productIcon, truck } from './icons';
+import { createYard } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { pack, unpack } from '../sim/offline';
 import { t } from './texts';
@@ -77,28 +78,34 @@ export function startApp(root: HTMLElement): void {
   state = result.state;
   root.innerHTML = `
     <main class="game">
-      <header>
+      <div id="scene-wrap"></div>
+      <header class="hud">
         <div class="money"><span class="coin">$</span><span id="dollars"></span></div>
         <span id="rate"></span>
       </header>
-      <div id="scene-wrap"></div>
       <p id="welcome" hidden></p>
-      <section id="extras"></section>
-      <h2>${t('shop.title')}</h2>
-      <section id="shop"></section>
+      <aside id="extras"></aside>
+      <button id="open-shop" type="button"><span class="cart">🛒</span><span>${t('shop.title')}</span><b id="shop-badge" hidden></b></button>
+      <section id="sheet" hidden>
+        <div class="sheet-head"><h2>${t('shop.title')}</h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
+        <div id="shop"></div>
+      </section>
     </main>`;
   const $ = (id: string) => root.querySelector<HTMLElement>('#' + id)!;
   if (result.simulatedSeconds > 60) {
     const w = $('welcome');
     w.hidden = false;
     w.textContent = t('welcomeBack', { dollars: fmt(result.dollarsEarned), minutes: Math.round(result.simulatedSeconds / 60) });
+    w.addEventListener('click', () => (w.hidden = true));
+    setTimeout(() => (w.hidden = true), 8000);
   }
-  const scene = createScene();
-  $('scene-wrap').appendChild(scene.el);
+  const scene = createYard($('scene-wrap'));
   scene.el.querySelector('#pile')!.addEventListener('click', () => {
     tap(state);
-    scene.pop('+' + ECONOMY.tap.scrap);
+    scene.pop('+' + ECONOMY.tap.scrap, 'pile');
   });
+  $('open-shop').addEventListener('click', () => ($('sheet').hidden = false));
+  $('close-shop').addEventListener('click', () => ($('sheet').hidden = true));
   scene.el.querySelector('#golden')!.addEventListener('click', async () => {
     if (busy || state.goldenVisible <= 0) return;
     busy = true;
@@ -131,22 +138,19 @@ export function startApp(root: HTMLElement): void {
     const today = localDay();
     const day = streakDayFor(state, today);
     const nextDay = (state.streakDay % ECONOMY.dailyStreak.rewardMinutes.length) + 1;
+    const btn = (action: string, icon: string, label: string, enabled: boolean, cls = '') =>
+      `<button type="button" class="${cls}" ${enabled ? `data-action="${action}"` : 'disabled'}><span class="ico">${icon}</span><span>${label}</span></button>`;
     const buttons = [
-      day > 0
-        ? `<button type="button" data-action="daily" ${dailyReward(state, today) > 0 ? '' : 'disabled'}>${t('daily.claim', { day })}</button>`
-        : `<button type="button" disabled>${t('daily.done', { day: nextDay })}</button>`,
       state.boostSeconds > 0
-        ? `<button type="button" disabled>${t('boost.active', { minutes: Math.ceil(state.boostSeconds / 60) })}</button>`
+        ? btn('boost', '⏱️', t('boost.activeShort', { minutes: Math.ceil(state.boostSeconds / 60) }), false, 'boost on')
         : canBoost(state)
-          ? `<button type="button" data-action="boost">${t('boost.ready')}</button>`
-          : `<button type="button" disabled>${t('boost.wait', { minutes: Math.ceil(state.boostCooldown / 60) })}</button>`,
+          ? btn('boost', '📺', t('boost.short'), true, 'boost')
+          : btn('boost', '⏳', t('boost.waitShort', { minutes: Math.ceil(state.boostCooldown / 60) }), false, 'boost'),
+      day > 0
+        ? btn('daily', '🎁', t('daily.short', { day }), dailyReward(state, today) > 0, 'daily ready')
+        : btn('daily', '🎁', t('daily.doneShort', { day: nextDay }), false, 'daily'),
+      state.hasPass ? btn('pass', '⭐', t('pass.ownedShort'), false, 'pass') : btn('pass', '⭐', t('pass.short'), true, 'pass'),
     ];
-    const price = ECONOMY.pass.priceEur.toFixed(2).replace('.', ',');
-    buttons.push(
-      state.hasPass
-        ? `<button type="button" disabled>${t('pass.owned')}</button>`
-        : `<button type="button" data-action="pass">${t('pass.buy', { price })}</button>`,
-    );
     return buttons.join('');
   }
 
@@ -175,6 +179,10 @@ export function startApp(root: HTMLElement): void {
     if (shop !== lastShop) {
       $('shop').innerHTML = shop;
       lastShop = shop;
+      const affordable = purchases(state).filter((p) => p.cost <= state.dollars).length;
+      const badge = $('shop-badge');
+      badge.hidden = affordable === 0;
+      badge.textContent = String(affordable);
     }
   }
 

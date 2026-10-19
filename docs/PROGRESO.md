@@ -2,6 +2,14 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Vista isométrica a pantalla completa
+
+- Mikel enseña una captura de un idle de serrería isométrico como referencia.
+- `src/ui/iso.ts`: proyección isométrica y bloques de tres caras. `src/ui/yard.ts`: el desguace entero en isométrico: carretera de atrás con hasta 3 camiones de chatarra, pila que se toca, cintas que reparten la chatarra, 8 puestos en dos filas (suelo del color de la zona con línea amarilla discontinua; 1-2 máquinas según las compradas, oxidadas en nivel 0, pintadas en 1, con panel y luz en 2, doradas en 3+; el ayudante hecho de bloques con su casco, gorra, barba…; palé con cajas), carretillas por los pasillos hasta el muelle, muelle con cajas, camión de expedición en la carretera de delante, camión dorado y dinero verde que salta al cobrar. Se ordena lo que está delante y detrás en cada fotograma.
+- Pantalla completa: arrastrar mueve la cámara, pellizcar o la rueda acercan; dinero arriba, botones flotantes (×2, premio diario, pase) a la derecha y «Mejoras» abajo con un contador de lo que se puede comprar, que abre un panel.
+- Qué probar: la web en el móvil: moverse por el mapa, acercar, tocar la pila y abrir las mejoras.
+- Siguiente: lo que diga Mikel del aspecto; sonidos; después Android.
+
 ## 2026-10-19 — La chatarrería en vista cenital inclinada
 
 - Mikel pide una escena más bonita: plano cenital inclinado con las líneas de cada máquina, máquinas que cambian por nivel, camiones de chatarra por detrás, carretillas dentro y camiones de expedición delante.
