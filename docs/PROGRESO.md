@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Ocho zonas con sus personajes
+
+- Mikel decide la Parte 5: Pase de chatarrero (compra única), racha de 7 días, empujón ×2 con anuncio, camión dorado con anuncio y más zonas antes de publicar.
+- `src/data/zones.json`: 4 zonas nuevas (vigas, piezas de motor, motores y coches reconstruidos) con sus ayudantes Grúa, Pistón, Bujía y Turbo; los 8 ayudantes llevan una frase de personalidad.
+- Ritmo con el jugador simulado: zona 5 a las ~18 h, zona 6 a las ~35 h, zona 7 a las ~75 h y zona 8 a las ~131 h volviendo cada hora (137 h jugando atento; 122 h cada 2 h). El ritmo de las 4 primeras no cambia.
+- Aviso: a partir de la zona 5 el freno es la chatarra (los camiones de chatarra suben de precio ×1,10 y traen siempre lo mismo); los niveles de los ayudantes ayudarán.
+- Qué probar: en la web, las zonas nuevas aparecen en la lista de compras al llegar a ellas.
+- Siguiente: la Parte 6 del diseño (ayudantes, racha, camión dorado y precio del pase); y el dibujado 3D.
+
 ## 2026-10-19 — Pantalla principal, guardado y ganancias con el juego cerrado
 
 - `src/ui/app.ts`: pantalla vertical provisional (sin 3D): dólares, pila de chatarra para tocar, zonas abiertas, muelle y lista de compras con botones de 44 px. Textos en `src/ui/texts.ts`.

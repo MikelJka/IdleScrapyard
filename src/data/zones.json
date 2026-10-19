@@ -10,7 +10,8 @@
     "upgradeCostScale": 1,
     "helper": {
       "id": "tuerca",
-      "name": "Tuerca"
+      "name": "Tuerca",
+      "bio": "Aplasta lo que sea con una sonrisa; dice que todo cabe si se aprieta lo suficiente."
     }
   },
   {
@@ -24,7 +25,8 @@
     "upgradeCostScale": 8,
     "helper": {
       "id": "chispa",
-      "name": "Chispa"
+      "name": "Chispa",
+      "bio": "Funde chatarra desde niña y no se le ha quemado ni una ceja… de las dos que le quedan."
     }
   },
   {
@@ -38,7 +40,8 @@
     "upgradeCostScale": 60,
     "helper": {
       "id": "yunque",
-      "name": "Yunque"
+      "name": "Yunque",
+      "bio": "Callado y enorme; habla a martillazos y todos le entienden."
     }
   },
   {
@@ -52,7 +55,68 @@
     "upgradeCostScale": 400,
     "helper": {
       "id": "codo",
-      "name": "Codo"
+      "name": "Codo",
+      "bio": "Fontanero de toda la vida; cualquier problema lo arregla con un tubo y cinta americana."
+    }
+  },
+  {
+    "id": "beams",
+    "name": "Taller de vigas",
+    "product": "Vigas",
+    "unitValue": 250,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 16,
+    "unlockCost": 24000000,
+    "upgradeCostScale": 2800,
+    "helper": {
+      "id": "grua",
+      "name": "Grúa",
+      "bio": "Levanta vigas con una grúa hecha de somieres y está muy orgullosa de ella."
+    }
+  },
+  {
+    "id": "engine-parts",
+    "name": "Torno de piezas de motor",
+    "product": "Piezas de motor",
+    "unitValue": 1000,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 32,
+    "unlockCost": 120000000,
+    "upgradeCostScale": 19600,
+    "helper": {
+      "id": "piston",
+      "name": "Pistón",
+      "bio": "Nervioso y rapidísimo; no para quieto ni cuando duerme."
+    }
+  },
+  {
+    "id": "engines",
+    "name": "Montaje de motores",
+    "product": "Motores",
+    "unitValue": 4000,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 64,
+    "unlockCost": 480000000,
+    "upgradeCostScale": 137200,
+    "helper": {
+      "id": "bujia",
+      "name": "Bujía",
+      "bio": "Presume de encender cualquier motor a la primera (lleva la cuenta en la pared)."
+    }
+  },
+  {
+    "id": "cars",
+    "name": "Taller de coches reconstruidos",
+    "product": "Coches reconstruidos",
+    "unitValue": 15000,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 128,
+    "unlockCost": 1440000000,
+    "upgradeCostScale": 960400,
+    "helper": {
+      "id": "turbo",
+      "name": "Turbo",
+      "bio": "Pilotaba carreras de coches de chatarra; ahora los reconstruye y los prueba a todo gas."
     }
   }
 ]

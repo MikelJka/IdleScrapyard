@@ -94,10 +94,16 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Mejoras de cada zona** (2026-10-19, con dólares): velocidad, capacidad, número de máquinas y nivel de las máquinas.
 - **Nivel de los ayudantes** (2026-10-19): la experiencia por trabajar desbloquea el siguiente nivel y se paga en dólares para subirlo.
 - **Qué mejoran los ayudantes** (2026-10-19): el valor de lo producido y la velocidad de su zona.
-- **Zonas de la primera versión** (2026-10-19): 4, industriales. Aplastado → bloques de chatarra (1 $), fundido → lingotes (4 $), chapa (15 $) y tubos (60 $). Los precios son un punto de partida y se ajustan con pruebas. Más adelante: vigas (250 $), piezas de motor (1 K $), motores (4 K $) y coches reconstruidos (15 K $).
+- **Zonas de la primera versión** (2026-10-19; ampliadas a 8 el mismo día): industriales. Aplastado → bloques de chatarra (1 $), fundido → lingotes (4 $), chapa (15 $) y tubos (60 $). Los precios son un punto de partida y se ajustan con pruebas. Ampliadas con vigas (250 $), piezas de motor (1 K $), motores (4 K $) y coches reconstruidos (15 K $).
 - **Ayudantes fijos** (2026-10-19): un personaje con nombre y personalidad por zona.
 - **Camiones** (2026-10-19): todos iguales; se mejora la carga que esperan en el muelle antes de salir.
 - **Ritmo R2** (2026-10-19): la zona 2 se abre hacia los 10 min y la zona 4 hacia las 6 h jugando atento. Lo comprueba un test con un jugador simulado (`src/sim/bot.ts`).
 - **Precios** (2026-10-19): cada mejora sube ×1,10 al comprarla.
 - **Ganancias con el juego cerrado** (2026-10-19): tope de 2 h; un «free pass» lo amplía (cómo, en la Parte 5).
 - **Ayudantes** (2026-10-19): Tuerca (aplastado), Chispa (fundido), Yunque (chapa) y Codo (tubos).
+- **Ayudantes de las zonas nuevas** (2026-10-19): Grúa (vigas), Pistón (piezas de motor), Bujía (motores) y Turbo (coches reconstruidos). Cada uno tiene una frase de personalidad en `src/data/zones.json`.
+- **Duración** (2026-10-19): con 8 zonas, abrirlo todo lleva unos 5-6 días (unas 131 h volviendo cada hora), sin contar aún los ayudantes.
+- **Pase de chatarrero** (2026-10-19): compra única que quita los anuncios y sube el tope de lo ganado fuera a 8 h.
+- **Premio diario** (2026-10-19): racha de 7 días con premio creciente.
+- **Empujón con anuncio** (2026-10-19): ×2 a la producción durante 30 min, con espera entre uno y otro.
+- **Suceso: camión dorado** (2026-10-19): aparece de vez en cuando; si se toca y se ve un anuncio, paga ×10 lo que hay en el muelle.

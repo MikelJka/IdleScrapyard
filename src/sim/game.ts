@@ -14,7 +14,7 @@ export interface ZoneDef {
   cycleSeconds: number;
   unlockCost: number;
   upgradeCostScale: number;
-  helper: { id: string; name: string };
+  helper: { id: string; name: string; bio: string };
 }
 
 export type Economy = typeof economyData;
