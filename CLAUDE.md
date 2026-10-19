@@ -6,7 +6,7 @@ Idioma: el código (nombres de variables, funciones, tipos) en inglés; comentar
 
 ## Tecnología
 
-- TypeScript estricto + Vite. Tests con Vitest. Dibujado en **3D con Three.js** y modelos gratuitos **CC0 de Kenney y Quaternius** (decidido por Mikel el 2026-10-19); lo que falte, hecho por código. **Nada de pixel art**.
+- TypeScript estricto + Vite. Tests con Vitest. Dibujado en **2D vectorial (SVG) hecho por código**, estilo dibujo animado, que tiene que ser muy bonito y atractivo (decidido por Mikel el 2026-10-19; sustituye al 3D con Three.js). Si se usan recursos gráficos de terceros, CC0 (p. ej. Kenney). **Nada de pixel art**.
 - **Política de coste cero** (orden de Mikel del 2026-10-19): no se compra nada. Solo herramientas gratuitas y recursos con licencia que permita uso comercial sin pagar (preferible CC0). Cada recurso de terceros se apunta en `docs/CREDITOS.md` con su autor, su enlace y su licencia.
 - Versión web de prueba en GitHub Pages al subir a `main` (`.github/workflows/deploy.yml`). URL: https://mikeljka.github.io/IdleScrapyard/
 - Android: más adelante, la web empaquetada con Capacitor (una tarea del roadmap). Sin backend propio.

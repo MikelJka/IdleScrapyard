@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Escena 2D del desguace
+
+- Mikel cambia el 3D por 2D muy bonito y atractivo (sin pixel art).
+- `src/ui/scene.ts`: escena SVG dibujada por código: cielo de atardecer con ruinas, pila de chatarra que se toca (crece con la chatarra y muestra «+1»), camión de chatarra que llega y vuelca, carretillas por el camino, muelle con cajas que se llenan, camión de expedición que se va y vuelve, las 8 zonas (cerradas con candado y precio; abiertas con su color, chimenea con humo, engranaje que gira, producto, barra del almacén y la cara de su ayudante con su nivel) y el camión dorado, que se toca en la propia escena.
+- `src/ui/look.ts`: colores de cada zona y rasgos de cada ayudante (casco, gafas de soldar, barba, gorra, pañuelo, pelo de punta, casco con rayo, casco de carreras), por id.
+- Tienda con tarjetas e iconos dibujados; ya no se redibuja en cada fotograma (los toques no se pierden).
+- Qué probar: la web en el móvil: tocar la pila, ver moverse camiones y carretillas, abrir la segunda zona.
+- Siguiente: sonidos y más animaciones; después Android (Capacitor, AdMob y Google Play).
+
 ## 2026-10-19 — Racha, empujón, camión dorado y pase
 
 - Mikel decide: si se falta un día, la racha vuelve al día 1.

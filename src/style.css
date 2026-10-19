@@ -12,15 +12,39 @@ html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); 
 h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .status { max-width: 320px; line-height: 1.5; }
 .build { font-size: 12px; color: var(--muted); }
-.game { max-width: 430px; margin: 0 auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-.game header { display: flex; justify-content: space-between; align-items: baseline; font-size: 28px; font-weight: 700; color: var(--rust); }
-.game header #rate { font-size: 13px; color: var(--muted); font-weight: 400; }
-#welcome { margin: 0; padding: 8px; background: #2a231a; border-radius: 8px; font-size: 14px; }
-#pile { min-height: 96px; font-size: 18px; background: var(--rust); color: #1b1712; border: 0; border-radius: 12px; font-weight: 700; }
-.row { display: flex; justify-content: space-between; padding: 8px 10px; background: #26201a; border-radius: 8px; font-size: 14px; }
-#extras, #shop { display: flex; flex-direction: column; gap: 6px; }
-#extras button, #shop button { min-height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; background: #3a2f22; color: var(--ink); border: 1px solid #5a4a36; border-radius: 8px; font-size: 14px; }
-#extras button:disabled, #shop button:disabled { opacity: 0.45; }
-#extras button { justify-content: center; text-align: center; }
-#extras .golden { background: #d9a520; color: #1b1712; font-weight: 700; border-color: #f2c94c; }
+.game { max-width: 430px; margin: 0 auto; padding: 10px 12px 24px; display: flex; flex-direction: column; gap: 10px; font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif; }
+.game header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: linear-gradient(180deg, #3a2c1f, #2a2018); border: 2px solid #4d3a28; border-radius: 16px; box-shadow: 0 3px 0 #120d09; }
+.money { display: flex; align-items: center; gap: 8px; font-size: 30px; font-weight: 900; color: #ffd76a; text-shadow: 0 2px 0 #7a4a10; }
+.coin { display: inline-flex; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1a8, #f2b705 60%, #b07d00); color: #7a4a10; font-size: 18px; text-shadow: none; border: 2px solid #7a4a10; }
+#rate { font-size: 14px; font-weight: 700; color: #b8e986; }
+#scene-wrap { border-radius: 18px; overflow: hidden; border: 3px solid #2a1d14; box-shadow: 0 4px 0 #120d09; background: #6e5236; }
+.scene { display: block; width: 100%; height: auto; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
+.tappable { cursor: pointer; }
+#pile:active #pile-body { filter: brightness(1.15); }
+#pile-hint { animation: bob 1.2s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translate(80px, 64px); } }
+.puff { animation: puff 2.4s linear infinite; transform-box: fill-box; transform-origin: center; }
+.puff.p2 { animation-delay: 0.8s; } .puff.p3 { animation-delay: 1.6s; }
+@keyframes puff { 0% { opacity: 0; transform: translateY(6px) scale(0.6); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translateY(-14px) scale(1.4); } }
+.sparkles { animation: twinkle 0.6s ease-in-out infinite alternate; }
+@keyframes twinkle { to { opacity: 0.2; } }
+.pop { font-size: 16px; font-weight: 900; fill: #fff6e0; stroke: #2a1d14; stroke-width: 3px; paint-order: stroke; animation: rise 0.9s ease-out forwards; }
+@keyframes rise { to { transform: translateY(-36px); opacity: 0; } }
+#welcome { margin: 0; padding: 10px 12px; background: #2f5d3a; border: 2px solid #4f8a5c; border-radius: 12px; font-size: 14px; font-weight: 700; }
+.game h2 { margin: 6px 4px 0; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+#extras, #shop { display: flex; flex-direction: column; gap: 8px; }
+#extras button, #shop button { min-height: 52px; display: flex; align-items: center; gap: 10px; padding: 6px 12px; color: var(--ink); background: linear-gradient(180deg, #4a3a29, #3a2d20); border: 2px solid #5f4a33; border-radius: 14px; box-shadow: 0 3px 0 #1a130d; font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+#extras button:active, #shop button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a130d; }
+#extras button { justify-content: center; text-align: center; font-weight: 700; }
+#extras button[data-action="daily"] { background: linear-gradient(180deg, #e0699a, #b8456f); border-color: #f08db5; }
+#extras button[data-action="boost"] { background: linear-gradient(180deg, #4f9ad8, #2f6fb3); border-color: #7cbcf0; }
+#extras button[data-action="pass"] { background: linear-gradient(180deg, #8d6bd1, #6447a8); border-color: #b49af0; }
+#extras button:disabled, #shop button:disabled { opacity: 0.5; cursor: default; filter: saturate(0.5); }
+#shop .icon { flex: 0 0 40px; height: 40px; background: #fff3dc; border-radius: 10px; border: 2px solid #2a1d14; }
+#shop .what { flex: 1; display: flex; flex-direction: column; line-height: 1.2; }
+#shop .what small { color: var(--muted); font-size: 12px; }
+#shop .price { padding: 6px 10px; border-radius: 10px; background: #2f5d3a; color: #d8ffcf; font-weight: 900; white-space: nowrap; }
+#shop button:disabled .price { background: #3a2d20; color: var(--muted); }
+#shop button.unlock { background: linear-gradient(180deg, #d98b2b, #a8601a); border-color: #f2b45c; }
+#shop button.helper { background: linear-gradient(180deg, #3f8f7a, #2d6156); border-color: #6cc4ad; }
 .ad-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); color: var(--ink); font-size: 20px; z-index: 10; }

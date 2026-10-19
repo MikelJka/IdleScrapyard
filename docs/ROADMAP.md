@@ -9,7 +9,7 @@ Terminado: la URL pública muestra la pantalla del juego en el móvil y en PC, l
 - [x] Proyecto Vite + TypeScript estricto + Vitest
 - [x] Publicación automática en GitHub Pages y capturas de la prueba de humo
 - [x] Estructura genérica de juego idle (`docs/DISENO.md`)
-- [x] Estilo visual decidido con Mikel (3D con Three.js y modelos CC0)
+- [x] Estilo visual decidido con Mikel (2D de dibujo animado, SVG por código)
 - [x] Diseño concreto decidido con Mikel en FEEDBACK.md (Partes 1-7)
 - [ ] Comprobar en la URL pública que se ve bien en el móvil (lo confirma Mikel)
 
@@ -21,7 +21,7 @@ Terminado: puedo tocar para ganar, comprar los primeros generadores y ver crecer
 - [x] Pantalla principal en vertical (primera versión en DOM, sin 3D todavía)
 - [x] Guardado automático
 - [x] Ganancias con el juego cerrado
-- [ ] Dibujado 3D con Three.js y modelos CC0 de la pantalla principal
+- [x] Escena 2D del desguace en la pantalla principal
 
 ## Fase 2 — Contenido de la primera versión
 
@@ -31,7 +31,7 @@ Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 - [x] Ayudantes con experiencia y niveles
 - [x] Retención: racha de 7 días, empujón ×2 y camión dorado
 - [x] Pase de chatarrero (en la web, de prueba)
-- [ ] Aspecto y sonidos (con el dibujado 3D)
+- [ ] Sonidos y más animaciones (vuelco de chatarra, monedas al cobrar)
 - [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
 - Prestigio: no en la primera versión (decidido por Mikel)
 
