@@ -12,11 +12,16 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-- **Parte 1 — Tema y monedas** (2026-10-19; el estilo visual y lo que nos diferencia ya están decididos, ver «Decidido» en DISENO.md):
-  - **Ambientación**: **O** el mundo de Óxido (páramo oxidado, chatarra, saqueadores); **L** postapocalíptico pero con tono más ligero y de humor; **P** otra que propongas tú.
-  - **Monedas**: **1** una sola principal (chatarra) + prestigio; **2** chatarra y una secundaria fabricada (metal) + prestigio; **3** chatarra, metal y componentes + prestigio.
-  - **Prestigio desde la primera versión**: **S** sí; **N** en una actualización posterior.
+- **Parte 2 — Cómo funciona la cadena** (2026-10-19; la Parte 1 ya está en «Decidido» de DISENO.md):
+  - **De dónde sale la chatarra**: **A** el jugador toca la pila para recogerla y luego compra camiones que la traen solos; **B** llega sola desde el principio a un ritmo que se mejora con dólares; **C** se compra con dólares a un precio que va subiendo.
+  - **Cómo se encadenan las zonas**: **E** en cadena: cada zona usa lo que hace la anterior (chatarra → bloques → lingotes…); **P** en paralelo: cada zona transforma chatarra directamente y vale más; **M** mezcla: las primeras en paralelo y las avanzadas en cadena.
+  - **Expedición**: **X** automática y continua (lo terminado se vende al momento); **T** un camión de expedición que sale cada pocos segundos con una capacidad que se mejora; **K** el jugador toca «Expedir» y, más adelante, un ayudante lo automatiza.
+  - **Mejoras de cada zona (con dólares)**: **1** solo velocidad; **2** velocidad y capacidad; **3** velocidad, capacidad y número de máquinas.
+  - **Cómo sube de nivel un ayudante**: **D** pagando dólares; **H** con experiencia por trabajar (sube solo con el tiempo); **DH** las dos cosas (la experiencia desbloquea el nivel y se paga para subirlo).
+  - **Qué mejora un ayudante** (además de que lo producido valga más): **V** solo el valor; **R** valor y velocidad; **Z** cada ayudante una cosa distinta según su rasgo (valor, velocidad, capacidad, ganancias con el juego cerrado…).
 
-Las siguientes partes, cuando respondas a esta: los ayudantes (cómo se consiguen, qué rasgos hay y cómo suben de nivel), generadores y su progresión, anuncios y compras, y retención (premio diario, sucesos).
+Las siguientes partes, cuando respondas a esta: la lista de zonas (nombres, productos y precios), retención (premio diario, sucesos) y anuncios y compras.
 
 ## Hecho
+
+- [x] **Parte 1 del diseño — tema y monedas** (2026-10-19): decidido por Mikel; resumido en «Decidido» de DISENO.md.

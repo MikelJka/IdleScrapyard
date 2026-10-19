@@ -83,3 +83,8 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 
 - **Estilo visual** (2026-10-19): 3D de dibujo animado (low-poly) con Three.js y modelos gratuitos CC0 de Kenney y Quaternius; lo que falte, hecho por código. Nada de pixel art; coste cero.
 - **Lo que nos diferencia** (2026-10-19): **ayudantes con nombre y rasgos que suben de nivel**. Cómo se consiguen, qué rasgos hay y cómo suben se decide en una parte posterior del diseño.
+- **Ambientación** (2026-10-19): postapocalíptico con tono ligero y de humor.
+- **Moneda y recurso** (2026-10-19): una sola moneda, el **dólar**, con la que se compran todas las mejoras. La **chatarra** es el único recurso de entrada. Todo lo fabricado se convierte en dólares al expedirlo.
+- **Zonas** (2026-10-19): se desbloquean con dólares y cada una transforma la chatarra en un producto de más valor (p. ej. aplastado de chatarra → bloques de chatarra, 1 $; fundido de chatarra → lingotes de chatarra, 4 $…).
+- **Ayudantes** (2026-10-19): uno nuevo por cada zona desbloqueada. Según su nivel dan mejoras, por ejemplo que lo producido valga más dinero.
+- **Prestigio** (2026-10-19): no en la primera versión; en una actualización posterior.

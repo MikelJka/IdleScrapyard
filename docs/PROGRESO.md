@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Decidida la Parte 1 del diseño
+
+- Esqueleto subido a `main` y publicado («Probar y publicar» correcto).
+- Mikel decide: tono ligero y de humor; el dólar como única moneda y la chatarra como único recurso; zonas que se desbloquean con dólares, cada una con su ayudante que da mejoras según su nivel; sin prestigio en la primera versión. Resumido en «Decidido» de DISENO.md.
+- Qué probar: nada nuevo en el juego.
+- Siguiente: la Parte 2 del diseño (de dónde sale la chatarra, cadena de zonas, expedición, mejoras y ayudantes) en FEEDBACK.md.
+
 ## 2026-10-19 — Nace Chatarrero, el primer juego de Zenit Studio
 
 - Mikel crea Zenit Studio (repositorio `IdleScrapyard`) y elige empezar por un juego incremental (idle) para Android.
