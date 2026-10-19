@@ -45,5 +45,30 @@
     "speedPerLevel": 0.05,
     "baseCost": 100,
     "costGrowth": 1.5
+  },
+  "pass": {
+    "offlineCapSeconds": 28800,
+    "priceEur": 2.99
+  },
+  "boost": {
+    "multiplier": 2,
+    "seconds": 1800,
+    "cooldownSeconds": 1800
+  },
+  "goldenTruck": {
+    "everySeconds": 900,
+    "visibleSeconds": 20,
+    "dockMultiplier": 10
+  },
+  "dailyStreak": {
+    "rewardMinutes": [
+      10,
+      20,
+      30,
+      45,
+      60,
+      90,
+      120
+    ]
   }
 }

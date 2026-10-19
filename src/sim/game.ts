@@ -55,6 +55,17 @@ export interface GameState {
   /** Segundos que faltan para que llegue el siguiente camión de expedición. */
   truckCooldown: number;
   zones: Record<string, ZoneState>;
+  /** Pase de chatarrero comprado: sin anuncios y tope de ganancias fuera más alto. */
+  hasPass: boolean;
+  /** Segundos que le quedan al empujón ×2 y a la espera para el siguiente. */
+  boostSeconds: number;
+  boostCooldown: number;
+  /** Segundos hasta que llegue el camión dorado y segundos que le quedan a la vista. */
+  goldenTimer: number;
+  goldenVisible: number;
+  /** Último día de la racha cobrado (1-7, 0 sin racha) y número del día en que se cobró (-1 nunca). */
+  streakDay: number;
+  lastClaimDay: number;
 }
 
 export function newGame(): GameState {
@@ -84,6 +95,13 @@ export function newGame(): GameState {
     dockValue: 0,
     truckCooldown: 0,
     zones,
+    hasPass: false,
+    boostSeconds: 0,
+    boostCooldown: 0,
+    goldenTimer: ECONOMY.goldenTruck.everySeconds,
+    goldenVisible: 0,
+    streakDay: 0,
+    lastClaimDay: -1,
   };
 }
 
@@ -133,8 +151,89 @@ export function tap(state: GameState): void {
   state.scrap += ECONOMY.tap.scrap;
 }
 
+/** Dólares por segundo a ritmo estable: la chatarra va a la zona que más paga, limitada por carretillas y muelle. Sin empujón. */
+export function incomePerSecond(state: GameState, tapsPerSecond = 0): number {
+  let scrap = scrapPerSecond(state) + tapsPerSecond * ECONOMY.tap.scrap;
+  let carry = Math.min(state.carts * ECONOMY.carts.unitsPerSecond, dockLoad(state) / ECONOMY.dock.returnSeconds);
+  let income = 0;
+  for (const def of ZONES_BY_PROFIT) {
+    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry);
+    scrap -= units * def.scrapPerUnit;
+    carry -= units;
+    income += units * unitValue(def, state.zones[def.id]);
+  }
+  return income;
+}
+
+/** Tope de lo ganado con el juego cerrado (más alto con el pase). */
+export function offlineCapSeconds(state: GameState): number {
+  return state.hasPass ? ECONOMY.pass.offlineCapSeconds : ECONOMY.offlineCapSeconds;
+}
+
+/** Se puede activar el empujón ×2 (tras ver el anuncio, o directamente con el pase). */
+export function canBoost(state: GameState): boolean {
+  return state.boostSeconds === 0 && state.boostCooldown === 0;
+}
+
+export function activateBoost(state: GameState): boolean {
+  if (!canBoost(state)) return false;
+  state.boostSeconds = ECONOMY.boost.seconds;
+  return true;
+}
+
+/** Cobra el camión dorado si está a la vista: paga ×10 lo que hay en el muelle y lo vacía. Devuelve lo cobrado. */
+export function claimGoldenTruck(state: GameState): number {
+  if (state.goldenVisible === 0) return 0;
+  const value = state.dockValue * ECONOMY.goldenTruck.dockMultiplier;
+  state.dollars += value;
+  state.totalEarned += value;
+  state.dockUnits = 0;
+  state.dockValue = 0;
+  state.goldenVisible = 0;
+  return value;
+}
+
+/** Día de la racha que se cobraría hoy (`today` = número de día local), o 0 si ya se cobró hoy. Si se falta un día, vuelve al 1. */
+export function streakDayFor(state: GameState, today: number): number {
+  if (state.lastClaimDay === today) return 0;
+  const days = ECONOMY.dailyStreak.rewardMinutes.length;
+  return state.lastClaimDay === today - 1 ? (state.streakDay % days) + 1 : 1;
+}
+
+/** Dólares del premio diario de hoy: minutos de producción según el día de la racha. */
+export function dailyReward(state: GameState, today: number): number {
+  const day = streakDayFor(state, today);
+  if (day === 0) return 0;
+  return ECONOMY.dailyStreak.rewardMinutes[day - 1] * 60 * incomePerSecond(state);
+}
+
+export function claimDaily(state: GameState, today: number): number {
+  const day = streakDayFor(state, today);
+  if (day === 0) return 0;
+  const value = dailyReward(state, today);
+  // Sin producción todavía (al empezar) el premio sería 0: no se gasta el día de la racha.
+  if (value <= 0) return 0;
+  state.dollars += value;
+  state.totalEarned += value;
+  state.streakDay = day;
+  state.lastClaimDay = today;
+  return value;
+}
+
 function step(state: GameState, dt: number): void {
   state.time += dt;
+  if (state.boostSeconds > 0) {
+    state.boostSeconds = Math.max(0, state.boostSeconds - dt);
+    if (state.boostSeconds === 0) state.boostCooldown = ECONOMY.boost.cooldownSeconds;
+  } else {
+    state.boostCooldown = Math.max(0, state.boostCooldown - dt);
+  }
+  state.goldenVisible = Math.max(0, state.goldenVisible - dt);
+  state.goldenTimer -= dt;
+  if (state.goldenTimer <= 0) {
+    state.goldenTimer += ECONOMY.goldenTruck.everySeconds;
+    state.goldenVisible = ECONOMY.goldenTruck.visibleSeconds;
+  }
   state.scrap += scrapPerSecond(state) * dt;
 
   for (const def of ZONES_BY_PROFIT) {
@@ -168,8 +267,10 @@ function step(state: GameState, dt: number): void {
     const value = (state.dockValue * load) / state.dockUnits;
     state.dockUnits -= load;
     state.dockValue -= value;
-    state.dollars += value;
-    state.totalEarned += value;
+    // El empujón dobla lo que pagan los camiones de expedición.
+    const paid = value * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+    state.dollars += paid;
+    state.totalEarned += paid;
     state.truckCooldown = ECONOMY.dock.returnSeconds;
   }
 }

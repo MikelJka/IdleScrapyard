@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Racha, empujón, camión dorado y pase
+
+- Mikel decide: si se falta un día, la racha vuelve al día 1.
+- `src/sim/game.ts`: racha de 7 días (10, 20, 30, 45, 60, 90 y 120 min de producción; sin producción no se cobra ni se gasta el día), empujón ×2 a lo que pagan los camiones durante 30 min, camión dorado cada 15 min que espera 20 s y paga ×10 lo del muelle, y Pase de chatarrero (tope fuera de 8 h). Números en `src/data/economy.json`. Tests en `tests/extras.test.ts`.
+- `src/ui/ads.ts`: anuncios y compra de prueba en la web (aviso de 2 s y confirmación); con el pase, las recompensas se dan sin anuncio.
+- Provisional: la espera de 30 min entre empujones y los días 2-6 de la racha (entre 10 min y 2 h).
+- Qué probar: cobrar el premio diario, activar el ×2, tocar el camión dorado cuando salga y activar el pase de prueba.
+- Siguiente: el dibujado 3D con Three.js y modelos CC0; después Android (Capacitor, AdMob y Google Play).
+
 ## 2026-10-19 — Los ayudantes suben de nivel
 
 - Mikel decide la Parte 6: un nivel de ayudante cada hora de trabajo, +10 % de valor y +5 % de velocidad por nivel, máximo 25, racha de 10 min a 2 h de producción, camión dorado cada ~15 min y pase a 2,99 €.

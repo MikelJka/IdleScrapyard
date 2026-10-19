@@ -18,6 +18,9 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #welcome { margin: 0; padding: 8px; background: #2a231a; border-radius: 8px; font-size: 14px; }
 #pile { min-height: 96px; font-size: 18px; background: var(--rust); color: #1b1712; border: 0; border-radius: 12px; font-weight: 700; }
 .row { display: flex; justify-content: space-between; padding: 8px 10px; background: #26201a; border-radius: 8px; font-size: 14px; }
-#shop { display: flex; flex-direction: column; gap: 6px; }
-#shop button { min-height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; background: #3a2f22; color: var(--ink); border: 1px solid #5a4a36; border-radius: 8px; font-size: 14px; }
-#shop button:disabled { opacity: 0.45; }
+#extras, #shop { display: flex; flex-direction: column; gap: 6px; }
+#extras button, #shop button { min-height: 44px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; background: #3a2f22; color: var(--ink); border: 1px solid #5a4a36; border-radius: 8px; font-size: 14px; }
+#extras button:disabled, #shop button:disabled { opacity: 0.45; }
+#extras button { justify-content: center; text-align: center; }
+#extras .golden { background: #d9a520; color: #1b1712; font-weight: 700; border-color: #f2c94c; }
+.ad-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); color: var(--ink); font-size: 20px; z-index: 10; }

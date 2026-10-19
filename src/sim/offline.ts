@@ -2,7 +2,7 @@
  * Guardado con marca de tiempo y ganancias con el juego cerrado.
  * El reloj entra como parámetro (milisegundos) para poder probarlo.
  */
-import { ECONOMY, advance, load, newGame, serialize, type GameState } from './game';
+import { advance, offlineCapSeconds, load, newGame, serialize, type GameState } from './game';
 
 export interface OfflineResult {
   state: GameState;
@@ -19,7 +19,7 @@ export function pack(state: GameState, nowMs: number): string {
   return JSON.stringify({ savedAt: nowMs, state: JSON.parse(serialize(state)) });
 }
 
-/** Lee una partida guardada y simula el tiempo pasado, con el tope de `offlineCapSeconds`. Sin datos, partida nueva. */
+/** Lee una partida guardada y simula el tiempo pasado, con el tope de `offlineCapSeconds` (más alto con el pase). Sin datos, partida nueva. */
 export function unpack(json: string | null, nowMs: number): OfflineResult {
   if (!json) return { state: newGame(), simulatedSeconds: 0, awaySeconds: 0, dollarsEarned: 0 };
   let parsed: { savedAt?: number; state?: unknown };
@@ -31,7 +31,7 @@ export function unpack(json: string | null, nowMs: number): OfflineResult {
   const state = load(JSON.stringify(parsed.state ?? {}));
   const savedAt = typeof parsed.savedAt === 'number' ? parsed.savedAt : nowMs;
   const awaySeconds = Math.max(0, (nowMs - savedAt) / 1000);
-  const simulatedSeconds = Math.min(awaySeconds, ECONOMY.offlineCapSeconds);
+  const simulatedSeconds = Math.min(awaySeconds, offlineCapSeconds(state));
   const before = state.dollars;
   advance(state, simulatedSeconds);
   return { state, simulatedSeconds, awaySeconds, dollarsEarned: state.dollars - before };

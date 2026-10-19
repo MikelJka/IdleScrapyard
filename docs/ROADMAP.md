@@ -10,7 +10,7 @@ Terminado: la URL pública muestra la pantalla del juego en el móvil y en PC, l
 - [x] Publicación automática en GitHub Pages y capturas de la prueba de humo
 - [x] Estructura genérica de juego idle (`docs/DISENO.md`)
 - [x] Estilo visual decidido con Mikel (3D con Three.js y modelos CC0)
-- [ ] Diseño concreto decidido con Mikel en FEEDBACK.md (Partes 1-4 hechas)
+- [x] Diseño concreto decidido con Mikel en FEEDBACK.md (Partes 1-7)
 - [ ] Comprobar en la URL pública que se ve bien en el móvil (lo confirma Mikel)
 
 ## Fase 1 — Bucle básico
@@ -27,17 +27,21 @@ Terminado: puedo tocar para ganar, comprar los primeros generadores y ver crecer
 
 Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 
-- [ ] Generadores, mejoras e hitos decididos
-- [ ] Retención decidida (premio diario, sucesos…)
-- [ ] Prestigio, si se decide para la primera versión
-- [ ] Aspecto y sonidos
+- [x] Ocho zonas con sus productos y mejoras
+- [x] Ayudantes con experiencia y niveles
+- [x] Retención: racha de 7 días, empujón ×2 y camión dorado
+- [x] Pase de chatarrero (en la web, de prueba)
+- [ ] Aspecto y sonidos (con el dibujado 3D)
+- [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
+- Prestigio: no en la primera versión (decidido por Mikel)
 
 ## Fase 3 — Android y monetización
 
 Terminado: el juego está en la prueba cerrada de Google Play con anuncios de prueba funcionando.
 
 - [ ] Empaquetar con Capacitor y generar el archivo para Google Play en GitHub Actions
-- [ ] Anuncios y compras decididos (AdMob y Google Play)
+- [x] Anuncios y compras decididos (empujón, camión dorado, pase a 2,99 €)
+- [ ] Anuncios reales con AdMob y compra del pase con Google Play Billing
 - [ ] Consentimiento de anuncios (UE) y política de privacidad
 - [ ] Textos en inglés
 - [ ] Ficha de la tienda: textos, icono y capturas

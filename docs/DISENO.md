@@ -109,6 +109,6 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Suceso: camión dorado** (2026-10-19): aparece de vez en cuando; si se toca y se ve un anuncio, paga ×10 lo que hay en el muelle.
 - **Experiencia de los ayudantes** (2026-10-19): cada hora de trabajo de su zona desbloquea un nivel nuevo, que se paga en dólares.
 - **Mejora por nivel** (2026-10-19): +10 % al valor de lo producido y +5 % a la velocidad de su zona; nivel máximo 25.
-- **Racha de 7 días** (2026-10-19): el día 1 da 10 min de producción y sube hasta 2 h el día 7.
+- **Racha de 7 días** (2026-10-19): el día 1 da 10 min de producción y sube hasta 2 h el día 7 (10, 20, 30, 45, 60, 90 y 120 min). Si se falta un día, vuelve al día 1.
 - **Camión dorado** (2026-10-19): aparece cada ~15 min y espera 20 s a que lo toques.
 - **Precio del Pase de chatarrero** (2026-10-19): 2,99 €, pago único.

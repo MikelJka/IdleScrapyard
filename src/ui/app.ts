@@ -1,5 +1,23 @@
 // Pantalla principal en vertical (provisional, sin 3D todavía). Solo lee el estado y llama a la simulación.
-import { ECONOMY, ZONES, advance, buy, dockLoad, purchases, scrapPerSecond, tap, zoneCapacity, type GameState } from '../sim/game';
+import {
+  ECONOMY,
+  ZONES,
+  activateBoost,
+  advance,
+  buy,
+  canBoost,
+  claimDaily,
+  claimGoldenTruck,
+  dailyReward,
+  dockLoad,
+  purchases,
+  scrapPerSecond,
+  streakDayFor,
+  tap,
+  zoneCapacity,
+  type GameState,
+} from '../sim/game';
+import { buyPass, showRewardedAd } from './ads';
 import { pack, unpack } from '../sim/offline';
 import { t } from './texts';
 
@@ -15,6 +33,12 @@ function fmt(n: number): string {
     i++;
   }
   return n.toFixed(n < 10 ? 2 : 1) + units[i];
+}
+
+/** Número del día según la hora local (para la racha). */
+function localDay(): number {
+  const now = new Date();
+  return Math.floor((now.getTime() - now.getTimezoneOffset() * 60_000) / 86_400_000);
 }
 
 function readSave(): string | null {
@@ -41,6 +65,7 @@ export function startApp(root: HTMLElement): void {
       <header><span id="dollars"></span><span id="rate"></span></header>
       <p id="welcome" hidden></p>
       <button id="pile" type="button"></button>
+      <section id="extras"></section>
       <section id="zones"></section>
       <section id="dock"></section>
       <section id="shop"></section>
@@ -57,7 +82,57 @@ export function startApp(root: HTMLElement): void {
     if (id) buy(state, id);
   });
 
+  // Con el pase, las recompensas se dan sin anuncio.
+  const rewarded = async (): Promise<boolean> => state.hasPass || (await showRewardedAd());
+  let busy = false;
+  $('extras').addEventListener('click', async (e) => {
+    const action = (e.target as HTMLElement).closest<HTMLElement>('button[data-action]')?.dataset.action;
+    if (!action || busy) return;
+    busy = true;
+    try {
+      if (action === 'daily') claimDaily(state, localDay());
+      if (action === 'boost' && canBoost(state) && (await rewarded())) activateBoost(state);
+      if (action === 'golden' && state.goldenVisible > 0 && (await rewarded())) claimGoldenTruck(state);
+      if (action === 'pass' && !state.hasPass && (await buyPass(ECONOMY.pass.priceEur))) state.hasPass = true;
+      writeSave(state);
+    } finally {
+      busy = false;
+    }
+  });
+
+  function renderExtras(): string {
+    const today = localDay();
+    const day = streakDayFor(state, today);
+    const nextDay = (state.streakDay % ECONOMY.dailyStreak.rewardMinutes.length) + 1;
+    const buttons = [
+      day > 0
+        ? `<button type="button" data-action="daily" ${dailyReward(state, today) > 0 ? '' : 'disabled'}>${t('daily.claim', { day })}</button>`
+        : `<button type="button" disabled>${t('daily.done', { day: nextDay })}</button>`,
+      state.boostSeconds > 0
+        ? `<button type="button" disabled>${t('boost.active', { minutes: Math.ceil(state.boostSeconds / 60) })}</button>`
+        : canBoost(state)
+          ? `<button type="button" data-action="boost">${t('boost.ready')}</button>`
+          : `<button type="button" disabled>${t('boost.wait', { minutes: Math.ceil(state.boostCooldown / 60) })}</button>`,
+    ];
+    if (state.goldenVisible > 0)
+      buttons.unshift(`<button type="button" class="golden" data-action="golden">${t('golden.claim', { seconds: Math.ceil(state.goldenVisible) })}</button>`);
+    const price = ECONOMY.pass.priceEur.toFixed(2).replace('.', ',');
+    buttons.push(
+      state.hasPass
+        ? `<button type="button" disabled>${t('pass.owned')}</button>`
+        : `<button type="button" data-action="pass">${t('pass.buy', { price })}</button>`,
+    );
+    return buttons.join('');
+  }
+
+  let lastExtras = '';
   function render(): void {
+    // Los botones de extras solo se redibujan si cambian, para no perder el toque.
+    const extras = renderExtras();
+    if (extras !== lastExtras) {
+      $('extras').innerHTML = extras;
+      lastExtras = extras;
+    }
     $('dollars').textContent = '$' + fmt(state.dollars);
     $('rate').textContent = t('scrapRate', { n: fmt(scrapPerSecond(state)) });
     $('pile').textContent = t('pile', { scrap: fmt(state.scrap), gain: ECONOMY.tap.scrap });

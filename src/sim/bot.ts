@@ -2,7 +2,7 @@
  * Jugador simulado para probar el ritmo: toca la pila mientras juega activo y
  * compra lo que más dólares por segundo añade por dólar gastado; abre cada zona en cuanto puede.
  */
-import { ECONOMY, ZONES, advance, buy, dockLoad, purchases, scrapPerSecond, tap, unitValue, zoneRate, type GameState, type Purchase } from './game';
+import { ECONOMY, ZONES, advance, buy, dockLoad, incomePerSecond, purchases, scrapPerSecond, tap, type GameState, type Purchase } from './game';
 
 export interface BotOptions {
   /** Toques por segundo mientras juega activo. */
@@ -17,20 +17,8 @@ export interface BotOptions {
 
 export const DEFAULT_BOT: BotOptions = { tapsPerSecond: 2, activeSeconds: 600, checkEverySeconds: 1 };
 
-/** Dólares por segundo a ritmo estable: la chatarra va a la zona que más paga, limitada por carretillas y muelle. */
-export function steadyIncome(state: GameState, tapsPerSecond = 0): number {
-  let scrap = scrapPerSecond(state) + tapsPerSecond * ECONOMY.tap.scrap;
-  let carry = Math.min(state.carts * ECONOMY.carts.unitsPerSecond, dockLoad(state) / ECONOMY.dock.returnSeconds);
-  let income = 0;
-  const byProfit = [...ZONES].sort((a, b) => b.unitValue / b.scrapPerUnit - a.unitValue / a.scrapPerUnit);
-  for (const def of byProfit) {
-    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry);
-    scrap -= units * def.scrapPerUnit;
-    carry -= units;
-    income += units * unitValue(def, state.zones[def.id]);
-  }
-  return income;
-}
+/** Dólares por segundo a ritmo estable (ver `incomePerSecond`). */
+export const steadyIncome = incomePerSecond;
 
 function score(state: GameState, p: Purchase, taps: number): number {
   const after = structuredClone(state);
