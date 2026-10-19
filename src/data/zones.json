@@ -1,0 +1,58 @@
+[
+  {
+    "id": "crusher",
+    "name": "Aplastado de chatarra",
+    "product": "Bloques de chatarra",
+    "unitValue": 1,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 1,
+    "unlockCost": 0,
+    "upgradeCostScale": 1,
+    "helper": {
+      "id": "tuerca",
+      "name": "Tuerca"
+    }
+  },
+  {
+    "id": "smelter",
+    "name": "Fundido de chatarra",
+    "product": "Lingotes de chatarra",
+    "unitValue": 4,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 2,
+    "unlockCost": 1000,
+    "upgradeCostScale": 8,
+    "helper": {
+      "id": "chispa",
+      "name": "Chispa"
+    }
+  },
+  {
+    "id": "sheet",
+    "name": "Laminado de chapa",
+    "product": "Chapa",
+    "unitValue": 15,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 4,
+    "unlockCost": 60000,
+    "upgradeCostScale": 60,
+    "helper": {
+      "id": "yunque",
+      "name": "Yunque"
+    }
+  },
+  {
+    "id": "pipes",
+    "name": "Taller de tubos",
+    "product": "Tubos",
+    "unitValue": 60,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 8,
+    "unlockCost": 3000000,
+    "upgradeCostScale": 400,
+    "helper": {
+      "id": "codo",
+      "name": "Codo"
+    }
+  }
+]

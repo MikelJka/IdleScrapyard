@@ -10,14 +10,14 @@ Terminado: la URL pública muestra la pantalla del juego en el móvil y en PC, l
 - [x] Publicación automática en GitHub Pages y capturas de la prueba de humo
 - [x] Estructura genérica de juego idle (`docs/DISENO.md`)
 - [x] Estilo visual decidido con Mikel (3D con Three.js y modelos CC0)
-- [ ] Diseño concreto decidido con Mikel en FEEDBACK.md
+- [ ] Diseño concreto decidido con Mikel en FEEDBACK.md (Partes 1-4 hechas)
 - [ ] Comprobar en la URL pública que se ve bien en el móvil (lo confirma Mikel)
 
 ## Fase 1 — Bucle básico
 
 Terminado: puedo tocar para ganar, comprar los primeros generadores y ver crecer la moneda; la partida se guarda.
 
-- [ ] Simulación: monedas, generadores con curva de precios y producción por segundo
+- [x] Simulación: chatarra, zonas, carretillas, muelle, camiones, mejoras y dólares
 - [ ] Pantalla principal en vertical
 - [ ] Guardado automático
 - [ ] Ganancias con el juego cerrado

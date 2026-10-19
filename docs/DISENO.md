@@ -97,3 +97,7 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Zonas de la primera versión** (2026-10-19): 4, industriales. Aplastado → bloques de chatarra (1 $), fundido → lingotes (4 $), chapa (15 $) y tubos (60 $). Los precios son un punto de partida y se ajustan con pruebas. Más adelante: vigas (250 $), piezas de motor (1 K $), motores (4 K $) y coches reconstruidos (15 K $).
 - **Ayudantes fijos** (2026-10-19): un personaje con nombre y personalidad por zona.
 - **Camiones** (2026-10-19): todos iguales; se mejora la carga que esperan en el muelle antes de salir.
+- **Ritmo R2** (2026-10-19): la zona 2 se abre hacia los 10 min y la zona 4 hacia las 6 h jugando atento. Lo comprueba un test con un jugador simulado (`src/sim/bot.ts`).
+- **Precios** (2026-10-19): cada mejora sube ×1,10 al comprarla.
+- **Ganancias con el juego cerrado** (2026-10-19): tope de 2 h; un «free pass» lo amplía (cómo, en la Parte 5).
+- **Ayudantes** (2026-10-19): Tuerca (aplastado), Chispa (fundido), Yunque (chapa) y Codo (tubos).
