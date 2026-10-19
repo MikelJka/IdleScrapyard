@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — La chatarrería en vista cenital inclinada
+
+- Mikel pide una escena más bonita: plano cenital inclinado con las líneas de cada máquina, máquinas que cambian por nivel, camiones de chatarra por detrás, carretillas dentro y camiones de expedición delante.
+- `src/ui/scene.ts` rehecha: carretera trasera con hasta 3 camiones de chatarra que vuelcan en la pila; tolva y cinta central que reparte la chatarra; 8 líneas en dos columnas, cada una con su suelo de color, su cinta con chatarra avanzando, su máquina (oxidada en nivel 0, pintada con franjas en nivel 1, con luces y ventana en nivel 2, con remates dorados y estrella en nivel 3 o más; «×N» con varias máquinas), su ayudante (se mueve al trabajar) y el palé con el producto; carretillas por los pasillos laterales entre los palés y el muelle; muelle de carga con cajas y camión de expedición que se va por la carretera delantera; camión dorado delante.
+- Qué probar: la web en el móvil; subir el nivel de máquina del aplastado y ver cómo cambia.
+- Siguiente: sonidos, monedas al cobrar y pulir; después Android.
+
 ## 2026-10-19 — Escena 2D del desguace
 
 - Mikel cambia el 3D por 2D muy bonito y atractivo (sin pixel art).

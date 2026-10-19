@@ -4,7 +4,7 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 ## Pendiente
 
-- [ ] **Estilo visual: 2D muy bonito y atractivo** (2026-10-19, Mikel cambia el 3D por 2D: «no aporta nada ver esto desde diferentes ángulos»): escena del desguace en SVG dibujada por código, estilo dibujo animado. **Hecha la primera parte** (escena con pila, camiones, carretillas, muelle, las 8 zonas con sus ayudantes y camión dorado; tienda con iconos). Falta: sonidos, más animaciones (vuelco de chatarra, monedas al cobrar) y pulir.
+- [ ] **Estilo visual: 2D muy bonito y atractivo** (2026-10-19, Mikel cambia el 3D por 2D: «no aporta nada ver esto desde diferentes ángulos»): escena del desguace en SVG dibujada por código, estilo dibujo animado. **Hecha la escena en vista cenital inclinada** (2026-10-19, como pidió Mikel: líneas con cada máquina, aspecto por nivel, camiones de chatarra detrás, carretillas dentro y camiones de expedición delante; tienda con iconos). Falta: sonidos, más animaciones (vuelco de chatarra, monedas al cobrar) y pulir.
 
 - [ ] **Base del proyecto** (2026-10-19, aprobado por Mikel al crear Zenit Studio): esqueleto con Vite + TypeScript + Vitest, publicación de la versión web en GitHub Pages y capturas automáticas para STONKS. **Hecho el esqueleto**; falta comprobar que la web publicada se ve en el móvil.
 
