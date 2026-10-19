@@ -84,3 +84,25 @@ export const FORKLIFT = `<g>
   <circle cx="-5" cy="-1" r="3" fill="#2a1d14"/><circle cx="3" cy="-1" r="3" fill="#2a1d14"/>
 </g>`;
 
+
+/** Iconos de la interfaz (botones, extras, logros): trazo redondeado y relleno propio, sin emojis. */
+export type UiIconName = 'sound' | 'muted' | 'trophy' | 'gear' | 'tv' | 'timer' | 'hourglass' | 'gift' | 'star' | 'medal' | 'lock';
+
+const UI_ICON_PATHS: Record<UiIconName, string> = {
+  sound: `<path d="M3 9 H7 L12 4 V20 L7 15 H3Z" fill="#f2c14e"/><path d="M15.5 8.5 Q18 12 15.5 15.5 M18 6 Q22 12 18 18"/>`,
+  muted: `<path d="M3 9 H7 L12 4 V20 L7 15 H3Z" fill="#9a8a78"/><path d="M16 9 L22 15 M22 9 L16 15"/>`,
+  trophy: `<path d="M7 4 H17 V10 Q17 15 12 15 Q7 15 7 10Z" fill="#f2c14e"/><path d="M7 6 H4 Q4 11 8 11 M17 6 H20 Q20 11 16 11 M12 15 V19 M8 20 H16"/>`,
+  gear: `<circle cx="12" cy="12" r="4" fill="#d8cdbd"/><path d="M12 2.5 V5.5 M12 18.5 V21.5 M2.5 12 H5.5 M18.5 12 H21.5 M5.3 5.3 L7.4 7.4 M16.6 16.6 L18.7 18.7 M18.7 5.3 L16.6 7.4 M7.4 16.6 L5.3 18.7"/>`,
+  tv: `<rect x="3" y="6" width="18" height="12" rx="2.5" fill="#8fc4e8"/><path d="M9 3 L12 6 L15 3 M10.5 9.5 L14.5 12 L10.5 14.5Z" fill="#fff"/>`,
+  timer: `<circle cx="12" cy="13" r="8" fill="#ffd27a"/><path d="M12 8.5 V13 L15 15 M9.5 2.5 H14.5"/>`,
+  hourglass: `<path d="M6 3 H18 M6 21 H18 M7 3 Q7 11 12 12 Q7 13 7 21 M17 3 Q17 11 12 12 Q17 13 17 21" fill="#e6d3a8"/>`,
+  gift: `<rect x="4" y="10" width="16" height="11" rx="1.5" fill="#e8685a"/><rect x="3" y="7" width="18" height="4" rx="1" fill="#f08c80"/><path d="M12 7 V21 M12 7 Q8 2 7 5 Q7 7 12 7 Q17 7 17 5 Q16 2 12 7"/>`,
+  star: `<path d="M12 3 L14.8 9 L21 9.7 L16.4 14 L17.7 20.5 L12 17.2 L6.3 20.5 L7.6 14 L3 9.7 L9.2 9Z" fill="#ffd54a"/>`,
+  medal: `<circle cx="12" cy="14" r="6" fill="#f2c14e"/><path d="M8 3 L11 9 M16 3 L13 9 M12 11.5 L12.8 13.3 L14.7 13.5 L13.3 14.8 L13.7 16.7 L12 15.7 L10.3 16.7 L10.7 14.8 L9.3 13.5 L11.2 13.3Z"/>`,
+  lock: `<rect x="5" y="11" width="14" height="10" rx="2" fill="#9a8a78"/><path d="M8 11 V8 Q8 3.5 12 3.5 Q16 3.5 16 8 V11"/>`,
+};
+
+/** Icono de interfaz en SVG en línea (hereda el tamaño del texto). */
+export function uiIcon(name: UiIconName, size = '1.2em'): string {
+  return `<svg class="uiicon" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="#2a1d14" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI_ICON_PATHS[name]}</svg>`;
+}

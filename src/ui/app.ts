@@ -28,7 +28,7 @@ import {
   type GameState,
 } from '../sim/game';
 import { HELPER_LOOKS } from './look';
-import { FORKLIFT, helperFace, productIcon, truck } from './icons';
+import { FORKLIFT, helperFace, productIcon, truck, uiIcon } from './icons';
 import { createYard, machineGrade } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/offline';
@@ -91,8 +91,8 @@ export function startApp(root: HTMLElement): void {
         <div class="money"><span class="coin">$</span><span id="dollars"></span></div>
         <span id="rate"></span>
         <button id="mute" type="button"></button>
-        <button id="ranking-btn" type="button" aria-label="${t('ranking.title')}">🏆</button>
-        <button id="settings" type="button" aria-label="${t('settings.title')}">⚙️</button>
+        <button id="ranking-btn" type="button" aria-label="${t('ranking.title')}">${uiIcon('trophy', '26px')}</button>
+        <button id="settings" type="button" aria-label="${t('settings.title')}">${uiIcon('gear', '26px')}</button>
       </header>
       <div id="stats"></div>
       <div id="toast" hidden></div>
@@ -201,7 +201,7 @@ export function startApp(root: HTMLElement): void {
   });
   const mute = $('mute');
   const showMute = () => {
-    mute.textContent = isMuted() ? '🔇' : '🔊';
+    mute.innerHTML = uiIcon(isMuted() ? 'muted' : 'sound', '26px');
     mute.setAttribute('aria-label', t(isMuted() ? 'sound.off' : 'sound.on'));
   };
   showMute();
@@ -247,7 +247,7 @@ export function startApp(root: HTMLElement): void {
 
   const esc = (x: string) => x.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
   function drawAchievements(): void {
-    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '🏅' : '🔒'} ${esc(a.name)}</li>`).join('')}</ul>`;
+    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? uiIcon('medal') : uiIcon('lock')} ${esc(a.name)}</li>`).join('')}</ul>`;
   }
   async function drawRanking(): Promise<void> {
     const box = $('ranking');
@@ -362,14 +362,14 @@ export function startApp(root: HTMLElement): void {
       `<button type="button" class="${cls}" ${enabled ? `data-action="${action}"` : 'disabled'}><span class="ico">${icon}</span><span>${label}</span></button>`;
     const buttons = [
       state.boostSeconds > 0
-        ? btn('boost', '⏱️', t('boost.activeShort', { minutes: Math.ceil(state.boostSeconds / 60) }), false, 'boost on')
+        ? btn('boost', uiIcon('timer', '28px'), t('boost.activeShort', { minutes: Math.ceil(state.boostSeconds / 60) }), false, 'boost on')
         : canBoost(state)
-          ? btn('boost', '📺', t('boost.short'), true, 'boost')
-          : btn('boost', '⏳', t('boost.waitShort', { minutes: Math.ceil(state.boostCooldown / 60) }), false, 'boost'),
+          ? btn('boost', uiIcon('tv', '28px'), t('boost.short'), true, 'boost')
+          : btn('boost', uiIcon('hourglass', '28px'), t('boost.waitShort', { minutes: Math.ceil(state.boostCooldown / 60) }), false, 'boost'),
       day > 0
-        ? btn('daily', '🎁', t('daily.short', { day }), dailyReward(state, today) > 0, 'daily ready')
-        : btn('daily', '🎁', t('daily.doneShort', { day: nextDay }), false, 'daily'),
-      state.hasPass ? btn('pass', '⭐', t('pass.ownedShort'), false, 'pass') : btn('pass', '⭐', t('pass.short'), true, 'pass'),
+        ? btn('daily', uiIcon('gift', '28px'), t('daily.short', { day }), dailyReward(state, today) > 0, 'daily ready')
+        : btn('daily', uiIcon('gift', '28px'), t('daily.doneShort', { day: nextDay }), false, 'daily'),
+      state.hasPass ? btn('pass', uiIcon('star', '28px'), t('pass.ownedShort'), false, 'pass') : btn('pass', uiIcon('star', '28px'), t('pass.short'), true, 'pass'),
     ];
     return buttons.join('');
   }

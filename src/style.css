@@ -28,7 +28,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 @keyframes rise { to { translate: 0 -46px; opacity: 0; } }
 
 .hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: rgba(42, 29, 20, 0.88); border: 2px solid #5f4a33; border-radius: 16px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35); pointer-events: none; }
-#mute { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px -8px -6px 6px; font-size: 20px; background: none; border: 0; cursor: pointer; }
+#mute { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px -8px -6px 6px; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; }
 .money { display: flex; align-items: center; gap: 8px; font-size: 26px; font-weight: 900; color: #ffd76a; text-shadow: 0 2px 0 #7a4a10; }
 .coin { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1a8, #f2b705 60%, #b07d00); color: #7a4a10; font-size: 16px; text-shadow: none; border: 2px solid #7a4a10; }
 #rate { font-size: 14px; font-weight: 800; color: #b8e986; }
@@ -36,7 +36,8 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 
 #extras { position: absolute; right: 10px; top: 76px; display: flex; flex-direction: column; gap: 8px; }
 #extras button { width: 64px; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px; font: inherit; font-size: 11px; font-weight: 900; color: #fff; border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 14px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35); cursor: pointer; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); }
-#extras .ico { font-size: 22px; line-height: 1; }
+#extras .ico { font-size: 22px; line-height: 1; display: inline-flex; }
+.uiicon { vertical-align: -0.2em; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.25)); }
 #extras .boost { background: linear-gradient(180deg, #4f9ad8, #2f6fb3); }
 #extras .boost.on { background: linear-gradient(180deg, #57c26a, #2f8a43); opacity: 1; }
 #extras .daily { background: linear-gradient(180deg, #e0699a, #b8456f); }
@@ -101,7 +102,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 @keyframes lvlup { 30% { scale: 1.14 0.9; } 60% { scale: 0.96 1.06; } }
 .badge { animation: bob 0.8s ease-in-out infinite; }
 
-#settings { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px -8px -6px 0; font-size: 20px; background: none; border: 0; cursor: pointer; }
+#settings { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px -8px -6px 0; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; }
 #stats { position: absolute; top: 66px; left: 10px; right: 84px; padding: 4px 8px; font-size: 11px; line-height: 1.35; color: #f3e3c3; background: rgba(42, 29, 20, 0.78); border-radius: 10px; pointer-events: none; }
 #stats .jam { color: #ffb347; font-weight: 900; }
 #tip { position: absolute; left: 0; right: 0; bottom: calc(8px + env(safe-area-inset-bottom)); margin: 0; text-align: center; font-size: 12px; font-weight: 800; color: #fff6e0; text-shadow: 0 1px 3px #000; pointer-events: none; }
@@ -118,7 +119,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #transfer[hidden] { display: none; }
 #sheet { max-height: 56%; }
 
-#ranking-btn { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px 0; font-size: 20px; background: none; border: 0; cursor: pointer; }
+#ranking-btn { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px 0; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; cursor: pointer; }
 #stats .goal { color: #ffd76a; font-weight: 800; }
 #toast { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); z-index: 6; padding: 8px 14px; font-size: 14px; font-weight: 900; color: #2a1d14; background: #ffd76a; border: 2px solid #fff1a8; border-radius: 14px; box-shadow: 0 3px 0 rgba(0,0,0,.35); pointer-events: none; }
 #toast[hidden], #fps[hidden], #ranking[hidden], #achieve[hidden] { display: none; }

@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Interfaz coherente, primera parte: iconos SVG propios
+
+- Los botones de arriba (sonido, ranking, ajustes), los extras (empujón, regalo diario, pase) y la lista de logros usan iconos SVG propios (`uiIcon` en `src/ui/icons.ts`) en lugar de emojis, con el mismo trazo y sombra.
+- Qué probar: que los iconos se ven bien y nítidos en el móvil y que los botones siguen siendo fáciles de tocar.
+- Siguiente: textos con emoji que quedan (avisos, objetivo, tutorial), botones con relieve, transiciones de paneles y cifras que cuentan hacia arriba.
+
 ## 2026-10-19 — Ranking con Firebase, hitos, logros y calidad profesional
 
 - Mikel: mejor el parpadeo; Firebase para el ranking; propuestas de la noche «como mejor veas»; amplía el roadmap y mejora la calidad general: «que sea un videojuego profesional y no parezca tan indie».
