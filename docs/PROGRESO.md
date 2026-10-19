@@ -2,6 +2,16 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Arreglos de la escena, AGV y tope de 1 h
+
+- Animaciones de las líneas: prensa, engranaje, humo, chispas, cintas y ayudante se mueven con un nivel de trabajo suavizado en código (arrancan rápido, paran despacio, sin reinicios ni saltos cuando la chatarra llega a golpes).
+- Carretillas: salen a trabajar en cuanto su zona tiene producto o está produciendo (antes esperaban hasta 8 s parqueadas y parecía que no estaban), empiezan girando junto al palé y no salen dos de la misma zona a la vez.
+- La gente que paseaba se cambia por 3 AGV (vehículos guiados) con rutas pintadas en el suelo: de la pila al inicio de las cintas, reparto por el pasillo central y pasillo del muelle; van cargados con un contenedor de chatarra, giran, descargan y vuelven vacíos.
+- Coches de fondo: misma velocidad por carril y huecos iguales, y carriles separados, así no se atraviesan.
+- Tope de lo ganado fuera: 1 h sin pase (antes 2 h); el pase sigue en 8 h. Tests actualizados.
+- Propuestas nuevas en FEEDBACK.md: Parte 9 (cinco opciones de fondo y decorado) y Parte 10 (cómo ampliar el tope con un anuncio).
+- Siguiente: lo que elija Mikel en las Partes 9 y 10.
+
 ## 2026-10-19 — Animaciones, productos propios y ciudad de fondo
 
 - Mikel pide todas las animaciones, un producto distinto por línea, carretillas que giran, arreglar las cargas y el camión, ciudad de fondo, nave en rayos X y más vida.

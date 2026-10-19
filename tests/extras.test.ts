@@ -99,9 +99,9 @@ describe('camión dorado', () => {
 });
 
 describe('Pase de chatarrero', () => {
-  it('sube el tope de lo ganado fuera de 2 h a 8 h', () => {
+  it('sube el tope de lo ganado fuera de 1 h a 8 h', () => {
     const s = producing();
-    expect(offlineCapSeconds(s)).toBe(2 * 3600);
+    expect(offlineCapSeconds(s)).toBe(3600);
     s.hasPass = true;
     expect(offlineCapSeconds(s)).toBe(8 * 3600);
     const r = unpack(pack(s, 0), 10 * 3600 * 1000);

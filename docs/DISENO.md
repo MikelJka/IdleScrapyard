@@ -99,7 +99,7 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Camiones** (2026-10-19): todos iguales; se mejora la carga que esperan en el muelle antes de salir.
 - **Ritmo R2** (2026-10-19): la zona 2 se abre hacia los 10 min y la zona 4 hacia las 6 h jugando atento. Lo comprueba un test con un jugador simulado (`src/sim/bot.ts`).
 - **Precios** (2026-10-19): cada mejora sube ×1,10 al comprarla.
-- **Ganancias con el juego cerrado** (2026-10-19): tope de 2 h; un «free pass» lo amplía (cómo, en la Parte 5).
+- **Ganancias con el juego cerrado** (2026-10-19): tope de 1 h sin pase (antes 2 h; Mikel, 2026-10-19), ampliable viendo un anuncio (cómo, en la Parte 10 de FEEDBACK.md); el Pase lo sube a 8 h.
 - **Ayudantes** (2026-10-19): Tuerca (aplastado), Chispa (fundido), Yunque (chapa) y Codo (tubos).
 - **Ayudantes de las zonas nuevas** (2026-10-19): Grúa (vigas), Pistón (piezas de motor), Bujía (motores) y Turbo (coches reconstruidos). Cada uno tiene una frase de personalidad en `src/data/zones.json`.
 - **Duración** (2026-10-19): con 8 zonas y los ayudantes, abrirlo todo lleva unos 4-5 días (unas 104 h volviendo cada hora; 108 h cada 2 h).

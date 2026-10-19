@@ -1,6 +1,6 @@
 {
   "costGrowth": 1.1,
-  "offlineCapSeconds": 7200,
+  "offlineCapSeconds": 3600,
   "tap": {
     "scrap": 1
   },

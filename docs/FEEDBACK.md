@@ -24,11 +24,35 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 - [x] **Partida en varios dispositivos, primera parte** (2026-10-19, lo pide Mikel): código de partida que se copia y se pega en otro dispositivo, sin servidor. **Hecho.** Sincronización automática descartada por ahora (Mikel eligió S1, 2026-10-19), con el guardado detrás de `SaveStore` para poder cambiarlo luego.
 
+- [x] **Tope de lo ganado fuera: 1 h sin pase** (2026-10-19, lo pide Mikel): antes 2 h; el pase sigue en 8 h. **Hecho.** Falta decidir cómo se amplía con un anuncio (Parte 10).
+- [x] **Arreglos de la escena** (2026-10-19, Mikel): animaciones de las líneas suaves (arrancan y paran sin saltos), carretillas que salen a trabajar en cuanto hay producto, AGV con rutas pintadas en vez de gente paseando, coches de fondo que ya no se atraviesan. **Hecho.**
+
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-Nada pendiente de decidir por ahora.
+### Parte 9 — Fondo y decorado de los sitios vacíos
+
+Ahora el exterior es un suelo marrón liso con una ciudad lejana y los huecos de la nave están vacíos. Opciones (se pueden combinar):
+
+- **D1 — Ciudad con vida:** más capas de edificios, autopista elevada con tráfico, farolas y carteles, árboles secos y aceras alrededor de la nave.
+- **D2 — Patio de desguace:** fuera y en los huecos, coches apilados, montones de neumáticos, contenedores de colores, vallas con alambre, charcos y huellas en la tierra.
+- **D3 — Puerto y tren:** vía con un tren de mercancías que pasa, grúa de puerto y agua con reflejos al fondo.
+- **D4 — Suelo y luz vivos:** suelo con texturas (grava, hierba, manchas) en lugar de color liso, sombras largas y ciclo día/noche con la hora real (farolas y ventanas que se encienden).
+- **D5 — Nave rellena:** los huecos interiores con estanterías, taquillas, oficina con cristalera, depósitos y tuberías; las zonas cerradas con andamios, lonas y cartel «próximamente».
+
+Mi recomendación: D5 + D2 (llenan lo vacío, encajan con el tema y son baratos de dibujar) y D4 después. Responde con las letras (p. ej. «D2D5»).
+
+### Parte 10 — Ampliar el tope de ganancias fuera con un anuncio
+
+El tope libre ya es 1 h (8 h con pase). Opciones:
+
+- **A1 — Antes de salir:** un botón «Ampliar a 2 h» (anuncio) que vale para la próxima ausencia.
+- **A2 — Por tramos:** cada anuncio suma +1 h al tope de la próxima ausencia, hasta 4 h (3 anuncios).
+- **A3 — Al volver, duplicar:** tras volver, un anuncio duplica lo ganado fuera (no cambia el tope).
+- **A4 — Al volver, recuperar lo perdido:** si pasaste del tope, un anuncio te da también lo que se perdió, hasta 8 h.
+
+Mi recomendación: A4 (el jugador ve lo que se pierde justo cuando le apetece verlo) y, si quieres, A3 como segundo botón. Responde con las letras (p. ej. «A4»).
 
 ## Hecho
 

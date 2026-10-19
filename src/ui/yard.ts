@@ -6,7 +6,7 @@ import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
 import { productIcon } from './icons';
 import { PROP_HEIGHT, propIso } from './props';
 import { HORIZON, citySvg, floorDetailsSvg, hallBackSvg, hallFrameSvg, skySvg } from './scenery';
-import { TRUCK_SLOTS, carIso, forkliftIso, goldenTruckIso, scrapTruckIso, shipTruckIso } from './vehicles';
+import { TRUCK_SLOTS, agvIso, carIso, forkliftIso, goldenTruckIso, scrapTruckIso, shipTruckIso } from './vehicles';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -115,11 +115,11 @@ function machineIso(id: string, level: number): string {
   // Partes que se mueven cuando la línea trabaja: prensa, engranaje, chispas y humo de la chimenea.
   s += `<g class="press">${block(0.12, 0.22, h, 0.5, 0.45, 0.16, '#3b3b3b')}</g>`;
   const [spx, spy] = iso(0.47, -0.04, h - 0.15);
-  s += `<circle class="spark" cx="${spx.toFixed(1)}" cy="${spy.toFixed(1)}" r="3.4" fill="#ffe37a"/>`;
+  s += `<g class="fx"><circle class="spark" cx="${spx.toFixed(1)}" cy="${spy.toFixed(1)}" r="3.4" fill="#ffe37a"/>`;
   const gz = h * 0.5;
   s += `<g transform="matrix(-28 14 0 -20 26.6 13.3)"><g transform="translate(0.55 ${gz.toFixed(2)})"><g class="gear" fill="#3b3b3b" stroke="#2a1d14" stroke-width="0.03"><circle r="0.13"/>${[0, 45, 90, 135].map((a) => `<rect x="-0.03" y="-0.19" width="0.06" height="0.38" transform="rotate(${a})"/>`).join('')}<circle r="0.05" fill="#8a8a8a"/></g></g></g>`;
   const [chx, chy] = iso(0.78, 0.8, h + (tier === 0 ? 0.35 : 0.5));
-  s += [0, 1, 2].map((k) => `<circle class="puff" cx="${chx.toFixed(1)}" cy="${chy.toFixed(1)}" r="5" fill="#e6dccb" style="animation-delay:${(-k * 0.8).toFixed(1)}s"/>`).join('');
+  s += [0, 1, 2].map((k) => `<circle class="puff" cx="${chx.toFixed(1)}" cy="${chy.toFixed(1)}" r="5" fill="#e6dccb" style="animation-delay:${(-k * 0.8).toFixed(1)}s"/>`).join('') + '</g>';
   // Placa con el producto en la cara frontal.
   const [px, py] = iso(0.62, 1.1, h * 0.5);
   s += `<g transform="translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(0.62)"><rect x="-11" y="-10" width="22" height="20" rx="3" fill="#fff3dc" stroke="#2a1d14"/>${productIcon(id)}</g>`;
@@ -132,7 +132,7 @@ function staticYard(): string {
   let s = '';
   // Carretera de atrás y valla.
   s += tile(-10, BACK_Y - 1.6, 44, 3.4, 'fill="#5b4632"');
-  s += `<polyline points="${[iso(-10, BACK_Y - 0.9), iso(34, BACK_Y - 0.9)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
+  s += `<polyline points="${[iso(-10, BACK_Y - 0.85), iso(34, BACK_Y - 0.85)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
   // Suelo del desguace con baldosas.
   s += tile(-0.6, -0.6, 20, 15.6, 'fill="#cdbba0" stroke="#2a1d14" stroke-width="1.2"');
   s += floorDetailsSvg();
@@ -146,6 +146,10 @@ function staticYard(): string {
   s += tile(0.25, BELT_Y[1], 18.75, 0.4, BELT_ATTR);
   const flow = (x0: number, y0: number, x1: number, y1: number) => `<polyline class="flow" points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 14"/>`;
   s += `<g id="mainflow" class="belts">${flow(4.6, 4.2, 19, 4.2)}${flow(0.45, 4.0, 0.45, 9.4)}${flow(0.25, 9.2, 19, 9.2)}</g>`;
+  // Rutas pintadas de los AGV.
+  for (const [x0, y0, x1, y1] of [[-0.25, 3.2, -0.25, 9.8], [0.9, 8.7, 18.2, 8.7], [1.0, 14.3, 18.2, 14.3]]) {
+    s += `<polyline points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" stroke="#3f8fc4" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round" opacity="0.7" fill="none"/>`;
+  }
   // Pasillos de las carretillas.
   for (const c of COL_X) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Muelle de carga.
@@ -254,19 +258,20 @@ export function createYard(container: HTMLElement): Yard {
 
   // Tráfico de fondo en las dos carreteras.
   const CAR_COLORS = ['#c0392b', '#2f6fb3', '#e8e0d0', '#3fa7a0', '#d4a72c', '#6b5a8a', '#4a4a4a'];
-  const mkCars = (parent: SVGGElement, lanes: { y: number; dir: 1 | -1 }[], perLane: number) => {
+  const mkCars = (parent: SVGGElement, lanes: { y: number; dir: 1 | -1; speed: number }[], perLane: number) => {
     const list: { g: SVGGElement; y: number; dir: 1 | -1; speed: number; off: number }[] = [];
     let n = 0;
     for (const lane of lanes)
       for (let i = 0; i < perLane; i++) {
+        // Misma velocidad en cada carril y huecos iguales: así nunca se alcanzan ni se atraviesan.
         const g = mk(parent, carIso(CAR_COLORS[(n * 3 + 1) % CAR_COLORS.length], n % 3 === 2, lane.dir < 0));
-        list.push({ g, y: lane.y, dir: lane.dir, speed: 2.2 + (n % 3) * 0.9, off: (i / perLane) * 44 + n * 5 });
+        list.push({ g, y: lane.y, dir: lane.dir, speed: lane.speed, off: (i / perLane) * 44 });
         n++;
       }
     return list;
   };
-  const backCars = mkCars(back, [{ y: BACK_Y - 1.5, dir: -1 }, { y: BACK_Y - 0.5 - 0.35 - 0.3, dir: 1 }], 2);
-  const frontCars = mkCars(front, [{ y: FRONT_Y + 1.9, dir: 1 }], 3);
+  const backCars = mkCars(back, [{ y: BACK_Y - 1.55, dir: -1, speed: 2.6 }, { y: BACK_Y - 0.7, dir: 1, speed: 3.0 }], 2);
+  const frontCars = mkCars(front, [{ y: FRONT_Y + 2.2, dir: 1, speed: 2.8 }], 3);
 
   // Camión de expedición (delante): carga los productos poco a poco y se va.
   const shipTruck = mk(front, '');
@@ -287,17 +292,16 @@ export function createYard(container: HTMLElement): Yard {
   objs.push({ el: dockCrates, depth: TRUCK_PARK_X + DOCK_Y + 1 });
   let cratesKey = '';
 
-  // Trabajadores que pasean por los pasillos.
-  const walkerLooks = ['tuerca', 'piston', 'yunque', 'bujia'];
-  const walkers = [
-    { x0: 1, x1: 18, y0: 14.2, y1: 14.2, speed: 0.9, look: walkerLooks[0] },
-    { x0: -0.3, x1: -0.3, y0: 2.5, y1: 14, speed: 0.7, look: walkerLooks[1] },
-    { x0: 1.5, x1: 18, y0: 8.65, y1: 8.65, speed: 0.6, look: walkerLooks[2] },
-  ].map((w) => {
-    const g = mk(objectsG, `<g transform="scale(1.2)">${personIso(HELPER_LOOKS[w.look])}</g>`, 'worker busy');
+  // Vehículos guiados (AGV) que llevan contenedores de chatarra por rutas fijas pintadas en el suelo.
+  const agvs = [
+    { x0: -0.25, y0: 3.2, x1: -0.25, y1: 9.8, speed: 1.1 }, // de la pila al inicio de las cintas
+    { x0: 0.9, y0: 8.7, x1: 18.2, y1: 8.7, speed: 1.0 }, // reparte por el pasillo central
+    { x0: 18.2, y0: 14.3, x1: 1.0, y1: 14.3, speed: 1.2 }, // pasillo del muelle
+  ].map((r) => {
+    const g = mk(objectsG, '');
     const o: Obj = { el: g, depth: 0 };
     objs.push(o);
-    return { ...w, g, o };
+    return { ...r, g, o, key: '' };
   });
 
   // Líneas de cada zona.
@@ -311,6 +315,15 @@ export function createYard(container: HTMLElement): Yard {
     label: SVGGElement;
     belts: SVGGElement;
     palletShown: number;
+    /** Cuánto está trabajando (0-1), suavizado para que las animaciones arranquen y paren sin saltos. */
+    level: number;
+    phase: number;
+    gearAngle: number;
+    press: SVGElement[];
+    gears: SVGElement[];
+    fx: SVGElement[];
+    flows: SVGElement[];
+    torso: SVGElement | null;
   }
   const floorLayer = q('ground');
   const lines: Line[] = ZONES.map((def, i) => {
@@ -325,6 +338,14 @@ export function createYard(container: HTMLElement): Yard {
       pallet: mk(objectsG, ''),
       label: mk(labels, ''),
       palletShown: -1,
+      level: 0,
+      phase: 0,
+      gearAngle: 0,
+      press: [],
+      gears: [],
+      fx: [],
+      flows: [],
+      torso: null,
     };
     line.worker.setAttribute('transform', at(st.x + 1.3, st.y + 2.3));
     line.pallet.setAttribute('transform', at(st.x + 2.45, st.y + 2.45));
@@ -338,8 +359,9 @@ export function createYard(container: HTMLElement): Yard {
     o: Obj;
     key: string;
     loadN: number;
-    idle: boolean;
-    lastU: number;
+    trip: boolean;
+    t0: number;
+    home: string;
   }
   const carts: Cart[] = [];
 
@@ -378,10 +400,16 @@ export function createYard(container: HTMLElement): Yard {
     l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text></g>
       <g class="lvl" transform="translate(${iso(st.x + 1.3, st.y + 2.3, 2.75)[0]} ${iso(st.x + 1.3, st.y + 2.3, 2.75)[1]})"><rect x="-17" y="-9" width="34" height="15" rx="7.5" fill="#2a1d14" opacity="0.85"/><text y="2.5" text-anchor="middle" font-size="9" font-weight="900" fill="#ffd76a"></text></g>`;
     l.palletShown = -1;
+    l.press = [...l.machines.querySelectorAll<SVGElement>('.press')];
+    l.gears = [...l.machines.querySelectorAll<SVGElement>('.gear')];
+    l.fx = [...l.machines.querySelectorAll<SVGElement>('.fx')];
+    l.flows = [...l.belts.querySelectorAll<SVGElement>('.flow')];
+    l.torso = l.worker.querySelector<SVGElement>('.torso');
   }
 
   let lastDepthOrder = '';
   let lastEarned = -1;
+  let mainLevel = 0;
 
   // Un viaje de carretilla dura CYC s: ir (MOVE), girar en el muelle (TURN), volver (MOVE) y girar junto al palé (TURN).
   const MOVE = 3.4;
@@ -417,7 +445,8 @@ export function createYard(container: HTMLElement): Yard {
     // Cielo: nubes y pájaros.
     cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
     birdEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * (16 + i * 3) + i * 520) % 2600) - 1100).toFixed(1)} ${(HORIZON - 120 - i * 34 + Math.sin(t * 1.3 + i) * 10).toFixed(1)})`));
-    mainFlow.classList.toggle('on', working);
+    mainLevel += ((working ? 1 : 0) - mainLevel) * Math.min(1, dtv * (working ? 6 : 1.4));
+    mainFlow.style.opacity = (0.95 * mainLevel).toFixed(2);
 
     // Pila.
     const s = 0.85 + Math.min(0.3, Math.log10(1 + state.scrap) / 10);
@@ -486,9 +515,17 @@ export function createYard(container: HTMLElement): Yard {
       }
       if (!zone.unlocked) return;
       const running = working && zone.buffer < zoneCapacity(zone) - 0.01;
-      l.worker.classList.toggle('busy', running);
-      l.machines.classList.toggle('busy', running);
-      l.belts.classList.toggle('on', running);
+      // Arranca rápido y para despacio; así no hay saltos cuando la chatarra llega a golpes.
+      l.level += ((running ? 1 : 0) - l.level) * Math.min(1, dtv * (running ? 6 : 1.4));
+      if (l.level < 0.004) l.level = 0;
+      l.phase += dtv * l.level * 11;
+      l.gearAngle = (l.gearAngle + dtv * l.level * 320) % 360;
+      const wave = 0.5 + 0.5 * Math.sin(l.phase);
+      for (const e of l.press) e.style.translate = `0 ${(l.level * wave * 7).toFixed(2)}px`;
+      for (const e of l.gears) e.style.rotate = `${l.gearAngle.toFixed(1)}deg`;
+      for (const e of l.fx) e.style.opacity = l.level.toFixed(2);
+      for (const e of l.flows) e.style.opacity = (0.95 * l.level).toFixed(2);
+      if (l.torso) l.torso.style.translate = `0 ${(-2 * l.level * (0.5 + 0.5 * Math.sin(l.phase * 1.3))).toFixed(2)}px`;
       const lvl = l.label.querySelector('.lvl text');
       const txt = `Nv ${zone.helperLevel}`;
       if (lvl && lvl.textContent !== txt) lvl.textContent = txt;
@@ -502,14 +539,15 @@ export function createYard(container: HTMLElement): Yard {
       }
     });
 
-    // Carretillas: cada una atiende una zona abierta, gira en cada extremo y solo lleva productos de verdad.
+    // Carretillas: cada una atiende una zona abierta. Si hay producto (o la zona está produciendo) sale a trabajar,
+    // gira en cada extremo y lleva solo lo que hay; si no, espera junto al palé.
     const open = ZONES.map((z, i) => ({ z, i })).filter(({ z }) => state.zones[z.id].unlocked);
     const nCarts = Math.min(8, state.carts);
     while (carts.length < nCarts) {
       const g = mk(objectsG, '');
       const o: Obj = { el: g, depth: 0 };
       objs.push(o);
-      carts.push({ g, o, key: '', loadN: 0, idle: true, lastU: 0 });
+      carts.push({ g, o, key: '', loadN: 0, trip: false, t0: 0, home: '' });
     }
     carts.forEach((c, k) => {
       if (k >= nCarts) {
@@ -518,22 +556,29 @@ export function createYard(container: HTMLElement): Yard {
         return;
       }
       const src = open[k % open.length];
+      if (c.home !== src.z.id) {
+        c.home = src.z.id;
+        c.trip = false;
+      }
       const zone = state.zones[src.z.id];
       const st = station(src.i);
       const p0 = { x: st.x + 3.0, y: st.y + 2.7 };
-      const u = (((t / CYC + k * 0.29) % 1) + 1) % 1 * CYC;
-      // Al llegar al palé (mitad del giro) decide si hay algo que llevar.
-      const midTurn = CYC - TURN / 2;
-      if (c.lastU < midTurn && u >= midTurn) {
-        const cap = zoneCapacity(zone);
-        c.loadN = zone.buffer > 0.5 ? Math.max(1, Math.min(3, Math.ceil((zone.buffer / cap) * 3))) : 0;
-        c.idle = c.loadN === 0;
+      const flowing = zone.buffer > 0.05 || (working && zone.buffer < zoneCapacity(zone) - 0.01);
+      if (c.trip && t - c.t0 >= CYC) c.trip = false;
+      if (!c.trip && flowing) {
+        // No sale otra carretilla de la misma zona hasta que la anterior se haya alejado.
+        const crowded = carts.some((o, j) => j !== k && j < nCarts && o.trip && o.home === c.home && t - o.t0 < 2.2);
+        if (!crowded) {
+          c.trip = true;
+          c.t0 = t - (CYC - TURN); // empieza girando junto al palé, donde carga
+          c.loadN = Math.max(1, Math.min(3, Math.ceil((zone.buffer / zoneCapacity(zone)) * 3)));
+        }
       }
-      if (c.lastU > u) c.lastU = 0;
-      else c.lastU = u;
-      const pose = c.idle ? { x: p0.x, y: p0.y, ang: 0, phase: 3 as const } : cartPose(u, p0, st.x + 4.0);
+      const u = c.trip ? Math.min(CYC - 1e-6, t - c.t0) : 0;
+      const pose = c.trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
       const dockMid = MOVE + TURN / 2;
-      const carrying = !c.idle && (u < dockMid || u >= midTurn) ? c.loadN : 0;
+      const midTurn = CYC - TURN / 2;
+      const carrying = c.trip && (u < dockMid || u >= midTurn) ? c.loadN : 0;
       const key = `${src.z.id}|${Math.round((pose.ang * 18) / Math.PI)}|${carrying}`;
       if (key !== c.key) {
         c.key = key;
@@ -597,18 +642,46 @@ export function createYard(container: HTMLElement): Yard {
     if (state.goldenVisible > 0) {
       const p = 1 - state.goldenVisible / ECONOMY.goldenTruck.visibleSeconds;
       golden.setAttribute('visibility', 'visible');
-      golden.setAttribute('transform', at(-2 + p * 10, FRONT_Y + 1.5));
+      golden.setAttribute('transform', at(-2 + p * 10, FRONT_Y + 1.05));
     } else golden.setAttribute('visibility', 'hidden');
 
-    // Trabajadores que pasean.
-    walkers.forEach((w, i) => {
-      const len = Math.hypot(w.x1 - w.x0, w.y1 - w.y0);
-      const run = (t * w.speed + i * 7) % (2 * len);
-      const f = (run < len ? run : 2 * len - run) / len;
-      const x = lerp(w.x0, w.x1, f);
-      const y = lerp(w.y0, w.y1, f);
-      w.g.setAttribute('transform', at(x, y));
-      w.o.depth = x + y + 0.5;
+    // AGV: van al final de su ruta cargados, giran, descargan y vuelven vacíos.
+    agvs.forEach((r, i) => {
+      const len = Math.hypot(r.x1 - r.x0, r.y1 - r.y0);
+      const move = len / r.speed;
+      const turn = 0.7;
+      const cyc = 2 * (move + turn);
+      const u = (t + i * 5.3) % cyc;
+      const dir = Math.atan2(r.y1 - r.y0, r.x1 - r.x0);
+      let f: number;
+      let ang: number;
+      let loaded: boolean;
+      if (u < move) {
+        f = u / move;
+        ang = dir;
+        loaded = true;
+      } else if (u < move + turn) {
+        f = 1;
+        ang = dir + Math.PI * ((u - move) / turn);
+        loaded = u < move + turn / 2;
+      } else if (u < 2 * move + turn) {
+        f = 1 - (u - move - turn) / move;
+        ang = dir + Math.PI;
+        loaded = false;
+      } else {
+        f = 0;
+        ang = dir + Math.PI + Math.PI * ((u - 2 * move - turn) / turn);
+        loaded = u >= 2 * move + turn + turn / 2;
+      }
+      const x = lerp(r.x0, r.x1, f);
+      const y = lerp(r.y0, r.y1, f);
+      const key = `${Math.round((ang * 18) / Math.PI)}|${loaded ? 1 : 0}`;
+      if (key !== r.key) {
+        r.key = key;
+        r.g.innerHTML = agvIso(ang, loaded);
+      }
+      r.g.setAttribute('transform', at(x, y));
+      r.o.depth = x + y + 0.3;
     });
 
     // Orden de dibujo: lo que está más al fondo, primero.

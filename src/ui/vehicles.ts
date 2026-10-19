@@ -40,6 +40,30 @@ export function forkliftIso(ang: number, loads: string[]): string {
   return `<ellipse cx="${sx}" cy="${sy + 3}" rx="19" ry="9" fill="#000" opacity="0.18"/>${parts.map((p) => p.svg).join('')}`;
 }
 
+/** Vehículo guiado automático (AGV): plataforma baja con luz y, si lleva carga, un contenedor de chatarra. Mira en la dirección `ang`. */
+export function agvIso(ang: number, loaded: boolean): string {
+  const c = Math.cos(ang);
+  const s = Math.sin(ang);
+  const parts: Part[] = [];
+  const part = (u: number, v: number, z: number, l: number, w: number, h: number, color: string) => {
+    const cx = u * c - v * s;
+    const cy = u * s + v * c;
+    parts.push({ depth: cx + cy + z * 0.05, svg: rblock(cx, cy, z, l, w, h, ang, color) });
+  };
+  part(0, 0, 0.05, 0.78, 0.5, 0.14, '#5a6b7a');
+  part(0.33, 0, 0.19, 0.08, 0.5, 0.03, '#f4c430');
+  part(-0.33, 0, 0.19, 0.08, 0.5, 0.03, '#f4c430');
+  part(0.3, 0, 0.22, 0.1, 0.12, 0.1, '#e63946');
+  if (loaded) {
+    part(-0.02, 0, 0.19, 0.46, 0.42, 0.3, '#8c7b6b');
+    part(0.0, -0.05, 0.49, 0.2, 0.2, 0.1, '#b5523b');
+    part(-0.12, 0.08, 0.49, 0.16, 0.16, 0.07, '#5f7d91');
+  }
+  parts.sort((a, b) => a.depth - b.depth);
+  const [sx, sy] = iso(0, 0);
+  return `<ellipse cx="${sx}" cy="${sy + 3}" rx="19" ry="8" fill="#000" opacity="0.18"/>${parts.map((p) => p.svg).join('')}`;
+}
+
 /** Coche de fondo; mira hacia +x, o hacia -x con `rev`. */
 export function carIso(body: string, van = false, rev = false): string {
   const len = van ? 1.0 : 0.85;
