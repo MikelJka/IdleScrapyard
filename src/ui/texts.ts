@@ -14,6 +14,8 @@ const es: Record<string, string> = {
   'buy.capacity': 'Capacidad',
   'buy.machines': 'Máquina extra',
   'buy.machineLevel': 'Nivel de máquina',
+  'buy.helper': 'Subir de nivel a {helper}',
+  helperLine: '{helper} · nivel {level}',
 };
 
 export function t(key: string, vars: Record<string, string | number> = {}): string {

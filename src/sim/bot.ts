@@ -2,7 +2,7 @@
  * Jugador simulado para probar el ritmo: toca la pila mientras juega activo y
  * compra lo que más dólares por segundo añade por dólar gastado; abre cada zona en cuanto puede.
  */
-import { ECONOMY, ZONES, advance, buy, dockLoad, purchases, scrapPerSecond, tap, zoneRate, type GameState, type Purchase } from './game';
+import { ECONOMY, ZONES, advance, buy, dockLoad, purchases, scrapPerSecond, tap, unitValue, zoneRate, type GameState, type Purchase } from './game';
 
 export interface BotOptions {
   /** Toques por segundo mientras juega activo. */
@@ -27,7 +27,7 @@ export function steadyIncome(state: GameState, tapsPerSecond = 0): number {
     const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry);
     scrap -= units * def.scrapPerUnit;
     carry -= units;
-    income += units * def.unitValue;
+    income += units * unitValue(def, state.zones[def.id]);
   }
   return income;
 }

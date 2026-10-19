@@ -88,3 +88,53 @@ describe('ritmo R2 (decidido por Mikel)', () => {
     expect(at.pipes / 3600).toBeLessThan(8);
   });
 });
+
+describe('ayudantes', () => {
+  const h = ECONOMY.helpers;
+
+  it('con una hora de trabajo de su zona se puede pagar el siguiente nivel', () => {
+    const s = newGame();
+    s.scrapTrucks = 10;
+    s.carts = 10;
+    advance(s, h.secondsPerLevel - 10);
+    expect(purchases(s).some((p) => p.id === 'helper:crusher')).toBe(false);
+    advance(s, 20);
+    s.dollars = 1e9;
+    expect(buy(s, 'helper:crusher')).toBe(true);
+    expect(s.zones.crusher.helperLevel).toBe(1);
+    expect(purchases(s).some((p) => p.id === 'helper:crusher')).toBe(false);
+  });
+
+  it('sin trabajo no gana experiencia', () => {
+    const s = newGame();
+    advance(s, 2 * h.secondsPerLevel);
+    expect(s.zones.crusher.helperXp).toBe(0);
+  });
+
+  it('cada nivel sube un 10 % el valor y un 5 % la velocidad', () => {
+    const s = newGame();
+    s.zones.crusher.helperLevel = 3;
+    s.carts = 0;
+    for (let i = 0; i < 100; i++) tap(s);
+    advance(s, 1);
+    expect(s.zones.crusher.buffer).toBeCloseTo(1 + 3 * h.speedPerLevel, 10);
+    s.carts = 1;
+    advance(s, 1);
+    expect(s.dockValue / s.dockUnits).toBeCloseTo(1 + 3 * h.valuePerLevel, 10);
+  });
+
+  it('no pasa del nivel máximo', () => {
+    const s = newGame();
+    s.zones.crusher.helperLevel = h.maxLevel;
+    s.scrapTrucks = 10;
+    advance(s, 2 * h.secondsPerLevel);
+    expect(s.zones.crusher.helperXp).toBe(0);
+    expect(purchases(s).some((p) => p.kind === 'helper')).toBe(false);
+  });
+
+  it('una partida guardada sin ayudantes empieza en nivel 0', () => {
+    const s = load(JSON.stringify({ zones: { crusher: { unlocked: true, machines: 3 } } }));
+    expect(s.zones.crusher.machines).toBe(3);
+    expect(s.zones.crusher.helperLevel).toBe(0);
+  });
+});

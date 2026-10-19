@@ -32,6 +32,10 @@ export interface ZoneState {
   machineLevel: number;
   /** Producto terminado esperando a una carretilla. */
   buffer: number;
+  /** Nivel del ayudante de la zona (0 al abrirla). */
+  helperLevel: number;
+  /** Segundos que ha trabajado la zona desde el último nivel desbloqueado del ayudante. */
+  helperXp: number;
 }
 
 export interface GameState {
@@ -63,6 +67,8 @@ export function newGame(): GameState {
       capacity: 0,
       machineLevel: 0,
       buffer: 0,
+      helperLevel: 0,
+      helperXp: 0,
     };
   }
   return {
@@ -89,11 +95,27 @@ export function zoneCapacity(zone: ZoneState): number {
   return c.startCapacity + zone.capacity * c.effectPerLevel;
 }
 
+/** Multiplicador del valor de lo producido por el nivel del ayudante. */
+export function helperValueMultiplier(zone: ZoneState): number {
+  return 1 + zone.helperLevel * ECONOMY.helpers.valuePerLevel;
+}
+
+/** Valor en dólares de cada unidad que sale de la zona (con el ayudante). */
+export function unitValue(def: ZoneDef, zone: ZoneState): number {
+  return def.unitValue * helperValueMultiplier(zone);
+}
+
+/** Niveles del ayudante que la experiencia ya ha desbloqueado y que se pueden pagar. */
+export function helperLevelsReady(zone: ZoneState): number {
+  const h = ECONOMY.helpers;
+  return Math.min(Math.floor(zone.helperXp / h.secondsPerLevel), h.maxLevel - zone.helperLevel);
+}
+
 /** Unidades de producto por segundo de una zona. */
 export function zoneRate(def: ZoneDef, zone: ZoneState): number {
   if (!zone.unlocked) return 0;
   const u = ECONOMY.zoneUpgrades;
-  const speed = 1 + zone.speed * u.speed.effectPerLevel;
+  const speed = (1 + zone.speed * u.speed.effectPerLevel) * (1 + zone.helperLevel * ECONOMY.helpers.speedPerLevel);
   const level = Math.pow(u.machineLevel.outputMultiplierPerLevel, zone.machineLevel);
   return (zone.machines * speed * level) / def.cycleSeconds;
 }
@@ -121,6 +143,9 @@ function step(state: GameState, dt: number): void {
     const space = Math.max(0, zoneCapacity(zone) - zone.buffer);
     const units = Math.min(zoneRate(def, zone) * dt, space, state.scrap / def.scrapPerUnit);
     if (units <= 0) continue;
+    // El ayudante gana experiencia mientras su zona trabaja (hasta el nivel máximo).
+    const h = ECONOMY.helpers;
+    zone.helperXp = Math.min(zone.helperXp + dt, (h.maxLevel - zone.helperLevel) * h.secondsPerLevel);
     state.scrap -= units * def.scrapPerUnit;
     zone.buffer += units;
   }
@@ -134,7 +159,7 @@ function step(state: GameState, dt: number): void {
     zone.buffer -= units;
     carry -= units;
     state.dockUnits += units;
-    state.dockValue += units * def.unitValue;
+    state.dockValue += units * unitValue(def, zone);
   }
 
   state.truckCooldown = Math.max(0, state.truckCooldown - dt);
@@ -159,7 +184,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'cart' | 'dock' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel';
+export type PurchaseKind = 'scrapTruck' | 'cart' | 'dock' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -202,6 +227,11 @@ export function purchases(state: GameState): Purchase[] {
         cost: s * growthCost(u.machineLevel.baseCost, zone.machineLevel, u.machineLevel.growth),
       },
     );
+    // El siguiente nivel del ayudante solo se ofrece cuando su experiencia lo ha desbloqueado.
+    if (helperLevelsReady(zone) > 0) {
+      const h = ECONOMY.helpers;
+      list.push({ id: `helper:${def.id}`, kind: 'helper', zoneId: def.id, cost: s * growthCost(h.baseCost, zone.helperLevel, h.costGrowth) });
+    }
   }
   return list;
 }
@@ -231,6 +261,10 @@ export function buy(state: GameState, id: string): boolean {
     case 'machines':
     case 'machineLevel':
       zone![p.kind]++;
+      break;
+    case 'helper':
+      zone!.helperLevel++;
+      zone!.helperXp -= ECONOMY.helpers.secondsPerLevel;
       break;
   }
   return true;

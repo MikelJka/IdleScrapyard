@@ -64,13 +64,14 @@ export function startApp(root: HTMLElement): void {
     $('zones').innerHTML = ZONES.filter((z) => state.zones[z.id].unlocked)
       .map((z) => {
         const zs = state.zones[z.id];
-        return `<div class="row"><b>${z.name}</b><span>${t('zoneLine', { buffer: fmt(zs.buffer), cap: fmt(zoneCapacity(zs)), machines: zs.machines })}</span></div>`;
+        return `<div class="row"><b>${z.name}</b><span>${t('zoneLine', { buffer: fmt(zs.buffer), cap: fmt(zoneCapacity(zs)), machines: zs.machines })}</span></div><div class="row"><span>${t('helperLine', { helper: z.helper.name, level: zs.helperLevel })}</span></div>`;
       })
       .join('');
     $('dock').innerHTML = `<div class="row"><b>${t('dock')}</b><span>${t('dockLine', { units: fmt(state.dockUnits), load: dockLoad(state) })}</span></div>`;
     $('shop').innerHTML = purchases(state)
       .map((p) => {
-        const name = t('buy.' + p.kind) + (p.zoneId ? ' · ' + ZONES.find((z) => z.id === p.zoneId)!.name : '');
+        const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
+        const name = p.kind === 'helper' ? t('buy.helper', { helper: def!.helper.name }) : t('buy.' + p.kind) + (def ? ' · ' + def.name : '');
         return `<button type="button" data-id="${p.id}" ${p.cost > state.dollars ? 'disabled' : ''}><span>${name}</span><b>$${fmt(p.cost)}</b></button>`;
       })
       .join('');

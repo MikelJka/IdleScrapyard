@@ -102,8 +102,13 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Ganancias con el juego cerrado** (2026-10-19): tope de 2 h; un «free pass» lo amplía (cómo, en la Parte 5).
 - **Ayudantes** (2026-10-19): Tuerca (aplastado), Chispa (fundido), Yunque (chapa) y Codo (tubos).
 - **Ayudantes de las zonas nuevas** (2026-10-19): Grúa (vigas), Pistón (piezas de motor), Bujía (motores) y Turbo (coches reconstruidos). Cada uno tiene una frase de personalidad en `src/data/zones.json`.
-- **Duración** (2026-10-19): con 8 zonas, abrirlo todo lleva unos 5-6 días (unas 131 h volviendo cada hora), sin contar aún los ayudantes.
+- **Duración** (2026-10-19): con 8 zonas y los ayudantes, abrirlo todo lleva unos 4-5 días (unas 104 h volviendo cada hora; 108 h cada 2 h).
 - **Pase de chatarrero** (2026-10-19): compra única que quita los anuncios y sube el tope de lo ganado fuera a 8 h.
 - **Premio diario** (2026-10-19): racha de 7 días con premio creciente.
 - **Empujón con anuncio** (2026-10-19): ×2 a la producción durante 30 min, con espera entre uno y otro.
 - **Suceso: camión dorado** (2026-10-19): aparece de vez en cuando; si se toca y se ve un anuncio, paga ×10 lo que hay en el muelle.
+- **Experiencia de los ayudantes** (2026-10-19): cada hora de trabajo de su zona desbloquea un nivel nuevo, que se paga en dólares.
+- **Mejora por nivel** (2026-10-19): +10 % al valor de lo producido y +5 % a la velocidad de su zona; nivel máximo 25.
+- **Racha de 7 días** (2026-10-19): el día 1 da 10 min de producción y sube hasta 2 h el día 7.
+- **Camión dorado** (2026-10-19): aparece cada ~15 min y espera 20 s a que lo toques.
+- **Precio del Pase de chatarrero** (2026-10-19): 2,99 €, pago único.

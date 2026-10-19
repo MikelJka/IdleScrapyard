@@ -1,14 +1,49 @@
 {
   "costGrowth": 1.1,
   "offlineCapSeconds": 7200,
-  "tap": { "scrap": 1 },
-  "scrapTrucks": { "baseCost": 10, "scrapPerSecond": 0.5 },
-  "carts": { "start": 1, "baseCost": 15, "unitsPerSecond": 1 },
-  "dock": { "baseLoad": 10, "loadPerLevel": 5, "baseCost": 25, "returnSeconds": 5 },
+  "tap": {
+    "scrap": 1
+  },
+  "scrapTrucks": {
+    "baseCost": 10,
+    "scrapPerSecond": 0.5
+  },
+  "carts": {
+    "start": 1,
+    "baseCost": 15,
+    "unitsPerSecond": 1
+  },
+  "dock": {
+    "baseLoad": 10,
+    "loadPerLevel": 5,
+    "baseCost": 25,
+    "returnSeconds": 5
+  },
   "zoneUpgrades": {
-    "speed": { "baseCost": 20, "effectPerLevel": 0.1 },
-    "capacity": { "baseCost": 10, "startCapacity": 10, "effectPerLevel": 10 },
-    "machines": { "baseCost": 50 },
-    "machineLevel": { "baseCost": 300, "growth": 4, "outputMultiplierPerLevel": 2 }
+    "speed": {
+      "baseCost": 20,
+      "effectPerLevel": 0.1
+    },
+    "capacity": {
+      "baseCost": 10,
+      "startCapacity": 10,
+      "effectPerLevel": 10
+    },
+    "machines": {
+      "baseCost": 50
+    },
+    "machineLevel": {
+      "baseCost": 300,
+      "growth": 4,
+      "outputMultiplierPerLevel": 2
+    }
+  },
+  "helpers": {
+    "secondsPerLevel": 3600,
+    "maxLevel": 25,
+    "valuePerLevel": 0.1,
+    "speedPerLevel": 0.05,
+    "baseCost": 100,
+    "costGrowth": 1.5
   }
 }

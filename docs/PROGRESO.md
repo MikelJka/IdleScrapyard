@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Los ayudantes suben de nivel
+
+- Mikel decide la Parte 6: un nivel de ayudante cada hora de trabajo, +10 % de valor y +5 % de velocidad por nivel, máximo 25, racha de 10 min a 2 h de producción, camión dorado cada ~15 min y pase a 2,99 €.
+- `src/sim/game.ts`: cada zona guarda el nivel y la experiencia de su ayudante; la experiencia sube solo mientras la zona trabaja; el nivel se compra cuando está desbloqueado. Números en `src/data/economy.json` (`helpers`); el precio de cada nivel (100 $ × escala de la zona × 1,5 por nivel) es provisional. Partidas antiguas: los ayudantes empiezan en nivel 0. Tests en `tests/game.test.ts`.
+- La pantalla muestra cada ayudante con su nivel y el botón «Subir de nivel a …» cuando está listo.
+- Ritmo con el jugador simulado: zona 8 a las ~104 h volviendo cada hora (antes 131 h); las 4 primeras zonas siguen en R2.
+- Qué probar: jugar una hora con la zona trabajando y subir de nivel a Tuerca.
+- Siguiente: la Parte 7 (qué pasa si se falta un día de la racha); después el pase, la racha, el empujón y el camión dorado, y el dibujado 3D.
+
 ## 2026-10-19 — Ocho zonas con sus personajes
 
 - Mikel decide la Parte 5: Pase de chatarrero (compra única), racha de 7 días, empujón ×2 con anuncio, camión dorado con anuncio y más zonas antes de publicar.
