@@ -2,6 +2,17 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Animaciones, productos propios y ciudad de fondo
+
+- Mikel pide todas las animaciones, un producto distinto por línea, carretillas que giran, arreglar las cargas y el camión, ciudad de fondo, nave en rayos X y más vida.
+- `src/ui/props.ts`: un producto con forma propia por zona (bloque de chatarra, lingotes, chapas, tubos, vigas en I, engranaje con pistón, motor, cochecito) en palés, carretillas, muelle y camión.
+- `src/ui/vehicles.ts`: carretilla que gira de verdad (ángulo libre) al cambiar de sentido en el muelle y junto al palé; solo lleva productos si su zona tiene producto (1-3 según lo que hay) y va vacía al volver; camión de chatarra que maniobra hasta la pila, levanta la caja, desliza la carga y levanta polvo; coches de fondo en las dos carreteras.
+- Arreglo: el camión de expedición se llena producto a producto en el muelle y solo sale cuando está lleno (antes aparecía lleno de golpe); lo que sobra espera en el muelle.
+- `src/ui/scenery.ts`: cielo, ciudad industrial en el horizonte (torres con ventanas, naves, silos, depósitos, chimeneas con humo, grúas), silueta de la nave en rayos X (paredes tenues y estructura de líneas), nubes y pájaros.
+- Máquinas: prensa que sube y baja, engranaje que gira, chispas y humo de la chimenea mientras trabajan; cintas con chatarra que avanza; tres trabajadores pasean por los pasillos; la pila salta y suelta esquirlas al tocarla.
+- Qué probar: arrastrar hacia arriba para ver la ciudad; mirar una carretilla girar en el muelle; tocar la pila muy rápido y ver llenarse el camión poco a poco; que la nave en rayos X no moleste.
+- Siguiente: pulir (rendimiento en móviles flojos, ajustar tamaños) y lo que diga Mikel.
+
 ## 2026-10-19 — Guardado reemplazable
 
 - Mikel elige S1 (solo código manual) con la condición de poder cambiarlo fácilmente. `src/ui/storage.ts` define `SaveStore` (`read`/`write`) y `app.ts` solo usa `store`: una nube futura es otra implementación y un cambio de una línea.

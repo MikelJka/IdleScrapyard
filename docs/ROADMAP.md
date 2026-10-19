@@ -32,7 +32,7 @@ Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 - [x] Retención: racha de 7 días, empujón ×2 y camión dorado
 - [x] Pase de chatarrero (en la web, de prueba)
 - [x] Sonidos (sintetizados, con botón de silencio)
-- [ ] Más animaciones (vuelco de chatarra)
+- [x] Más animaciones (vuelco de chatarra, máquinas trabajando, coches, ciudad de fondo, nave en rayos X)
 - [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
 - Prestigio: no en la primera versión (decidido por Mikel)
 

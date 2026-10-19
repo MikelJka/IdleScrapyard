@@ -4,6 +4,9 @@ import { ECONOMY, ZONES, dockLoad, zoneCapacity, type GameState, type ZoneDef } 
 import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
 import { productIcon } from './icons';
+import { PROP_HEIGHT, propIso } from './props';
+import { HORIZON, citySvg, floorDetailsSvg, hallBackSvg, hallFrameSvg, skySvg } from './scenery';
+import { TRUCK_SLOTS, carIso, forkliftIso, goldenTruckIso, scrapTruckIso, shipTruckIso } from './vehicles';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -41,29 +44,6 @@ function at(x: number, y: number, z = 0): string {
 }
 
 // ---- Piezas ----
-
-function truckIso(body: string, cab: string, load = ''): string {
-  return `<ellipse cx="${iso(1.3, 0.5)[0]}" cy="${iso(1.3, 0.5)[1] + 4}" rx="44" ry="14" fill="#000" opacity="0.18"/>
-    ${block(0, 0, 0.25, 2.7, 1, 0.12, '#3b3b3b')}
-    ${block(0, 0, 0.37, 1.75, 1, 0.75, body)}
-    ${load}
-    ${block(1.85, 0, 0.37, 0.85, 1, 0.8, cab)}
-    <polygon points="${[iso(2.7, 0.12, 0.75), iso(2.7, 0.88, 0.75), iso(2.7, 0.88, 1.08), iso(2.7, 0.12, 1.08)].map((p) => p.join(',')).join(' ')}" fill="#bfe7ff" stroke="#2a1d14" stroke-width="0.8"/>
-    ${wheel(0.45, 1)}${wheel(1.4, 1)}${wheel(2.3, 1)}`;
-}
-
-const SCRAP_LOAD = block(0.15, 0.15, 1.12, 0.5, 0.4, 0.22, '#8c7b6b') + block(0.7, 0.3, 1.12, 0.45, 0.5, 0.3, '#b5523b') + block(1.15, 0.1, 1.12, 0.45, 0.45, 0.18, '#5f7d91');
-
-function forkliftIso(loaded: boolean, crate: string): string {
-  return `<ellipse cx="0" cy="${iso(0.25, 0.5)[1] + 3}" rx="18" ry="8" fill="#000" opacity="0.18"/>
-    ${block(0, 0, 0.12, 0.55, 0.7, 0.35, '#f4c430')}
-    ${block(0.05, 0.05, 0.47, 0.45, 0.4, 0.05, '#2a1d14')}
-    ${block(0.17, 0.18, 0.47, 0.22, 0.2, 0.25, '#f2c28e')}
-    ${block(0.06, 0.7, 0.12, 0.44, 0.07, 0.95, '#3b3b3b')}
-    ${block(0.08, 0.77, 0.14, 0.4, 0.42, 0.04, '#5a5a5a')}
-    ${loaded ? block(0.08, 0.78, 0.18, 0.4, 0.4, 0.34, crate) : ''}
-    ${wheel(0.1, 0.7, 0.13)}${wheel(0.45, 0.7, 0.13)}`;
-}
 
 /** Ayudante o trabajador hecho de bloques. */
 export function personIso(look: HelperLook): string {
@@ -132,14 +112,18 @@ function machineIso(id: string, level: number): string {
     s += block(-0.02, -0.02, h, 0.99, 1.14, 0.05, '#f2b705');
     s += block(0.1, 0.1, h + 0.05, 0.14, 0.14, 0.45, '#f2b705');
   }
+  // Partes que se mueven cuando la línea trabaja: prensa, engranaje, chispas y humo de la chimenea.
+  s += `<g class="press">${block(0.12, 0.22, h, 0.5, 0.45, 0.16, '#3b3b3b')}</g>`;
+  const [spx, spy] = iso(0.47, -0.04, h - 0.15);
+  s += `<circle class="spark" cx="${spx.toFixed(1)}" cy="${spy.toFixed(1)}" r="3.4" fill="#ffe37a"/>`;
+  const gz = h * 0.5;
+  s += `<g transform="matrix(-28 14 0 -20 26.6 13.3)"><g transform="translate(0.55 ${gz.toFixed(2)})"><g class="gear" fill="#3b3b3b" stroke="#2a1d14" stroke-width="0.03"><circle r="0.13"/>${[0, 45, 90, 135].map((a) => `<rect x="-0.03" y="-0.19" width="0.06" height="0.38" transform="rotate(${a})"/>`).join('')}<circle r="0.05" fill="#8a8a8a"/></g></g></g>`;
+  const [chx, chy] = iso(0.78, 0.8, h + (tier === 0 ? 0.35 : 0.5));
+  s += [0, 1, 2].map((k) => `<circle class="puff" cx="${chx.toFixed(1)}" cy="${chy.toFixed(1)}" r="5" fill="#e6dccb" style="animation-delay:${(-k * 0.8).toFixed(1)}s"/>`).join('');
   // Placa con el producto en la cara frontal.
   const [px, py] = iso(0.62, 1.1, h * 0.5);
   s += `<g transform="translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(0.62)"><rect x="-11" y="-10" width="22" height="20" rx="3" fill="#fff3dc" stroke="#2a1d14"/>${productIcon(id)}</g>`;
   return `<ellipse cx="${iso(0.5, 0.55)[0]}" cy="${iso(0.5, 0.55)[1] + 3}" rx="30" ry="13" fill="#000" opacity="0.15"/>${s}`;
-}
-
-function crate(color: string): string {
-  return block(0, 0, 0, 0.34, 0.34, 0.28, color);
 }
 
 const BELT_ATTR = 'fill="#5a5550" stroke="#2a1d14" stroke-width="0.8"';
@@ -147,10 +131,11 @@ const BELT_ATTR = 'fill="#5a5550" stroke="#2a1d14" stroke-width="0.8"';
 function staticYard(): string {
   let s = '';
   // Carretera de atrás y valla.
-  s += tile(-10, BACK_Y - 0.6, 40, 2.4, 'fill="#5b4632"');
-  s += `<polyline points="${[iso(-10, BACK_Y + 0.6), iso(30, BACK_Y + 0.6)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
+  s += tile(-10, BACK_Y - 1.6, 44, 3.4, 'fill="#5b4632"');
+  s += `<polyline points="${[iso(-10, BACK_Y - 0.9), iso(34, BACK_Y - 0.9)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
   // Suelo del desguace con baldosas.
   s += tile(-0.6, -0.6, 20, 15.6, 'fill="#cdbba0" stroke="#2a1d14" stroke-width="1.2"');
+  s += floorDetailsSvg();
   for (let x = 0; x <= 19; x++) s += `<polyline points="${[iso(x - 0.6, -0.6), iso(x - 0.6, 15)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
   for (let y = 0; y <= 15; y++) s += `<polyline points="${[iso(-0.6, y - 0.6), iso(19.4, y - 0.6)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
   for (let x = -0.6; x < 19.4; x += 0.8) s += block(x, -0.9, 0, 0.12, 0.12, 0.55, '#8a7a6a');
@@ -159,13 +144,15 @@ function staticYard(): string {
   s += tile(4.6, BELT_Y[0], 14.4, 0.4, BELT_ATTR);
   s += tile(0.25, 4.0, 0.4, 5.4, BELT_ATTR);
   s += tile(0.25, BELT_Y[1], 18.75, 0.4, BELT_ATTR);
+  const flow = (x0: number, y0: number, x1: number, y1: number) => `<polyline class="flow" points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 14"/>`;
+  s += `<g id="mainflow" class="belts">${flow(4.6, 4.2, 19, 4.2)}${flow(0.45, 4.0, 0.45, 9.4)}${flow(0.25, 9.2, 19, 9.2)}</g>`;
   // Pasillos de las carretillas.
   for (const c of COL_X) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Muelle de carga.
   s += block(0.2, DOCK_Y, 0, 19, 1.4, 0.3, '#8a6a4a');
   for (let b = 0; b < 4; b++) s += tile(2 + b * 4.6, DOCK_Y + 0.2, 2.2, 1, 'fill="none" stroke="#f4c430" stroke-width="1.5" stroke-dasharray="5 4"', 0.3);
   // Carretera de delante.
-  s += tile(-10, FRONT_Y - 0.6, 40, 3.4, 'fill="#5b4632"');
+  s += tile(-10, FRONT_Y - 0.6, 44, 3.4, 'fill="#5b4632"');
   s += `<polyline points="${[iso(-10, FRONT_Y + 1.1), iso(30, FRONT_Y + 1.1)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
   return s;
 }
@@ -207,11 +194,17 @@ interface Obj {
 export function createYard(container: HTMLElement): Yard {
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'yard');
-  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient></defs>
-    <rect x="-3000" y="-3000" width="6000" height="6000" fill="#a8906a"/>
-    <g id="ground">${staticYard()}</g>
-    <g id="back"></g>
+  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient>
+      <clipPath id="hz"><rect x="-4000" y="${HORIZON}" width="8000" height="6000"/></clipPath></defs>
+    ${skySvg()}
+    <g id="clouds"></g>
+    <g id="city">${citySvg()}</g>
+    <g id="birds"></g>
+    <g id="ground" clip-path="url(#hz)">${staticYard()}</g>
+    <g id="back" clip-path="url(#hz)"></g>
+    ${hallBackSvg()}
     <g id="objects"></g>
+    ${hallFrameSvg()}
     <g id="front"></g>
     <g id="labels"></g>
     <g id="pops"></g>`;
@@ -222,6 +215,9 @@ export function createYard(container: HTMLElement): Yard {
   const front = q('front');
   const labels = q('labels');
   const pops = q('pops');
+  const clouds = q('clouds');
+  const birds = q('birds');
+  const mainFlow = q('mainflow');
 
   const mk = (parent: SVGGElement, html: string, cls = ''): SVGGElement => {
     const g = document.createElementNS(NS, 'g');
@@ -230,6 +226,10 @@ export function createYard(container: HTMLElement): Yard {
     parent.appendChild(g);
     return g;
   };
+
+  // Nubes y pájaros del cielo.
+  const cloudEls = [0, 1, 2, 3].map((i) => mk(clouds, `<g opacity="${0.5 + (i % 2) * 0.15}" fill="#fff6e6"><ellipse rx="${60 + i * 8}" ry="${14 + (i % 2) * 4}"/><ellipse cx="${-26 + i * 4}" cy="-10" rx="30" ry="14"/><ellipse cx="22" cy="-12" rx="34" ry="15"/></g>`));
+  const birdEls = [0, 1, 2, 3, 4].map(() => mk(birds, '<path class="bird" d="M-7 0 Q-3.5 -5 0 0 Q3.5 -5 7 0" fill="none" stroke="#2a1d14" stroke-width="1.6" stroke-linecap="round"/>'));
 
   // Pila de chatarra (se toca).
   const pile = mk(objectsG, `<g class="pile-body">${pileIso()}</g>`, 'tappable');
@@ -248,18 +248,57 @@ export function createYard(container: HTMLElement): Yard {
 
   const objs: Obj[] = [{ el: pile, depth: PILE.x + PILE.y + 2 }];
 
-  // Camiones de chatarra (atrás) y de expedición (delante).
-  const scrapTrucks = [0, 1, 2].map(() => mk(back, truckIso('#7d8b6a', '#9fb07f', SCRAP_LOAD)));
+  // Camiones de chatarra (atrás): llegan, se acercan a la pila, vuelcan la caja y se van.
+  const scrapTrucks = [0, 1, 2].map(() => mk(back, ''));
+  const scrapKey: string[] = ['', '', ''];
+
+  // Tráfico de fondo en las dos carreteras.
+  const CAR_COLORS = ['#c0392b', '#2f6fb3', '#e8e0d0', '#3fa7a0', '#d4a72c', '#6b5a8a', '#4a4a4a'];
+  const mkCars = (parent: SVGGElement, lanes: { y: number; dir: 1 | -1 }[], perLane: number) => {
+    const list: { g: SVGGElement; y: number; dir: 1 | -1; speed: number; off: number }[] = [];
+    let n = 0;
+    for (const lane of lanes)
+      for (let i = 0; i < perLane; i++) {
+        const g = mk(parent, carIso(CAR_COLORS[(n * 3 + 1) % CAR_COLORS.length], n % 3 === 2, lane.dir < 0));
+        list.push({ g, y: lane.y, dir: lane.dir, speed: 2.2 + (n % 3) * 0.9, off: (i / perLane) * 44 + n * 5 });
+        n++;
+      }
+    return list;
+  };
+  const backCars = mkCars(back, [{ y: BACK_Y - 1.5, dir: -1 }, { y: BACK_Y - 0.5 - 0.35 - 0.3, dir: 1 }], 2);
+  const frontCars = mkCars(front, [{ y: FRONT_Y + 1.9, dir: 1 }], 3);
+
+  // Camión de expedición (delante): carga los productos poco a poco y se va.
   const shipTruck = mk(front, '');
-  let shipLoaded = -1;
-  const golden = mk(front, `<g class="bob">${truckIso('url(#gold)', '#ffd34d', block(0.5, 0.3, 1.12, 0.7, 0.4, 0.2, '#fff1a8'))}</g><g class="sparkles" fill="#fffbd1"><path d="M0 -40 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2Z"/><path d="M50 -30 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5Z"/></g>`, 'tappable');
+  let shipKey = '';
+  let shipPhase: 'park' | 'leave' | 'return' = 'park';
+  let shipT = 0;
+  let shipFill = 0;
+  let shipPending = 0;
+  let pendingMoney = 0;
+  let prevCooldown = -1;
+  let lastTime = -1;
+  const golden = mk(front, `<g class="bob">${goldenTruckIso()}</g><g class="sparkles" fill="#fffbd1"><path d="M0 -40 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2Z"/><path d="M50 -30 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5Z"/></g>`, 'tappable');
   golden.id = 'golden';
   golden.dataset.action = 'golden';
 
-  // Cajas del muelle.
+  // Productos que esperan en el muelle.
   const dockCrates = mk(objectsG, '');
   objs.push({ el: dockCrates, depth: TRUCK_PARK_X + DOCK_Y + 1 });
-  let cratesShown = -1;
+  let cratesKey = '';
+
+  // Trabajadores que pasean por los pasillos.
+  const walkerLooks = ['tuerca', 'piston', 'yunque', 'bujia'];
+  const walkers = [
+    { x0: 1, x1: 18, y0: 14.2, y1: 14.2, speed: 0.9, look: walkerLooks[0] },
+    { x0: -0.3, x1: -0.3, y0: 2.5, y1: 14, speed: 0.7, look: walkerLooks[1] },
+    { x0: 1.5, x1: 18, y0: 8.65, y1: 8.65, speed: 0.6, look: walkerLooks[2] },
+  ].map((w) => {
+    const g = mk(objectsG, `<g transform="scale(1.2)">${personIso(HELPER_LOOKS[w.look])}</g>`, 'worker busy');
+    const o: Obj = { el: g, depth: 0 };
+    objs.push(o);
+    return { ...w, g, o };
+  });
 
   // Líneas de cada zona.
   interface Line {
@@ -280,7 +319,7 @@ export function createYard(container: HTMLElement): Yard {
       def,
       key: '',
       floor: mk(floorLayer, ''),
-      belts: mk(floorLayer, ''),
+      belts: mk(floorLayer, '', 'belts'),
       machines: mk(objectsG, ''),
       worker: mk(objectsG, '', 'worker'),
       pallet: mk(objectsG, ''),
@@ -294,8 +333,15 @@ export function createYard(container: HTMLElement): Yard {
   });
 
   // Carretillas.
-  const cartsG: SVGGElement[] = [];
-  let cartsLoaded: boolean[] = [];
+  interface Cart {
+    g: SVGGElement;
+    o: Obj;
+    key: string;
+    loadN: number;
+    idle: boolean;
+    lastU: number;
+  }
+  const carts: Cart[] = [];
 
   function buildLine(l: Line, state: GameState, i: number, isNext: boolean): void {
     const st = station(i);
@@ -319,6 +365,9 @@ export function createYard(container: HTMLElement): Yard {
     for (let j = 0; j < n; j++) {
       const mx = st.x + 0.2 + j * 1.6;
       belts += tile(mx + 0.4, BELT_Y[st.row] + 0.4, 0.5, st.y + 0.3 - BELT_Y[st.row] - 0.4, BELT_ATTR);
+      const [fx0, fy0] = iso(mx + 0.65, BELT_Y[st.row] + 0.4);
+      const [fx1, fy1] = iso(mx + 0.65, st.y + 0.3);
+      belts += `<polyline class="flow" points="${fx0.toFixed(1)},${fy0.toFixed(1)} ${fx1.toFixed(1)},${fy1.toFixed(1)}" fill="none" stroke="${look.wall}" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="4 14"/>`;
       machines += `<g transform="${at(mx - st.x, 0.3)} scale(1.35)">${machineIso(l.def.id, zone.machineLevel)}</g>`;
     }
     l.belts.innerHTML = belts;
@@ -333,12 +382,42 @@ export function createYard(container: HTMLElement): Yard {
 
   let lastDepthOrder = '';
   let lastEarned = -1;
-  let lastCooldown = 0;
+
+  // Un viaje de carretilla dura CYC s: ir (MOVE), girar en el muelle (TURN), volver (MOVE) y girar junto al palé (TURN).
+  const MOVE = 3.4;
+  const TURN = 0.6;
+  const CYC = 2 * MOVE + 2 * TURN;
+  const lerp = (a: number, b: number, f: number) => a + (b - a) * Math.min(1, Math.max(0, f));
+
+  function cartPose(u: number, p0: { x: number; y: number }, ax: number): { x: number; y: number; ang: number; phase: 0 | 1 | 2 | 3 } {
+    const legA = ax - p0.x;
+    const legB = DOCK_Y - 0.9 - p0.y;
+    const total = legA + legB;
+    const at2 = (d: number) => (d < legA ? { x: p0.x + d, y: p0.y } : { x: ax, y: p0.y + (d - legA) });
+    const w = 0.6;
+    if (u < MOVE) {
+      const d = (u / MOVE) * total;
+      return { ...at2(d), ang: lerp(0, Math.PI / 2, (d - legA + w) / (2 * w)), phase: 0 };
+    }
+    if (u < MOVE + TURN) return { ...at2(total), ang: Math.PI / 2 + Math.PI * ((u - MOVE) / TURN), phase: 1 };
+    if (u < 2 * MOVE + TURN) {
+      const d = (1 - (u - MOVE - TURN) / MOVE) * total;
+      return { ...at2(d), ang: lerp((3 * Math.PI) / 2, Math.PI, (legA - d + w) / (2 * w)), phase: 2 };
+    }
+    return { ...at2(0), ang: Math.PI + Math.PI * ((u - 2 * MOVE - TURN) / TURN), phase: 3 };
+  }
 
   function update(state: GameState): void {
     const t = state.time;
     const nextLocked = ZONES.find((z) => !state.zones[z.id].unlocked)?.id ?? '';
     const working = state.scrap > 0.01 || state.scrapTrucks > 0;
+    const dtv = lastTime < 0 ? 0 : Math.min(0.25, Math.max(0, t - lastTime));
+    lastTime = t;
+
+    // Cielo: nubes y pájaros.
+    cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
+    birdEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * (16 + i * 3) + i * 520) % 2600) - 1100).toFixed(1)} ${(HORIZON - 120 - i * 34 + Math.sin(t * 1.3 + i) * 10).toFixed(1)})`));
+    mainFlow.classList.toggle('on', working);
 
     // Pila.
     const s = 0.85 + Math.min(0.3, Math.log10(1 + state.scrap) / 10);
@@ -347,19 +426,59 @@ export function createYard(container: HTMLElement): Yard {
     pileLabel.innerHTML = `<text x="${plx}" y="${ply}" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${fmtShort(state.scrap)} chatarra</text>`;
     hint.setAttribute('visibility', state.scrapTrucks === 0 ? 'visible' : 'hidden');
 
-    // Camiones de chatarra: llegan por detrás, vuelcan junto a la pila y se van.
+    // Camiones de chatarra: llegan por detrás, maniobran hasta la pila, vuelcan la caja y se van vacíos.
     const nTrucks = Math.min(3, state.scrapTrucks);
     scrapTrucks.forEach((g, i) => {
       if (i >= nTrucks) return g.setAttribute('visibility', 'hidden');
-      const p = (t / 10 + i / nTrucks) % 1;
-      const x = p < 0.35 ? -9 + (p / 0.35) * 12 : p < 0.55 ? 3 : 3 + ((p - 0.55) / 0.45) * 26;
+      const p = (t / 12 + i / nTrucks) % 1;
+      const lane = BACK_Y;
+      let x = 1.2;
+      let y = lane;
+      let tilt = 0;
+      let slide = 0;
+      let dust = 0;
+      if (p < 0.3) x = -5 + (p / 0.3) * 6.2;
+      else if (p < 0.36) y = lane + ((p - 0.3) / 0.06) * 0.85;
+      else if (p < 0.5) {
+        y = lane + 0.85;
+        tilt = Math.min(1, (p - 0.36) / 0.06) * 0.6;
+        slide = Math.min(1, Math.max(0, (p - 0.42) / 0.07));
+        dust = slide > 0.9 ? Math.min(1, (p - 0.49) / 0.04) : 0;
+      } else if (p < 0.56) {
+        y = lane + 0.85;
+        tilt = (1 - (p - 0.5) / 0.06) * 0.6;
+        slide = 1;
+      } else if (p < 0.6) {
+        y = lane + 0.85 * (1 - (p - 0.56) / 0.04);
+        slide = 1;
+      } else {
+        x = 1.2 + ((p - 0.6) / 0.4) * 34;
+        slide = 1;
+      }
+      const loaded = p < 0.5;
+      const key = `${Math.round(tilt * 30)}|${Math.round(slide * 12)}|${Math.round(dust * 6)}|${loaded ? 1 : 0}`;
+      if (scrapKey[i] !== key) {
+        scrapKey[i] = key;
+        g.innerHTML = scrapTruckIso(tilt, true, slide, dust);
+      }
       g.setAttribute('visibility', 'visible');
-      g.setAttribute('transform', at(x, BACK_Y));
+      g.setAttribute('transform', at(x, y));
     });
 
+    // Tráfico de fondo.
+    const drive = (list: typeof backCars) =>
+      list.forEach((c) => {
+        const run = (((c.off + c.dir * t * c.speed) % 44) + 44) % 44;
+        c.g.setAttribute('transform', at(-8 + run, c.y));
+      });
+    drive(backCars);
+    drive(frontCars);
+
     // Líneas.
+    const openIds: string[] = [];
     lines.forEach((l, i) => {
       const zone = state.zones[l.def.id];
+      if (zone.unlocked) openIds.push(l.def.id);
       const key = `${zone.unlocked ? 1 : 0}-${zone.machineLevel}-${Math.min(2, zone.machines)}-${zone.machines}-${l.def.id === nextLocked ? 1 : 0}`;
       if (key !== l.key) {
         l.key = key;
@@ -368,83 +487,111 @@ export function createYard(container: HTMLElement): Yard {
       if (!zone.unlocked) return;
       const running = working && zone.buffer < zoneCapacity(zone) - 0.01;
       l.worker.classList.toggle('busy', running);
+      l.machines.classList.toggle('busy', running);
+      l.belts.classList.toggle('on', running);
       const lvl = l.label.querySelector('.lvl text');
       const txt = `Nv ${zone.helperLevel}`;
       if (lvl && lvl.textContent !== txt) lvl.textContent = txt;
       const stack = Math.ceil(Math.min(1, zone.buffer / zoneCapacity(zone)) * 8);
       if (stack !== l.palletShown) {
         l.palletShown = stack;
-        const c = (ZONE_LOOKS[l.def.id] ?? { wall: '#c58a4a' }).wall;
+        const hgt = PROP_HEIGHT[l.def.id] ?? 0.3;
         let h = block(0, 0, 0, 0.8, 0.8, 0.12, '#b07a45');
-        for (let k = 0; k < stack; k++) h += `<g transform="${at(0.04 + (k % 2) * 0.38, 0.04 + (Math.floor(k / 2) % 2) * 0.38, 0.12 + Math.floor(k / 4) * 0.28)}">${crate(c)}</g>`;
+        for (let k = 0; k < stack; k++) h += `<g transform="${at(0.03 + (k % 2) * 0.4, 0.03 + (Math.floor(k / 2) % 2) * 0.4, 0.12 + Math.floor(k / 4) * hgt)}">${propIso(l.def.id)}</g>`;
         l.pallet.innerHTML = `<g transform="scale(1.25)">${h}</g>`;
       }
     });
 
-    // Carretillas: del palé de cada zona abierta, por su pasillo, hasta el muelle.
+    // Carretillas: cada una atiende una zona abierta, gira en cada extremo y solo lleva productos de verdad.
     const open = ZONES.map((z, i) => ({ z, i })).filter(({ z }) => state.zones[z.id].unlocked);
-    const busy = open.some(({ z }) => state.zones[z.id].buffer > 0.5) || state.dockUnits > 0;
-    const nCarts = busy ? Math.min(8, state.carts) : 0;
-    while (cartsG.length < nCarts) {
+    const nCarts = Math.min(8, state.carts);
+    while (carts.length < nCarts) {
       const g = mk(objectsG, '');
-      cartsG.push(g);
-      objs.push({ el: g, depth: 0 });
-      cartsLoaded.push(false);
+      const o: Obj = { el: g, depth: 0 };
+      objs.push(o);
+      carts.push({ g, o, key: '', loadN: 0, idle: true, lastU: 0 });
     }
-    cartsG.forEach((g, k) => {
-      const obj = objs.find((o) => o.el === g)!;
+    carts.forEach((c, k) => {
       if (k >= nCarts) {
-        g.setAttribute('visibility', 'hidden');
-        obj.depth = -99;
+        c.g.setAttribute('visibility', 'hidden');
+        c.o.depth = -99;
         return;
       }
       const src = open[k % open.length];
+      const zone = state.zones[src.z.id];
       const st = station(src.i);
-      const ax = st.x + 4.0;
       const p0 = { x: st.x + 3.0, y: st.y + 2.7 };
-      const legA = ax - p0.x;
-      const legB = DOCK_Y - 0.9 - p0.y;
-      const total = legA + legB;
-      const ph = ((t / 8 + k * 0.29) % 1) * 2;
-      const going = ph < 1;
-      const d = (going ? ph : 2 - ph) * total;
-      const x = d < legA ? p0.x + d : ax;
-      const y = d < legA ? p0.y : p0.y + (d - legA);
-      if (cartsLoaded[k] !== going || !g.firstChild) {
-        cartsLoaded[k] = going;
-        g.innerHTML = forkliftIso(going, (ZONE_LOOKS[src.z.id] ?? { wall: '#c58a4a' }).wall);
+      const u = (((t / CYC + k * 0.29) % 1) + 1) % 1 * CYC;
+      // Al llegar al palé (mitad del giro) decide si hay algo que llevar.
+      const midTurn = CYC - TURN / 2;
+      if (c.lastU < midTurn && u >= midTurn) {
+        const cap = zoneCapacity(zone);
+        c.loadN = zone.buffer > 0.5 ? Math.max(1, Math.min(3, Math.ceil((zone.buffer / cap) * 3))) : 0;
+        c.idle = c.loadN === 0;
       }
-      g.setAttribute('visibility', 'visible');
-      g.setAttribute('transform', at(x - 0.27, y - 0.35));
-      obj.depth = x + y;
+      if (c.lastU > u) c.lastU = 0;
+      else c.lastU = u;
+      const pose = c.idle ? { x: p0.x, y: p0.y, ang: 0, phase: 3 as const } : cartPose(u, p0, st.x + 4.0);
+      const dockMid = MOVE + TURN / 2;
+      const carrying = !c.idle && (u < dockMid || u >= midTurn) ? c.loadN : 0;
+      const key = `${src.z.id}|${Math.round((pose.ang * 18) / Math.PI)}|${carrying}`;
+      if (key !== c.key) {
+        c.key = key;
+        c.g.innerHTML = forkliftIso(
+          pose.ang,
+          Array.from({ length: carrying }, () => propIso(src.z.id)),
+        );
+      }
+      c.g.setAttribute('visibility', 'visible');
+      c.g.setAttribute('transform', at(pose.x, pose.y));
+      c.o.depth = pose.x + pose.y;
     });
 
-    // Cajas en el muelle.
-    const fill = Math.min(1, state.dockUnits / dockLoad(state));
-    const nCrates = Math.round(fill * 8);
-    if (nCrates !== cratesShown) {
-      cratesShown = nCrates;
-      dockCrates.innerHTML = Array.from({ length: nCrates }, (_, k) => `<g transform="${at(TRUCK_PARK_X + (k % 4) * 0.42, DOCK_Y + 0.4 + Math.floor(k / 4) * 0.42, 0.3)}">${crate('#c58a4a')}</g>`).join('');
+    // Camión de expedición: espera en el muelle mientras se llena, y se va cuando está completo.
+    if (prevCooldown >= 0 && state.truckCooldown > prevCooldown + 0.5) {
+      shipPending = Math.min(2, shipPending + 1);
+      pendingMoney += Math.max(0, state.totalEarned - lastEarned);
     }
-
-    // Camión de expedición: espera junto al muelle y se va cargado.
-    const away = state.truckCooldown / ECONOMY.dock.returnSeconds;
+    prevCooldown = state.truckCooldown;
+    const load = dockLoad(state);
+    if (shipPhase === 'park') {
+      const target = shipPending > 0 ? 1 : Math.min(1, state.dockUnits / load);
+      shipFill = target < shipFill ? target : Math.min(target, shipFill + dtv * 1.4);
+      if (shipPending > 0 && shipFill >= 0.999) {
+        shipPhase = 'leave';
+        shipT = 0;
+        shipPending--;
+        if (pendingMoney > 0) pop('+$' + fmtShort(pendingMoney), 'dock');
+        pendingMoney = 0;
+      }
+    } else {
+      shipT += dtv;
+      if (shipT >= 2.4) {
+        shipT = 0;
+        shipPhase = shipPhase === 'leave' ? 'return' : 'park';
+        shipFill = 0;
+      }
+    }
+    lastEarned = state.totalEarned;
     let tx = TRUCK_PARK_X;
-    if (away > 0) {
-      const p = 1 - away;
-      tx = p < 0.5 ? TRUCK_PARK_X + p * 2 * 22 : TRUCK_PARK_X - 22 + (p - 0.5) * 2 * 22;
-    }
-    const loaded = away > 0 && 1 - away < 0.5 ? 1 : 0;
-    if (loaded !== shipLoaded) {
-      shipLoaded = loaded;
-      shipTruck.innerHTML = truckIso('#c2683a', '#e08a4f', loaded ? block(0.2, 0.2, 1.12, 0.6, 0.6, 0.3, '#c58a4a') + block(0.9, 0.2, 1.12, 0.6, 0.6, 0.3, '#c58a4a') : '');
+    if (shipPhase === 'leave') tx = TRUCK_PARK_X + (shipT / 2.4) * 24;
+    else if (shipPhase === 'return') tx = TRUCK_PARK_X - 24 + (shipT / 2.4) * 24;
+    const count = shipPhase === 'leave' ? TRUCK_SLOTS : shipPhase === 'return' ? 0 : Math.round(shipFill * TRUCK_SLOTS);
+    const ids = Array.from({ length: count }, (_, k) => openIds[k % openIds.length]);
+    const sk = ids.join(',');
+    if (sk !== shipKey) {
+      shipKey = sk;
+      shipTruck.innerHTML = shipTruckIso(ids);
     }
     shipTruck.setAttribute('transform', at(tx, FRONT_Y));
 
-    // Dinero que salta al cobrar un camión.
-    if (lastEarned >= 0 && state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > lastCooldown) pop('+$' + fmtShort(state.totalEarned - lastEarned), 'dock');
-    lastEarned = state.totalEarned;
-    lastCooldown = state.truckCooldown;
+    // Productos que esperan en el muelle mientras no hay camión.
+    const stock = shipPhase === 'park' ? 0 : Math.round(Math.min(1, state.dockUnits / load) * TRUCK_SLOTS);
+    const ck = `${stock}|${openIds.join()}`;
+    if (ck !== cratesKey) {
+      cratesKey = ck;
+      dockCrates.innerHTML = Array.from({ length: stock }, (_, k) => `<g transform="${at(TRUCK_PARK_X + (k % 3) * 0.55, DOCK_Y + 0.35 + Math.floor(k / 3) * 0.5, 0.3)}">${propIso(openIds[k % openIds.length])}</g>`).join('');
+    }
 
     // Camión dorado.
     if (state.goldenVisible > 0) {
@@ -452,6 +599,17 @@ export function createYard(container: HTMLElement): Yard {
       golden.setAttribute('visibility', 'visible');
       golden.setAttribute('transform', at(-2 + p * 10, FRONT_Y + 1.5));
     } else golden.setAttribute('visibility', 'hidden');
+
+    // Trabajadores que pasean.
+    walkers.forEach((w, i) => {
+      const len = Math.hypot(w.x1 - w.x0, w.y1 - w.y0);
+      const run = (t * w.speed + i * 7) % (2 * len);
+      const f = (run < len ? run : 2 * len - run) / len;
+      const x = lerp(w.x0, w.x1, f);
+      const y = lerp(w.y0, w.y1, f);
+      w.g.setAttribute('transform', at(x, y));
+      w.o.depth = x + y + 0.5;
+    });
 
     // Orden de dibujo: lo que está más al fondo, primero.
     const sorted = objs.filter((o) => o.depth > -99).sort((a, b) => a.depth - b.depth);
@@ -463,6 +621,25 @@ export function createYard(container: HTMLElement): Yard {
   }
 
   function pop(text: string, where: 'pile' | 'dock'): void {
+    if (where === 'pile') {
+      pileBody.classList.remove('jiggle');
+      void pileBody.getBoundingClientRect();
+      pileBody.classList.add('jiggle');
+      const [cx, cy] = iso(PILE.x + 1.8, PILE.y + 1.4, 1.8);
+      for (let k = 0; k < 4; k++) {
+        const chip = document.createElementNS(NS, 'rect');
+        const a = Math.random() * Math.PI - Math.PI;
+        chip.setAttribute('x', String(cx - 2));
+        chip.setAttribute('y', String(cy - 2));
+        chip.setAttribute('width', '5');
+        chip.setAttribute('height', '5');
+        chip.setAttribute('fill', ['#b5523b', '#5f7d91', '#c9a24a', '#9aa5ab'][k]);
+        chip.setAttribute('class', 'chip');
+        chip.setAttribute('style', `--dx:${(Math.cos(a) * 34).toFixed(0)}px;--dy:${(Math.sin(a) * 26 - 8).toFixed(0)}px`);
+        pops.appendChild(chip);
+        setTimeout(() => chip.remove(), 600);
+      }
+    }
     const [x, y] = where === 'pile' ? iso(PILE.x + 1.5, PILE.y + 1.5, 2) : iso(TRUCK_PARK_X + 1.2, FRONT_Y, 1.8);
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('transform', `translate(${(x + (Math.random() - 0.5) * 30).toFixed(1)} ${y})`);
@@ -472,7 +649,7 @@ export function createYard(container: HTMLElement): Yard {
   }
 
   // ---- Cámara: arrastrar para mover, pellizcar o rueda para acercar ----
-  const cam = { x: iso(4.5, 6.5)[0], y: iso(4.5, 6.5)[1], scale: 1 };
+  const cam = { x: iso(4.5, 6.5)[0], y: iso(4.5, 4.8)[1], scale: 1 };
   let fitted = false;
   function apply(): void {
     const w = container.clientWidth || 380;
@@ -483,7 +660,7 @@ export function createYard(container: HTMLElement): Yard {
     }
     cam.scale = Math.min(2.2, Math.max(0.4, cam.scale));
     cam.x = Math.min(700, Math.max(-560, cam.x));
-    cam.y = Math.min(560, Math.max(-60, cam.y));
+    cam.y = Math.min(560, Math.max(-230, cam.y));
     const vw = w / cam.scale;
     const vh = h / cam.scale;
     svg.setAttribute('viewBox', `${(cam.x - vw / 2).toFixed(1)} ${(cam.y - vh / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
