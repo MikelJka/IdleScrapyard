@@ -20,6 +20,11 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
   reward: { notes: [523, 659, 784, 1047], step: 0.08, wave: 'triangle', gain: 0.16 },
 };
 
+/** Vibración corta en el móvil (si el aparato lo permite). */
+export function buzz(ms = 12): void {
+  if (!muted) navigator.vibrate?.(ms);
+}
+
 export function isMuted(): boolean {
   return muted;
 }

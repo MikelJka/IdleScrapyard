@@ -2,6 +2,16 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Ranking con Firebase, hitos, logros y calidad profesional
+
+- Mikel: mejor el parpadeo; Firebase para el ranking; propuestas de la noche «como mejor veas»; amplía el roadmap y mejora la calidad general: «que sea un videojuego profesional y no parezca tan indie».
+- Ranking (`src/ui/ranking.ts`, `docs/RANKING.md`): botón 🏆 con apodo y top 50; Firebase se carga solo al abrir el ranking. Está apagado hasta que Mikel cree el proyecto y pegue la configuración en `src/data/firebase.json` (pasos en `docs/RANKING.md`).
+- Simulación: premio al llegar a un múltiplo de 5 de nivel de máquina (`milestoneReward`, una sola vez por hito), logros (`src/data/achievements.json`, `checkAchievements`) y objetivo (`currentGoal`). Partidas antiguas válidas. Tests nuevos (50).
+- Pantalla: línea de objetivo, aviso de logro, lista de logros en ⚙, contador de fotogramas con `?fps=1`, pantalla de carga con logo, icono y manifest, vibración en toques y compras.
+- Roadmap: nueva Fase 2b «Calidad profesional» con 14 tareas (tutorial, interfaz coherente, juice, apertura de zona animada, logística visible, música, ajustes, rendimiento, luz y sombras, estadísticas, accesibilidad, inglés, equilibrio, pruebas).
+- Qué probar: ⚙ (logros), subir una máquina a nivel 5 (premio), `?fps=1` en el Pixel y decirme los fps.
+- Siguiente: tareas de la Fase 2b en orden.
+
 ## 2026-10-19 — Pedidos tras probar en el Pixel 10: líneas, muelle, noche y niveles
 
 - Mikel contesta que sigue parpadeando (menos). El Android empaquetado con Capacitor usa el mismo motor (WebView de Chromium), así que **no lo quita por sí solo**: lo que pesa es dibujar miles de nodos SVG con animaciones; si persiste, habrá que dibujar lo animado en canvas. Sigue anotado como posible tarea (opción N4 de la Parte 11).

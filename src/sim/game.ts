@@ -4,6 +4,7 @@
  */
 import zonesData from '../data/zones.json';
 import economyData from '../data/economy.json';
+import achievementsData from '../data/achievements.json';
 
 export interface ZoneDef {
   id: string;
@@ -36,6 +37,8 @@ export interface ZoneState {
   helperLevel: number;
   /** Segundos que ha trabajado la zona desde el último nivel desbloqueado del ayudante. */
   helperXp: number;
+  /** Mayor múltiplo de 5 de nivel de máquina cuyo premio ya se cobró. */
+  milestone: number;
 }
 
 export interface GameState {
@@ -68,6 +71,8 @@ export interface GameState {
   /** Último día de la racha cobrado (1-7, 0 sin racha) y número del día en que se cobró (-1 nunca). */
   streakDay: number;
   lastClaimDay: number;
+  /** Ids de los logros conseguidos (`src/data/achievements.json`). */
+  achievements: string[];
 }
 
 export function newGame(): GameState {
@@ -82,6 +87,7 @@ export function newGame(): GameState {
       buffer: 0,
       helperLevel: 0,
       helperXp: 0,
+      milestone: 0,
     };
   }
   return {
@@ -105,6 +111,7 @@ export function newGame(): GameState {
     goldenVisible: 0,
     streakDay: 0,
     lastClaimDay: -1,
+    achievements: [],
   };
 }
 
@@ -369,6 +376,58 @@ export function purchases(state: GameState): Purchase[] {
   return list;
 }
 
+/** Premio por llegar a un múltiplo de 5 de nivel de máquina: 10 minutos de lo que produce la línea. */
+export function milestoneReward(def: ZoneDef, zone: ZoneState): number {
+  return 600 * zoneRate(def, zone) * unitValue(def, zone);
+}
+
+export interface AchievementDef {
+  id: string;
+  name: string;
+  kind: 'earned' | 'zones' | 'machineLevel' | 'carts' | 'helperLevel' | 'machines';
+  value: number;
+}
+export const ACHIEVEMENTS: readonly AchievementDef[] = achievementsData as AchievementDef[];
+
+function achievementProgress(state: GameState, kind: AchievementDef['kind']): number {
+  const zs = Object.values(state.zones);
+  switch (kind) {
+    case 'earned':
+      return state.totalEarned;
+    case 'zones':
+      return zs.filter((z) => z.unlocked).length;
+    case 'machineLevel':
+      return Math.max(...zs.map((z) => z.machineLevel));
+    case 'carts':
+      return state.carts;
+    case 'helperLevel':
+      return Math.max(...zs.map((z) => z.helperLevel));
+    case 'machines':
+      return Math.max(...zs.map((z) => z.machines));
+  }
+}
+
+/** Marca los logros recién conseguidos y los devuelve (para avisar al jugador). */
+export function checkAchievements(state: GameState): AchievementDef[] {
+  const got = ACHIEVEMENTS.filter((a) => !state.achievements.includes(a.id) && achievementProgress(state, a.kind) >= a.value);
+  for (const a of got) state.achievements.push(a.id);
+  return got;
+}
+
+export type Goal = { kind: 'unlock'; zoneId: string; cost: number } | { kind: 'machineLevel'; zoneId: string; level: number; cost: number } | { kind: 'done' };
+
+/** Objetivo a la vista: abrir la siguiente zona o, con todas abiertas, el siguiente múltiplo de 5 de máquina más cercano. */
+export function currentGoal(state: GameState): Goal {
+  const next = ZONES.find((d) => !state.zones[d.id].unlocked);
+  if (next) return { kind: 'unlock', zoneId: next.id, cost: next.unlockCost };
+  const p = purchases(state)
+    .filter((x) => x.kind === 'machineLevel')
+    .sort((a, b) => a.cost - b.cost)[0];
+  if (!p) return { kind: 'done' };
+  const zone = state.zones[p.zoneId!];
+  return { kind: 'machineLevel', zoneId: p.zoneId!, level: (Math.floor(zone.machineLevel / 5) + 1) * 5, cost: p.cost };
+}
+
 /** Compra algo si hay dólares. Devuelve si se ha comprado. */
 export function buy(state: GameState, id: string): boolean {
   const p = purchases(state).find((x) => x.id === id);
@@ -392,9 +451,19 @@ export function buy(state: GameState, id: string): boolean {
     case 'speed':
     case 'capacity':
     case 'machines':
-    case 'machineLevel':
       zone![p.kind]++;
       break;
+    case 'machineLevel': {
+      zone!.machineLevel++;
+      // Hito cada 5 niveles de máquina: premio único de unos minutos de producción de la línea.
+      if (zone!.machineLevel % 5 === 0 && zone!.machineLevel > zone!.milestone) {
+        zone!.milestone = zone!.machineLevel;
+        const reward = milestoneReward(ZONES.find((d) => d.id === p.zoneId)!, zone!);
+        state.dollars += reward;
+        state.totalEarned += reward;
+      }
+      break;
+    }
     case 'helper':
       zone!.helperLevel++;
       zone!.helperXp -= ECONOMY.helpers.secondsPerLevel;

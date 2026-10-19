@@ -38,6 +38,31 @@ Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 - [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
 - Prestigio: no en la primera versión (decidido por Mikel)
 
+## Fase 2b — Calidad profesional
+
+Terminado: el juego se ve, suena y se siente como un título de estudio grande, no de aficionado (orden de Mikel, 2026-10-19: «que sea un videojuego profesional y no parezca tan indie»). Cada sesión toma la primera tarea sin marcar.
+
+- [x] Pantalla de carga con logo, icono, manifest e iconos de la web
+- [x] Vibración en toques y compras
+- [x] Contador de fotogramas (`?fps=1`) para medir el parpadeo
+- [x] Objetivo a la vista, logros con aviso y lista en ajustes
+- [x] Hito cada 5 niveles de máquina con premio
+- [x] Ranking mundial: código listo (Firebase); falta que Mikel cree el proyecto (`docs/RANKING.md`)
+- [ ] Tutorial de los primeros 2 minutos: flechas y mensajes que guían (tocar la pila, comprar, abrir un puesto, abrir la segunda zona)
+- [ ] Interfaz coherente: iconos SVG propios en lugar de emojis, tipografía y botones con relieve en todo, paneles con transición, cifras que cuentan hacia arriba
+- [ ] «Juice»: monedas que vuelan al contador al cobrar, números flotantes por camión, destello al comprar, temblor suave al abrir una zona
+- [ ] Apertura de zona animada (se levanta el andamio y entra la máquina)
+- [ ] Logística visible (L1): las carretillas sueltan su producto en su huella y el camión se llena de las huellas
+- [ ] Música ambiental sintetizada (suave, con volumen propio) y sonidos por tipo de línea
+- [ ] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
+- [ ] Rendimiento: ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
+- [ ] Iluminación y sombras suaves en toda la escena, no solo de noche (degradados, ambient occlusion falso bajo las máquinas)
+- [ ] Estadísticas del jugador (tiempo jugado, camiones, mejor racha) en ajustes
+- [ ] Accesibilidad: texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
+- [ ] Textos en inglés con selector de idioma
+- [ ] Equilibrio con el bot: tabla de tiempos por zona y grado de máquina, propuesta de números para Mikel
+- [ ] Pruebas: la prueba de humo comprueba el panel por línea, el ranking apagado y la noche; tests de interfaz sencillos
+
 ## Fase 3 — Android y monetización
 
 Terminado: el juego está en la prueba cerrada de Google Play con anuncios de prueba funcionando.

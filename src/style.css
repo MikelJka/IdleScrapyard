@@ -117,3 +117,20 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #sheet { max-height: 70%; overflow-y: auto; }
 #transfer[hidden] { display: none; }
 #sheet { max-height: 56%; }
+
+#ranking-btn { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px 0; font-size: 20px; background: none; border: 0; cursor: pointer; }
+#stats .goal { color: #ffd76a; font-weight: 800; }
+#toast { position: absolute; left: 50%; top: 120px; transform: translateX(-50%); z-index: 6; padding: 8px 14px; font-size: 14px; font-weight: 900; color: #2a1d14; background: #ffd76a; border: 2px solid #fff1a8; border-radius: 14px; box-shadow: 0 3px 0 rgba(0,0,0,.35); pointer-events: none; }
+#toast[hidden], #fps[hidden], #ranking[hidden], #achieve[hidden] { display: none; }
+#fps { position: absolute; left: 10px; bottom: 10px; padding: 2px 8px; font: 700 11px monospace; color: #8be28b; background: rgba(0,0,0,.6); border-radius: 8px; pointer-events: none; }
+#ranking, #achieve { color: var(--ink); font-size: 14px; margin: 0 4px 8px; }
+#ranking form { display: flex; gap: 8px; margin-bottom: 8px; }
+#ranking input { flex: 1; min-height: 44px; padding: 0 10px; font: inherit; color: var(--ink); background: #3a2d20; border: 2px solid #5f4a33; border-radius: 12px; }
+#ranking form button { min-height: 44px; padding: 0 14px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
+#ranking ol { margin: 0; padding-left: 28px; }
+#ranking li { padding: 4px 0; }
+#ranking li > span { display: inline-block; min-width: 55%; }
+#ranking li.me { color: #ffd76a; font-weight: 900; }
+#achieve ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+#achieve li { opacity: 0.55; font-size: 13px; }
+#achieve li.got { opacity: 1; }

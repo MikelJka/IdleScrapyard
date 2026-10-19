@@ -6,8 +6,12 @@ import {
   advance,
   bottleneck,
   buy,
+  ACHIEVEMENTS,
   canBoost,
+  checkAchievements,
   claimDaily,
+  currentGoal,
+  milestoneReward,
   claimGoldenTruck,
   dailyReward,
   dockLoad,
@@ -31,7 +35,8 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { t } from './texts';
 import { store } from './storage';
-import { isMuted, play, setMuted } from './sound';
+import { buzz, isMuted, play, setMuted } from './sound';
+import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
 const AUTOSAVE_MS = 10_000;
 
@@ -86,9 +91,12 @@ export function startApp(root: HTMLElement): void {
         <div class="money"><span class="coin">$</span><span id="dollars"></span></div>
         <span id="rate"></span>
         <button id="mute" type="button"></button>
+        <button id="ranking-btn" type="button" aria-label="${t('ranking.title')}">🏆</button>
         <button id="settings" type="button" aria-label="${t('settings.title')}">⚙️</button>
       </header>
       <div id="stats"></div>
+      <div id="toast" hidden></div>
+      <div id="fps" hidden></div>
       <div id="welcome" hidden></div>
       <aside id="extras"></aside>
       <p id="tip">${t('tip')}</p>
@@ -96,6 +104,8 @@ export function startApp(root: HTMLElement): void {
         <div class="sheet-head"><h2 id="sheet-title"></h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
         <div id="panel-info"></div>
         <div id="shop"></div>
+        <div id="ranking" hidden></div>
+        <div id="achieve" hidden></div>
         <div id="transfer" hidden>
           <b>${t('transfer.title')}</b>
           <small>${t('transfer.help')}</small>
@@ -151,6 +161,7 @@ export function startApp(root: HTMLElement): void {
   scene.el.querySelector('#pile')!.addEventListener('click', () => {
     tap(state);
     play('tap');
+    buzz(8);
     scene.pop('+' + ECONOMY.tap.scrap, 'pile');
   });
   const mute = $('mute');
@@ -170,6 +181,7 @@ export function startApp(root: HTMLElement): void {
   let lastInfo = '';
   const panelTitle = (sel: string): string => {
     if (sel === 'settings') return t('settings.title');
+    if (sel === 'ranking') return t('ranking.title');
     if (sel === 'dock') return t('panel.dock');
     if (sel === 'trucks') return t('panel.trucks');
     return ZONES.find((z) => z.id === sel)?.name ?? '';
@@ -179,15 +191,74 @@ export function startApp(root: HTMLElement): void {
     lastShop = lastInfo = '';
     $('sheet').hidden = sel === null;
     $('transfer').hidden = sel !== 'settings';
-    scene.setSelected(sel === 'settings' ? null : sel);
+    $('achieve').hidden = sel !== 'settings';
+    $('ranking').hidden = sel !== 'ranking';
+    $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
+    $('shop').hidden = sel === 'settings' || sel === 'ranking';
+    const global = sel === 'settings' || sel === 'ranking';
+    scene.setSelected(global ? null : sel);
     if (sel) $('sheet-title').textContent = panelTitle(sel);
-    if (sel && sel !== 'settings') scene.focus(sel);
+    if (sel && !global) scene.focus(sel);
+    if (sel === 'settings') drawAchievements();
+    if (sel === 'ranking') void drawRanking();
   };
   scene.onSelect((sel) => {
     play('tap');
     openPanel(panel === sel ? null : sel);
   });
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
+  $('ranking-btn').addEventListener('click', () => openPanel(panel === 'ranking' ? null : 'ranking'));
+
+  const esc = (x: string) => x.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  function drawAchievements(): void {
+    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '🏅' : '🔒'} ${esc(a.name)}</li>`).join('')}</ul>`;
+  }
+  async function drawRanking(): Promise<void> {
+    const box = $('ranking');
+    if (!rankingEnabled) {
+      box.innerHTML = `<p class="empty">${t('ranking.off')}</p>`;
+      return;
+    }
+    const nick = getNick();
+    box.innerHTML = `<form id="nick-form"><input id="nick" maxlength="16" placeholder="${t('ranking.nick')}" value="${esc(nick)}" autocomplete="off"><button type="submit">${t('ranking.save')}</button></form><div id="rank-list">${t('ranking.loading')}</div>`;
+    box.querySelector('form')!.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const clean = cleanNick((box.querySelector('#nick') as HTMLInputElement).value);
+      if (!clean) return alert(t('ranking.badNick'));
+      setNick(clean);
+      void sendScore().then(() => drawRanking());
+    });
+    try {
+      const { list, me } = await topScores(50);
+      box.querySelector('#rank-list')!.innerHTML = list.length
+        ? `<ol>${list.map((r) => `<li class="${r.uid === me ? 'me' : ''}"><span>${esc(r.name)}</span><b>$${fmt(r.total)}</b></li>`).join('')}</ol>`
+        : `<p class="empty">${t('ranking.empty')}</p>`;
+    } catch {
+      box.querySelector('#rank-list')!.innerHTML = `<p class="empty">${t('ranking.error')}</p>`;
+    }
+  }
+  let sentTotal = -1;
+  async function sendScore(): Promise<void> {
+    const nick = getNick();
+    if (!rankingEnabled || !nick || state.totalEarned === sentTotal) return;
+    try {
+      await submitScore(nick, state.totalEarned);
+      sentTotal = state.totalEarned;
+    } catch {
+      // sin conexión: se reintenta en el siguiente envío
+    }
+  }
+  setInterval(() => void sendScore(), 60_000);
+
+  // Avisos breves (logros).
+  let toastTimer = 0;
+  function toast(text: string): void {
+    const el = $('toast');
+    el.textContent = text;
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (el.hidden = true), 3500);
+  }
   $('close-shop').addEventListener('click', () => openPanel(null));
   scene.el.querySelector('#golden')!.addEventListener('click', async () => {
     if (busy || state.goldenVisible <= 0) return;
@@ -220,7 +291,10 @@ export function startApp(root: HTMLElement): void {
   });
   $('shop').addEventListener('click', (e) => {
     const id = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]')?.dataset.id;
-    if (id && buy(state, id)) play('buy');
+    if (id && buy(state, id)) {
+      play('buy');
+      buzz(15);
+    }
   });
 
   $('extras').addEventListener('click', async (e) => {
@@ -280,6 +354,10 @@ export function startApp(root: HTMLElement): void {
     lastCooldown = state.truckCooldown;
     renderStats();
     celebrateLevels();
+    for (const a of checkAchievements(state)) {
+      toast(t('achieve.got', { name: a.name }));
+      play('reward');
+    }
     if (panel === null || panel === 'settings') return;
     const sel = panel;
     const mine = purchases(state).filter((p) =>
@@ -310,11 +388,18 @@ export function startApp(root: HTMLElement): void {
   function renderStats(): void {
     const pallets = ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0);
     const jam = bottleneck(state);
+    const goal = currentGoal(state);
+    const goalTxt =
+      goal.kind === 'unlock'
+        ? t('goal.unlock', { name: ZONES.find((z) => z.id === goal.zoneId)!.name, cost: fmt(goal.cost), left: fmt(Math.max(0, goal.cost - state.dollars)) })
+        : goal.kind === 'machineLevel'
+          ? t('goal.level', { name: ZONES.find((z) => z.id === goal.zoneId)!.name, level: goal.level, cost: fmt(goal.cost) })
+          : '';
     const html = `<b>${t('stats.scrap', { n: fmt(state.scrap), in: fmt(scrapPerSecond(state)), need: fmt(scrapDemand(state)) })}</b><br>${t('stats.stock', {
       pallets: fmt(pallets),
       dock: fmt(state.dockUnits),
       load: dockLoad(state),
-    })}${jam === 'none' ? '' : ` · <span class="jam">${t('jam.' + jam)}</span>`}`;
+    })}${jam === 'none' ? '' : ` · <span class="jam">${t('jam.' + jam)}</span>`}${goalTxt ? `<br><span class="goal">${goalTxt}</span>` : ''}`;
     if (html !== lastStats) {
       lastStats = html;
       $('stats').innerHTML = html;
@@ -339,7 +424,8 @@ export function startApp(root: HTMLElement): void {
         const prev = seen[id];
         seen[id] = now;
         if (prev === undefined || now <= prev || now % 5 !== 0) continue;
-        scene.celebrate(z.id, t('levelUp', { what: t(key), n: now }), field === 'machineLevel');
+        const reward = field === 'machineLevel' ? ` +$${fmt(milestoneReward(z, zone))}` : '';
+        scene.celebrate(z.id, t('levelUp', { what: t(key), n: now }) + reward, field === 'machineLevel');
         play('reward');
       }
     }
@@ -363,7 +449,25 @@ export function startApp(root: HTMLElement): void {
 
   let last = performance.now();
   let lastSave = last;
+  const showFps = new URLSearchParams(location.search).has('fps');
+  let frames = 0;
+  let fpsAt = performance.now();
+  let worst = 0;
+  let prevFrame = fpsAt;
   const loop = (now: number) => {
+    if (showFps) {
+      frames++;
+      worst = Math.max(worst, now - prevFrame);
+      prevFrame = now;
+      if (now - fpsAt >= 1000) {
+        const el = $('fps');
+        el.hidden = false;
+        el.textContent = `${frames} fps · peor ${Math.round(worst)} ms`;
+        frames = 0;
+        worst = 0;
+        fpsAt = now;
+      }
+    }
     advance(state, Math.min((now - last) / 1000, 1));
     last = now;
     if (now - lastSave > AUTOSAVE_MS && !importing) {

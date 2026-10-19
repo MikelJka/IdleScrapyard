@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ECONOMY, ZONES, advance, bottleneck, buy, dockLoad, load, newGame, purchases, scrapDemand, serialize, tap, zoneStatus } from '../src/sim/game';
+import { ECONOMY, ZONES, advance, bottleneck, buy, checkAchievements, currentGoal, dockLoad, load, newGame, purchases, scrapDemand, serialize, tap, zoneStatus } from '../src/sim/game';
 import { DEFAULT_BOT, playBot } from '../src/sim/bot';
 
 describe('cadena de la chatarra', () => {
@@ -183,5 +183,40 @@ describe('cuello de botella', () => {
     const one = scrapDemand(s);
     s.zones.crusher.machines = 3;
     expect(scrapDemand(s)).toBeCloseTo(one * 3, 6);
+  });
+});
+
+describe('hitos, logros y objetivo', () => {
+  it('al llegar a un múltiplo de 5 de máquina se cobra el premio una sola vez', () => {
+    const s = newGame();
+    s.zones.crusher.machineLevel = 4;
+    s.dollars = 1e12;
+    const before = s.dollars;
+    const cost = purchases(s).find((p) => p.id === 'machineLevel:crusher')!.cost;
+    expect(buy(s, 'machineLevel:crusher')).toBe(true);
+    expect(s.zones.crusher.milestone).toBe(5);
+    expect(s.dollars).toBeGreaterThan(before - cost);
+    const after = s.dollars;
+    buy(s, 'machineLevel:crusher'); // nivel 6: sin premio
+    expect(s.dollars).toBeLessThan(after);
+  });
+
+  it('los logros se dan una vez', () => {
+    const s = newGame();
+    expect(checkAchievements(s)).toEqual([]);
+    s.totalEarned = 2000;
+    expect(checkAchievements(s).map((a) => a.id)).toEqual(['earned1k']);
+    expect(checkAchievements(s)).toEqual([]);
+  });
+
+  it('el objetivo es abrir la siguiente zona', () => {
+    const g = currentGoal(newGame());
+    expect(g.kind).toBe('unlock');
+  });
+
+  it('una partida antigua sin hitos ni logros se carga', () => {
+    const s = load(JSON.stringify({ zones: { crusher: { unlocked: true } } }));
+    expect(s.achievements).toEqual([]);
+    expect(s.zones.crusher.milestone).toBe(0);
   });
 });
