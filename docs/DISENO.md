@@ -88,3 +88,9 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Zonas** (2026-10-19): se desbloquean con dólares y cada una transforma la chatarra en un producto de más valor (p. ej. aplastado de chatarra → bloques de chatarra, 1 $; fundido de chatarra → lingotes de chatarra, 4 $…).
 - **Ayudantes** (2026-10-19): uno nuevo por cada zona desbloqueada. Según su nivel dan mejoras, por ejemplo que lo producido valga más dinero.
 - **Prestigio** (2026-10-19): no en la primera versión; en una actualización posterior.
+- **Chatarra** (2026-10-19): al principio se recoge tocando la pila; luego se compran camiones que la traen solos.
+- **Zonas en paralelo** (2026-10-19): cada zona transforma la chatarra directamente en su producto; las nuevas dan un producto que vale más.
+- **Expedición** (2026-10-19): se compran carretillas que llevan lo fabricado a un muelle de carga; los camiones llegan solos a cargar cuando el muelle tiene suficiente stock, y al expedirlo se convierte en dólares.
+- **Mejoras de cada zona** (2026-10-19, con dólares): velocidad, capacidad, número de máquinas y nivel de las máquinas.
+- **Nivel de los ayudantes** (2026-10-19): la experiencia por trabajar desbloquea el siguiente nivel y se paga en dólares para subirlo.
+- **Qué mejoran los ayudantes** (2026-10-19): el valor de lo producido y la velocidad de su zona.

@@ -12,16 +12,18 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-- **Parte 2 — Cómo funciona la cadena** (2026-10-19; la Parte 1 ya está en «Decidido» de DISENO.md):
-  - **De dónde sale la chatarra**: **A** el jugador toca la pila para recogerla y luego compra camiones que la traen solos; **B** llega sola desde el principio a un ritmo que se mejora con dólares; **C** se compra con dólares a un precio que va subiendo.
-  - **Cómo se encadenan las zonas**: **E** en cadena: cada zona usa lo que hace la anterior (chatarra → bloques → lingotes…); **P** en paralelo: cada zona transforma chatarra directamente y vale más; **M** mezcla: las primeras en paralelo y las avanzadas en cadena.
-  - **Expedición**: **X** automática y continua (lo terminado se vende al momento); **T** un camión de expedición que sale cada pocos segundos con una capacidad que se mejora; **K** el jugador toca «Expedir» y, más adelante, un ayudante lo automatiza.
-  - **Mejoras de cada zona (con dólares)**: **1** solo velocidad; **2** velocidad y capacidad; **3** velocidad, capacidad y número de máquinas.
-  - **Cómo sube de nivel un ayudante**: **D** pagando dólares; **H** con experiencia por trabajar (sube solo con el tiempo); **DH** las dos cosas (la experiencia desbloquea el nivel y se paga para subirlo).
-  - **Qué mejora un ayudante** (además de que lo producido valga más): **V** solo el valor; **R** valor y velocidad; **Z** cada ayudante una cosa distinta según su rasgo (valor, velocidad, capacidad, ganancias con el juego cerrado…).
+- **Parte 3 — Zonas y ayudantes** (2026-10-19; las Partes 1 y 2 ya están en «Decidido» de DISENO.md):
+  - **Cuántas zonas en la primera versión**: **4**; **6**; **8**.
+  - **Qué se fabrica** (cada zona transforma chatarra directamente; los precios son un punto de partida y se ajustarán con pruebas):
+    - **I** industrial: bloques (1 $) → lingotes (4 $) → chapa (15 $) → tubos (60 $) → vigas (250 $) → piezas de motor (1 K $) → motores (4 K $) → coches reconstruidos (15 K $).
+    - **H** de humor: bloques (1 $) → lingotes (4 $) → tostadoras «casi nuevas» (15 $) → bicis frankenstein (60 $) → robots mascota (250 $) → coches tuneados (1 K $) → tanques de juguete (4 K $) → cohetes caseros (15 K $).
+    - **Mx** mezcla: las primeras industriales (bloques, lingotes, chapa) y luego de humor (tostadoras, robots, coches tuneados, cohetes…).
+  - **Cómo son los ayudantes**: **F** personajes fijos con nombre y personalidad, uno por zona (p. ej. «Tuerca», la que aplasta); **G** se generan con nombre y aspecto al azar al abrir cada zona; **FG** fijos los primeros y al azar los siguientes.
+  - **Camiones**: **Q** todos iguales y se mejora la carga que esperan (el «X stock»); **W** varios tipos de camión (cada uno más grande y que paga más); **QW** primero uno y más adelante se desbloquean más grandes.
 
-Las siguientes partes, cuando respondas a esta: la lista de zonas (nombres, productos y precios), retención (premio diario, sucesos) y anuncios y compras.
+Las siguientes partes, cuando respondas a esta: retención (premio diario, sucesos) y anuncios y compras.
 
 ## Hecho
 
 - [x] **Parte 1 del diseño — tema y monedas** (2026-10-19): decidido por Mikel; resumido en «Decidido» de DISENO.md.
+- [x] **Parte 2 del diseño — cómo funciona la cadena** (2026-10-19): decidido por Mikel; resumido en «Decidido» de DISENO.md.
