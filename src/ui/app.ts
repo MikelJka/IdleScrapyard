@@ -22,9 +22,9 @@ import { buyPass, showRewardedAd } from './ads';
 import { pack, unpack } from '../sim/offline';
 import { fromCode, toCode } from '../sim/transfer';
 import { t } from './texts';
+import { store } from './storage';
 import { isMuted, play, setMuted } from './sound';
 
-const KEY = 'chatarrero.save';
 const AUTOSAVE_MS = 10_000;
 
 function fmt(n: number): string {
@@ -45,19 +45,11 @@ function localDay(): number {
 }
 
 function readSave(): string | null {
-  try {
-    return localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
+  return store.read();
 }
 
 function writeSave(state: GameState): void {
-  try {
-    localStorage.setItem(KEY, pack(state, Date.now()));
-  } catch {
-    /* sin almacenamiento: se juega igual */
-  }
+  store.write(pack(state, Date.now()));
 }
 
 function shopIcon(kind: string, zoneId?: string): string {
@@ -153,11 +145,7 @@ export function startApp(root: HTMLElement): void {
     if (json === null) return alert(t('transfer.invalid'));
     if (!confirm(t('transfer.confirm'))) return;
     importing = true;
-    try {
-      localStorage.setItem(KEY, json);
-    } catch {
-      return alert(t('transfer.invalid'));
-    }
+    if (!store.write(json)) return alert(t('transfer.invalid'));
     location.reload();
   });
   $('shop').addEventListener('click', (e) => {

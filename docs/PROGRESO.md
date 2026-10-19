@@ -2,6 +2,11 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Guardado reemplazable
+
+- Mikel elige S1 (solo código manual) con la condición de poder cambiarlo fácilmente. `src/ui/storage.ts` define `SaveStore` (`read`/`write`) y `app.ts` solo usa `store`: una nube futura es otra implementación y un cambio de una línea.
+- Siguiente: animación de vuelco de chatarra y pulir.
+
 ## 2026-10-19 — Partida en otro dispositivo
 
 - Mikel pregunta si la partida es multidispositivo: hasta ahora no (solo `localStorage`). Primera parte sin servidor: `src/sim/transfer.ts` convierte el guardado en un código `CHAT1:…` y lo valida al leerlo; tests en `tests/transfer.test.ts`.

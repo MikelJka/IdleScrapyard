@@ -112,3 +112,4 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Racha de 7 días** (2026-10-19): el día 1 da 10 min de producción y sube hasta 2 h el día 7 (10, 20, 30, 45, 60, 90 y 120 min). Si se falta un día, vuelve al día 1.
 - **Camión dorado** (2026-10-19): aparece cada ~15 min y espera 20 s a que lo toques.
 - **Precio del Pase de chatarrero** (2026-10-19): 2,99 €, pago único.
+- **Partida en varios dispositivos** (2026-10-19): por ahora solo el código de partida que se copia y se pega (S1). El guardado pasa por `SaveStore` (`src/ui/storage.ts`) para poder cambiarlo por una nube más adelante sin tocar el resto.
