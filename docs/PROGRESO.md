@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Sonidos
+
+- `src/ui/sound.ts`: sonidos sintetizados con WebAudio (sin archivos ni licencias): toque en la pila, cobro del camión, compra, camión dorado y premios. Botón 🔊/🔇 abajo a la izquierda; se recuerda en el móvil.
+- Qué probar: tocar la pila, comprar algo, esperar a que se vaya un camión y silenciar con el botón.
+- Siguiente: animaciones (vuelco de chatarra, monedas al cobrar) y pulir; después Android.
+
 ## 2026-10-19 — Vista isométrica a pantalla completa
 
 - Mikel enseña una captura de un idle de serrería isométrico como referencia.

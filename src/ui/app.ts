@@ -21,6 +21,7 @@ import { createYard } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { pack, unpack } from '../sim/offline';
 import { t } from './texts';
+import { isMuted, play, setMuted } from './sound';
 
 const KEY = 'chatarrero.save';
 const AUTOSAVE_MS = 10_000;
@@ -85,6 +86,7 @@ export function startApp(root: HTMLElement): void {
       </header>
       <p id="welcome" hidden></p>
       <aside id="extras"></aside>
+      <button id="mute" type="button" aria-label="${t('sound')}"></button>
       <button id="open-shop" type="button"><span class="cart">🛒</span><span>${t('shop.title')}</span><b id="shop-badge" hidden></b></button>
       <section id="sheet" hidden>
         <div class="sheet-head"><h2>${t('shop.title')}</h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
@@ -102,7 +104,16 @@ export function startApp(root: HTMLElement): void {
   const scene = createYard($('scene-wrap'));
   scene.el.querySelector('#pile')!.addEventListener('click', () => {
     tap(state);
+    play('tap');
     scene.pop('+' + ECONOMY.tap.scrap, 'pile');
+  });
+  const muteBtn = $('mute');
+  const showMute = () => (muteBtn.textContent = isMuted() ? '🔇' : '🔊');
+  showMute();
+  muteBtn.addEventListener('click', () => {
+    setMuted(!isMuted());
+    showMute();
+    play('tap');
   });
   $('open-shop').addEventListener('click', () => ($('sheet').hidden = false));
   $('close-shop').addEventListener('click', () => ($('sheet').hidden = true));
@@ -110,14 +121,17 @@ export function startApp(root: HTMLElement): void {
     if (busy || state.goldenVisible <= 0) return;
     busy = true;
     try {
-      if (await rewarded()) claimGoldenTruck(state);
+      if (await rewarded()) {
+        claimGoldenTruck(state);
+        play('golden');
+      }
     } finally {
       busy = false;
     }
   });
   $('shop').addEventListener('click', (e) => {
     const id = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]')?.dataset.id;
-    if (id) buy(state, id);
+    if (id && buy(state, id)) play('buy');
   });
 
   $('extras').addEventListener('click', async (e) => {
@@ -125,8 +139,8 @@ export function startApp(root: HTMLElement): void {
     if (!action || busy) return;
     busy = true;
     try {
-      if (action === 'daily') claimDaily(state, localDay());
-      if (action === 'boost' && canBoost(state) && (await rewarded())) activateBoost(state);
+      if (action === 'daily' && claimDaily(state, localDay()) > 0) play('reward');
+      if (action === 'boost' && canBoost(state) && (await rewarded()) && activateBoost(state)) play('reward');
       if (action === 'pass' && !state.hasPass && (await buyPass(ECONOMY.pass.priceEur))) state.hasPass = true;
       writeSave(state);
     } finally {
@@ -154,6 +168,7 @@ export function startApp(root: HTMLElement): void {
     return buttons.join('');
   }
 
+  let lastEarned = state.totalEarned;
   let lastExtras = '';
   let lastShop = '';
   function render(): void {
@@ -163,6 +178,9 @@ export function startApp(root: HTMLElement): void {
       $('extras').innerHTML = extras;
       lastExtras = extras;
     }
+    // Cobro de un camión de expedición: suena la caja.
+    if (state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > 0) play('cash');
+    lastEarned = state.totalEarned;
     $('dollars').textContent = fmt(state.dollars);
     $('rate').textContent = t('incomeRate', { n: fmt(incomePerSecond(state)) });
     scene.update(state);
