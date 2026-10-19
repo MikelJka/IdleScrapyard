@@ -19,7 +19,7 @@ import { HELPER_LOOKS } from './look';
 import { FORKLIFT, helperFace, productIcon, truck } from './icons';
 import { createYard } from './yard';
 import { buyPass, showRewardedAd } from './ads';
-import { pack, unpack } from '../sim/offline';
+import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/offline';
 import { fromCode, toCode } from '../sim/transfer';
 import { t } from './texts';
 import { store } from './storage';
@@ -79,7 +79,7 @@ export function startApp(root: HTMLElement): void {
         <span id="rate"></span>
         <button id="mute" type="button"></button>
       </header>
-      <p id="welcome" hidden></p>
+      <div id="welcome" hidden></div>
       <aside id="extras"></aside>
       <button id="open-shop" type="button"><span class="cart">🛒</span><span>${t('shop.title')}</span><b id="shop-badge" hidden></b></button>
       <section id="sheet" hidden>
@@ -96,9 +96,45 @@ export function startApp(root: HTMLElement): void {
   if (result.simulatedSeconds > 60) {
     const w = $('welcome');
     w.hidden = false;
-    w.textContent = t('welcomeBack', { dollars: fmt(result.dollarsEarned), minutes: Math.round(result.simulatedSeconds / 60) });
-    w.addEventListener('click', () => (w.hidden = true));
-    setTimeout(() => (w.hidden = true), 8000);
+    // Anuncios al volver: ×2 a lo ganado (A3) y recuperar lo perdido por pasar del tope (A4).
+    let doubled = false;
+    let recovered = result.lostSeconds <= 0;
+    const draw = () => {
+      const hours = Math.round((result.lostSeconds / 3600) * 10) / 10;
+      w.innerHTML = `<div class="welcome-text">${t('welcomeBack', { dollars: fmt(result.dollarsEarned), minutes: Math.round(result.simulatedSeconds / 60) })}</div>
+        <div class="welcome-actions">
+          ${doubled ? '' : `<button type="button" data-offline="double">${t('offline.double', { dollars: fmt(result.dollarsEarned) })}</button>`}
+          ${recovered ? '' : `<button type="button" data-offline="recover">${t('offline.recover', { hours, dollars: fmt(result.lostDollars) })}</button>`}
+          <button type="button" data-offline="close" aria-label="${t('close')}">✕</button>
+        </div>`;
+    };
+    draw();
+    w.addEventListener('click', async (e) => {
+      const action = (e.target as HTMLElement).closest<HTMLElement>('button[data-offline]')?.dataset.offline;
+      if (!action || busy) return;
+      if (action === 'close') {
+        w.hidden = true;
+        return;
+      }
+      busy = true;
+      try {
+        if (!(await rewarded())) return;
+        if (action === 'double' && !doubled) {
+          doubled = true;
+          doubleOfflineEarnings(state, result.dollarsEarned);
+        }
+        if (action === 'recover' && !recovered) {
+          recovered = true;
+          recoverLostTime(state, result.lostSeconds);
+        }
+        play('reward');
+        writeSave(state);
+        if (doubled && recovered) w.hidden = true;
+        else draw();
+      } finally {
+        busy = false;
+      }
+    });
   }
   const scene = createYard($('scene-wrap'));
   scene.el.querySelector('#pile')!.addEventListener('click', () => {

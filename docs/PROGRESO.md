@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Decorado nuevo, día y noche y anuncios al volver
+
+- Mikel envía un vídeo de la web y elige D1, D3, D4 y D5 (fondo) y A3 y A4 (anuncios al volver). En el vídeo se ve un parpadeo en el que desaparecen máquinas y ayudantes durante un fotograma y mucho espacio vacío; para aligerar, lo estático (ciudad, terreno, suelo, nave y puerto) pasa a imágenes que se dibujan una vez y las animaciones ocultas se apagan (de ~3000 a ~2000 nodos).
+- `src/ui/scenery.ts`: ciudad con 4 capas, autopista elevada con coches, farolas con luz de noche, árboles secos, cartel, aceras, charcos y manchas de suelo, vía con tren de mercancías que pasa cada 75 s, grúa pórtico, barco con contenedores, agua con destellos; interior de la nave con estanterías, oficina de cristal, depósitos, bidones, taquillas y palés; andamio y lona en las zonas cerradas. Cielo de día, atardecer y noche según la hora local (`?hora=22` en la URL para probar); de noche se encienden las ventanas y las farolas.
+- `src/sim/offline.ts`: `unpack` devuelve también `lostSeconds` y `lostDollars` (lo perdido por pasar del tope libre, hasta las 8 h); `doubleOfflineEarnings` y `recoverLostTime`. Tests en `tests/offline.test.ts`.
+- Pantalla: el aviso de bienvenida tiene los botones «×2» y «Recuperar N h» (con el Pase se dan sin anuncio) y una ✕ para cerrarlo.
+- Qué probar: arrastrar hacia arriba (ciudad y autopista) y hacia abajo (tren, grúa y barco); la hora del día; volver tras más de 1 h y usar los dos botones; si el parpadeo del vídeo sigue.
+- Siguiente: lo que diga Mikel; pulir el rendimiento si el parpadeo persiste en el móvil.
+
 ## 2026-10-19 — Arreglos de la escena, AGV y tope de 1 h
 
 - Animaciones de las líneas: prensa, engranaje, humo, chispas, cintas y ayudante se mueven con un nivel de trabajo suavizado en código (arrancan rápido, paran despacio, sin reinicios ni saltos cuando la chatarra llega a golpes).

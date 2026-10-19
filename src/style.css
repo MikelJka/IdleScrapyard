@@ -32,7 +32,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .money { display: flex; align-items: center; gap: 8px; font-size: 26px; font-weight: 900; color: #ffd76a; text-shadow: 0 2px 0 #7a4a10; }
 .coin { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff1a8, #f2b705 60%, #b07d00); color: #7a4a10; font-size: 16px; text-shadow: none; border: 2px solid #7a4a10; }
 #rate { font-size: 14px; font-weight: 800; color: #b8e986; }
-#welcome { position: absolute; top: 68px; left: 10px; right: 10px; margin: 0; padding: 10px 12px; background: #2f5d3a; border: 2px solid #4f8a5c; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--ink); }
+#welcome { pointer-events: auto; z-index: 5; position: absolute; top: 68px; left: 10px; right: 10px; margin: 0; padding: 10px 12px; background: #2f5d3a; border: 2px solid #4f8a5c; border-radius: 12px; font-size: 14px; font-weight: 700; color: var(--ink); }
 
 #extras { position: absolute; right: 10px; top: 76px; display: flex; flex-direction: column; gap: 8px; }
 #extras button { width: 64px; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px; font: inherit; font-size: 11px; font-weight: 900; color: #fff; border: 2px solid rgba(255, 255, 255, 0.6); border-radius: 14px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35); cursor: pointer; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5); }
@@ -89,3 +89,8 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .chip { animation: chip 0.55s ease-out forwards; }
 @keyframes chip { to { translate: var(--dx) var(--dy); opacity: 0; rotate: 180deg; } }
 #mainflow .flow { opacity: 0.95; }
+.shimmer { animation: twinkle 1.6s ease-in-out infinite alternate; }
+
+.welcome-actions { display: flex; gap: 8px; margin-top: 8px; }
+.welcome-actions button { flex: 1; min-height: 44px; font: inherit; font-size: 13px; font-weight: 900; color: #2a1d14; background: linear-gradient(180deg, #ffd76a, #f2a20f); border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
+.welcome-actions button[data-offline="close"] { flex: 0 0 44px; background: #4a3a29; color: var(--ink); border-color: #5f4a33; }

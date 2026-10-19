@@ -12,6 +12,8 @@ const es: Record<string, string> = {
   'buy.unlock': 'Abrir zona nueva',
   'shop.title': 'Mejoras',
   close: 'Cerrar',
+  'offline.double': '📺 ×2 · +${dollars}',
+  'offline.recover': '📺 Recuperar {hours} h · +${dollars}',
   'transfer.title': 'Partida en otro dispositivo',
   'transfer.help': 'Copia el código aquí y pégalo en el otro dispositivo.',
   'transfer.copy': 'Copiar código',

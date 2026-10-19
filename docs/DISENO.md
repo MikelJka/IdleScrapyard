@@ -113,3 +113,5 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Camión dorado** (2026-10-19): aparece cada ~15 min y espera 20 s a que lo toques.
 - **Precio del Pase de chatarrero** (2026-10-19): 2,99 €, pago único.
 - **Partida en varios dispositivos** (2026-10-19): por ahora solo el código de partida que se copia y se pega (S1). El guardado pasa por `SaveStore` (`src/ui/storage.ts`) para poder cambiarlo por una nube más adelante sin tocar el resto.
+- **Fondo y decorado** (2026-10-19): ciudad con autopista elevada, farolas, árboles y cartel (D1); puerto con vía, tren, grúa y barco (D3); suelo con texturas y ciclo día/noche con la hora real (D4); interior de la nave relleno y zonas cerradas con andamios (D5). Sin patio de coches apilados (D2 no).
+- **Anuncios al volver** (2026-10-19): botón «×2» que duplica lo ganado fuera (A3) y botón «Recuperar» que da lo perdido por pasar del tope libre de 1 h, hasta las 8 h del Pase (A4). Con el Pase no hace falta anuncio.

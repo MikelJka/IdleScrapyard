@@ -5,7 +5,25 @@ import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
 import { productIcon } from './icons';
 import { PROP_HEIGHT, propIso } from './props';
-import { HORIZON, citySvg, floorDetailsSvg, hallBackSvg, hallFrameSvg, skySvg } from './scenery';
+import {
+  HORIZON,
+  PORT,
+  cityMarkup,
+  duskAmount,
+  floorDetailsSvg,
+  hallBackSvg,
+  hallFrameSvg,
+  hallInteriorSvg,
+  hwayCarIso,
+  hwayPoint,
+  lampGlowSvg,
+  nightAmount,
+  portFrontSvg,
+  scaffoldSvg,
+  skySvg,
+  staticImage,
+  terrainSvg,
+} from './scenery';
 import { TRUCK_SLOTS, agvIso, carIso, forkliftIso, goldenTruckIso, scrapTruckIso, shipTruckIso } from './vehicles';
 
 const NS = 'http://www.w3.org/2000/svg';
@@ -128,6 +146,12 @@ function machineIso(id: string, level: number): string {
 
 const BELT_ATTR = 'fill="#5a5550" stroke="#2a1d14" stroke-width="0.8"';
 
+/** Chatarra que avanza por las cintas principales (animada, va fuera de la imagen estática). */
+function mainFlowSvg(): string {
+  const flow = (x0: number, y0: number, x1: number, y1: number) => `<polyline class="flow" points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 14"/>`;
+  return `<g id="mainflow" class="belts">${flow(4.6, 4.2, 19, 4.2)}${flow(0.45, 4.0, 0.45, 9.4)}${flow(0.25, 9.2, 19, 9.2)}</g>`;
+}
+
 function staticYard(): string {
   let s = '';
   // Carretera de atrás y valla.
@@ -144,8 +168,6 @@ function staticYard(): string {
   s += tile(4.6, BELT_Y[0], 14.4, 0.4, BELT_ATTR);
   s += tile(0.25, 4.0, 0.4, 5.4, BELT_ATTR);
   s += tile(0.25, BELT_Y[1], 18.75, 0.4, BELT_ATTR);
-  const flow = (x0: number, y0: number, x1: number, y1: number) => `<polyline class="flow" points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" fill="none" stroke="#c9a24a" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 14"/>`;
-  s += `<g id="mainflow" class="belts">${flow(4.6, 4.2, 19, 4.2)}${flow(0.45, 4.0, 0.45, 9.4)}${flow(0.25, 9.2, 19, 9.2)}</g>`;
   // Rutas pintadas de los AGV.
   for (const [x0, y0, x1, y1] of [[-0.25, 3.2, -0.25, 9.8], [0.9, 8.7, 18.2, 8.7], [1.0, 14.3, 18.2, 14.3]]) {
     s += `<polyline points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" stroke="#3f8fc4" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round" opacity="0.7" fill="none"/>`;
@@ -198,18 +220,31 @@ interface Obj {
 export function createYard(container: HTMLElement): Yard {
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('class', 'yard');
-  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient>
-      <clipPath id="hz"><rect x="-4000" y="${HORIZON}" width="8000" height="6000"/></clipPath></defs>
+  const city = cityMarkup();
+  const hallBox = [-500, -170, 1140, 600] as const;
+  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient></defs>
     ${skySvg()}
     <g id="clouds"></g>
-    <g id="city">${citySvg()}</g>
+    ${staticImage(city.base, -1900, HORIZON - 380, 3800, 480)}
+    <g id="cityLit" opacity="0">${staticImage(city.lit, -1900, HORIZON - 380, 3800, 480)}</g>
+    <g id="hway"></g>
     <g id="birds"></g>
-    <g id="ground" clip-path="url(#hz)">${staticYard()}</g>
-    <g id="back" clip-path="url(#hz)"></g>
-    ${hallBackSvg()}
+    ${staticImage(terrainSvg(), -1900, HORIZON, 3800, 1250)}
+    <g id="water"></g>
+    ${staticImage(staticYard(), -900, -260, 2000, 1060)}
+    ${mainFlowSvg()}
+    <g id="ground"></g>
+    <g id="back"></g>
+    ${staticImage(hallBackSvg(), ...hallBox)}
+    ${staticImage(hallInteriorSvg(), ...hallBox)}
     <g id="objects"></g>
-    ${hallFrameSvg()}
+    ${staticImage(hallFrameSvg(), ...hallBox)}
     <g id="front"></g>
+    <g id="train"></g>
+    ${staticImage(portFrontSvg(), -900, 200, 1800, 760)}
+    <g id="lampglow" opacity="0" pointer-events="none">${lampGlowSvg()}</g>
+    <rect id="duskR" x="-4000" y="-1700" width="8000" height="5000" fill="#ff8a3c" opacity="0" pointer-events="none"/>
+    <rect id="nightR" x="-4000" y="-1700" width="8000" height="5000" fill="#0b1738" opacity="0" pointer-events="none"/>
     <g id="labels"></g>
     <g id="pops"></g>`;
   container.appendChild(svg);
@@ -234,6 +269,34 @@ export function createYard(container: HTMLElement): Yard {
   // Nubes y pájaros del cielo.
   const cloudEls = [0, 1, 2, 3].map((i) => mk(clouds, `<g opacity="${0.5 + (i % 2) * 0.15}" fill="#fff6e6"><ellipse rx="${60 + i * 8}" ry="${14 + (i % 2) * 4}"/><ellipse cx="${-26 + i * 4}" cy="-10" rx="30" ry="14"/><ellipse cx="22" cy="-12" rx="34" ry="15"/></g>`));
   const birdEls = [0, 1, 2, 3, 4].map(() => mk(birds, '<path class="bird" d="M-7 0 Q-3.5 -5 0 0 Q3.5 -5 7 0" fill="none" stroke="#2a1d14" stroke-width="1.6" stroke-linecap="round"/>'));
+
+  // Tráfico de la autopista elevada del fondo: dos carriles, cada uno a su velocidad y con huecos iguales.
+  const hway = q('hway');
+  const HWAY_COLORS = ['#c0392b', '#2f6fb3', '#e8e0d0', '#3fa7a0', '#d4a72c', '#4a4a4a'];
+  const hwayCars = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+    const rev = i % 2 === 1;
+    return { g: mk(hway, hwayCarIso(HWAY_COLORS[(i * 5) % HWAY_COLORS.length], rev)), rev, off: Math.floor(i / 2) * 27, v: rev ? -0.5 : 0.5, speed: rev ? 4.2 : 3.4 };
+  });
+
+  // Agua del puerto: destellos que parpadean.
+  const water = q('water');
+  water.innerHTML = Array.from({ length: 14 }, (_, k) => {
+    const x = -24 + ((k * 37) % 70);
+    const y = PORT.quayY + 1.2 + ((k * 13) % 9);
+    return `<polyline class="shimmer" points="${iso(x, y)[0]},${iso(x, y)[1]} ${iso(x + 1.4, y)[0]},${iso(x + 1.4, y)[1]}" stroke="#e6f6ff" stroke-width="1.6" fill="none" style="animation-delay:${(-k * 0.37).toFixed(2)}s"/>`;
+  }).join('');
+
+  // Tren de mercancías que pasa de vez en cuando por la vía de delante.
+  const train = mk(
+    q('train'),
+    (() => {
+      const y = PORT.trackY + 0.2;
+      let t = block(0, y, 0.2, 2.4, 1.1, 1.0, '#c0392b') + block(1.7, y, 1.2, 0.9, 1.1, 0.7, '#e8e0d0') + block(0.2, y + 0.3, 1.2, 0.5, 0.5, 0.3, '#3b3b3b');
+      const cols = ['#c0392b', '#2f6fb3', '#d4a72c', '#3fa7a0', '#6b5a8a', '#e8e0d0'];
+      for (let k = 0; k < 6; k++) t += block(2.7 + k * 2.8, y, 0.2, 2.6, 1.1, 0.35, '#3b3b3b') + block(2.8 + k * 2.8, y + 0.05, 0.55, 2.4, 1.0, 0.95, cols[k % cols.length]);
+      return t;
+    })(),
+  );
 
   // Pila de chatarra (se toca).
   const pile = mk(objectsG, `<g class="pile-body">${pileIso()}</g>`, 'tappable');
@@ -372,10 +435,13 @@ export function createYard(container: HTMLElement): Yard {
     if (!zone.unlocked) {
       l.floor.innerHTML = tile(st.x, st.y, SIZE, SIZE, `fill="#000" opacity="${isNext ? 0.12 : 0.06}" stroke="#2a1d14" stroke-width="1.2" stroke-dasharray="6 5"`);
       l.belts.innerHTML = '';
-      l.machines.innerHTML = l.worker.innerHTML = l.pallet.innerHTML = '';
+      l.worker.innerHTML = l.pallet.innerHTML = '';
+      l.machines.innerHTML = `<g transform="${at(st.x, st.y)}">${scaffoldSvg(0, 0, SIZE)}</g>`;
+      l.press = l.gears = l.fx = l.flows = [];
+      l.torso = null;
       const [x, y] = iso(st.x + SIZE / 2, st.y + SIZE / 2, 0.4);
       l.label.innerHTML = `<g transform="translate(${x} ${y})" opacity="${isNext ? 1 : 0.6}"><rect x="-10" y="-5" width="20" height="15" rx="3" fill="#c9a24a" stroke="#2a1d14"/><path d="M-6 -5 V-9 Q0 -16 6 -9 V-5" stroke="#2a1d14" stroke-width="2.2" fill="none"/>
-        ${isNext ? `<text y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.name}</text><text y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke">$${fmtShort(l.def.unlockCost)}</text>` : ''}</g>`;
+        ${isNext ? `<text y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.name}</text><text y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke">$${fmtShort(l.def.unlockCost)}</text>` : `<text y="24" text-anchor="middle" font-size="9" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">Próximamente</text>`}</g>`;
       return;
     }
     l.floor.innerHTML =
@@ -408,6 +474,7 @@ export function createYard(container: HTMLElement): Yard {
   }
 
   let lastDepthOrder = '';
+  let lastHourCheck = -1;
   let lastEarned = -1;
   let mainLevel = 0;
 
@@ -442,10 +509,37 @@ export function createYard(container: HTMLElement): Yard {
     const dtv = lastTime < 0 ? 0 : Math.min(0.25, Math.max(0, t - lastTime));
     lastTime = t;
 
+    // Hora del día real (o ?hora=22 para probar): cielo, luces y noche.
+    const nowMs = performance.now();
+    if (nowMs - lastHourCheck > 2000 || lastHourCheck < 0) {
+      lastHourCheck = nowMs;
+      const forced = Number(new URLSearchParams(location.search).get('hora'));
+      const d = new Date();
+      const hour = Number.isFinite(forced) && new URLSearchParams(location.search).has('hora') ? forced : d.getHours() + d.getMinutes() / 60;
+      const night = nightAmount(hour);
+      const dusk = duskAmount(hour);
+      q('skyNightR').setAttribute('opacity', night.toFixed(3));
+      q('skyDuskR').setAttribute('opacity', Math.min(1, dusk * (1 - night * 0.6)).toFixed(3));
+      q('duskR').setAttribute('opacity', (dusk * 0.14).toFixed(3));
+      q('nightR').setAttribute('opacity', (night * 0.45).toFixed(3));
+      q('cityLit').setAttribute('opacity', Math.min(1, night * 1.6 + dusk * 0.5).toFixed(3));
+      q('lampglow').setAttribute('opacity', Math.min(1, night * 1.5 + dusk * 0.6).toFixed(3));
+      clouds.setAttribute('opacity', (1 - night * 0.8).toFixed(2));
+      birds.setAttribute('opacity', (1 - night).toFixed(2));
+    }
+    // Autopista y tren.
+    hwayCars.forEach((c) => {
+      const run = (((c.off + (c.rev ? -1 : 1) * t * c.speed) % 108) + 108) % 108;
+      const [x, y, z] = hwayPoint(-52 + run, c.v);
+      c.g.setAttribute('transform', at(x, y, z));
+    });
+    const trainPos = -48 + ((t % PORT.trainPeriod) / PORT.trainPeriod) * 130;
+    train.setAttribute('transform', at(trainPos, 0));
     // Cielo: nubes y pájaros.
     cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
     birdEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * (16 + i * 3) + i * 520) % 2600) - 1100).toFixed(1)} ${(HORIZON - 120 - i * 34 + Math.sin(t * 1.3 + i) * 10).toFixed(1)})`));
     mainLevel += ((working ? 1 : 0) - mainLevel) * Math.min(1, dtv * (working ? 6 : 1.4));
+    mainFlow.style.display = mainLevel > 0 ? '' : 'none';
     mainFlow.style.opacity = (0.95 * mainLevel).toFixed(2);
 
     // Pila.
@@ -523,8 +617,15 @@ export function createYard(container: HTMLElement): Yard {
       const wave = 0.5 + 0.5 * Math.sin(l.phase);
       for (const e of l.press) e.style.translate = `0 ${(l.level * wave * 7).toFixed(2)}px`;
       for (const e of l.gears) e.style.rotate = `${l.gearAngle.toFixed(1)}deg`;
-      for (const e of l.fx) e.style.opacity = l.level.toFixed(2);
-      for (const e of l.flows) e.style.opacity = (0.95 * l.level).toFixed(2);
+      const shown = l.level > 0;
+      for (const e of l.fx) {
+        e.style.display = shown ? '' : 'none';
+        e.style.opacity = l.level.toFixed(2);
+      }
+      for (const e of l.flows) {
+        e.style.display = shown ? '' : 'none';
+        e.style.opacity = (0.95 * l.level).toFixed(2);
+      }
       if (l.torso) l.torso.style.translate = `0 ${(-2 * l.level * (0.5 + 0.5 * Math.sin(l.phase * 1.3))).toFixed(2)}px`;
       const lvl = l.label.querySelector('.lvl text');
       const txt = `Nv ${zone.helperLevel}`;

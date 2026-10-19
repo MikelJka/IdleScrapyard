@@ -24,35 +24,17 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 - [x] **Partida en varios dispositivos, primera parte** (2026-10-19, lo pide Mikel): código de partida que se copia y se pega en otro dispositivo, sin servidor. **Hecho.** Sincronización automática descartada por ahora (Mikel eligió S1, 2026-10-19), con el guardado detrás de `SaveStore` para poder cambiarlo luego.
 
-- [x] **Tope de lo ganado fuera: 1 h sin pase** (2026-10-19, lo pide Mikel): antes 2 h; el pase sigue en 8 h. **Hecho.** Falta decidir cómo se amplía con un anuncio (Parte 10).
+- [x] **Tope de lo ganado fuera: 1 h sin pase** (2026-10-19, lo pide Mikel): antes 2 h; el pase sigue en 8 h. **Hecho.** La ampliación con anuncio, hecha (Parte 10: A3 + A4).
 - [x] **Arreglos de la escena** (2026-10-19, Mikel): animaciones de las líneas suaves (arrancan y paran sin saltos), carretillas que salen a trabajar en cuanto hay producto, AGV con rutas pintadas en vez de gente paseando, coches de fondo que ya no se atraviesan. **Hecho.**
+
+- [x] **Fondo y decorado (Parte 9: D1, D3, D4, D5)** (2026-10-19, lo elige Mikel tras ver un vídeo de la web): ciudad con autopista elevada, farolas, árboles, cartel y aceras (D1); puerto con vía y tren de mercancías, grúa pórtico, barco y agua (D3); suelo con texturas, charcos y ciclo día/noche con la hora real (D4); nave rellena con estanterías, oficina, depósitos, bidones, taquillas y palés, y andamios con lona y «Próximamente» en las zonas cerradas (D5). **Hecho.**
+- [x] **Anuncios al volver (Parte 10: A3 + A4)** (2026-10-19): al volver tras estar fuera, un botón duplica lo ganado y, si se pasó del tope, otro recupera lo perdido (hasta el tope del Pase, 8 h). Con el Pase se dan sin anuncio. **Hecho.**
 
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-### Parte 9 — Fondo y decorado de los sitios vacíos
-
-Ahora el exterior es un suelo marrón liso con una ciudad lejana y los huecos de la nave están vacíos. Opciones (se pueden combinar):
-
-- **D1 — Ciudad con vida:** más capas de edificios, autopista elevada con tráfico, farolas y carteles, árboles secos y aceras alrededor de la nave.
-- **D2 — Patio de desguace:** fuera y en los huecos, coches apilados, montones de neumáticos, contenedores de colores, vallas con alambre, charcos y huellas en la tierra.
-- **D3 — Puerto y tren:** vía con un tren de mercancías que pasa, grúa de puerto y agua con reflejos al fondo.
-- **D4 — Suelo y luz vivos:** suelo con texturas (grava, hierba, manchas) en lugar de color liso, sombras largas y ciclo día/noche con la hora real (farolas y ventanas que se encienden).
-- **D5 — Nave rellena:** los huecos interiores con estanterías, taquillas, oficina con cristalera, depósitos y tuberías; las zonas cerradas con andamios, lonas y cartel «próximamente».
-
-Mi recomendación: D5 + D2 (llenan lo vacío, encajan con el tema y son baratos de dibujar) y D4 después. Responde con las letras (p. ej. «D2D5»).
-
-### Parte 10 — Ampliar el tope de ganancias fuera con un anuncio
-
-El tope libre ya es 1 h (8 h con pase). Opciones:
-
-- **A1 — Antes de salir:** un botón «Ampliar a 2 h» (anuncio) que vale para la próxima ausencia.
-- **A2 — Por tramos:** cada anuncio suma +1 h al tope de la próxima ausencia, hasta 4 h (3 anuncios).
-- **A3 — Al volver, duplicar:** tras volver, un anuncio duplica lo ganado fuera (no cambia el tope).
-- **A4 — Al volver, recuperar lo perdido:** si pasaste del tope, un anuncio te da también lo que se perdió, hasta 8 h.
-
-Mi recomendación: A4 (el jugador ve lo que se pierde justo cuando le apetece verlo) y, si quieres, A3 como segundo botón. Responde con las letras (p. ej. «A4»).
+Nada pendiente de decidir por ahora.
 
 ## Hecho
 
@@ -64,3 +46,5 @@ Mi recomendación: A4 (el jugador ve lo que se pierde justo cuando le apetece ve
 - [x] **Parte 6 del diseño — ayudantes, racha y pase** (2026-10-19): decidido por Mikel; resumido en «Decidido» de DISENO.md.
 - [x] **Parte 7 del diseño — racha** (2026-10-19): si se falta un día, vuelve al día 1.
 - [x] **Parte 8 del diseño — sincronización entre dispositivos** (2026-10-19): S1, solo código manual; fácil de sustituir. Resumido en «Decidido» de DISENO.md.
+- [x] **Parte 9 del diseño — fondo y decorado** (2026-10-19): D1, D3, D4 y D5; resumido en «Decidido» de DISENO.md.
+- [x] **Parte 10 del diseño — anuncios al volver** (2026-10-19): A3 y A4; resumido en «Decidido» de DISENO.md.
