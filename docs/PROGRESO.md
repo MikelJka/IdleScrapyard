@@ -10,7 +10,8 @@ Diario de sesiones, la más reciente arriba.
 - Pantalla: línea de objetivo, aviso de logro, lista de logros en ⚙, contador de fotogramas con `?fps=1`, pantalla de carga con logo, icono y manifest, vibración en toques y compras.
 - Roadmap: nueva Fase 2b «Calidad profesional» con 14 tareas (tutorial, interfaz coherente, juice, apertura de zona animada, logística visible, música, ajustes, rendimiento, luz y sombras, estadísticas, accesibilidad, inglés, equilibrio, pruebas).
 - Qué probar: ⚙ (logros), subir una máquina a nivel 5 (premio), `?fps=1` en el Pixel y decirme los fps.
-- Siguiente: tareas de la Fase 2b en orden.
+- Tutorial de los primeros minutos (mensaje amarillo que guía: tocar 5 veces, juntar $10, abrir Aplastado, comprar, cerrar); se salta si ya hay partida.
+- Siguiente: interfaz coherente (iconos SVG propios, relieve, transiciones) y «juice».
 
 ## 2026-10-19 — Pedidos tras probar en el Pixel 10: líneas, muelle, noche y niveles
 

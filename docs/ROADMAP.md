@@ -48,7 +48,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Objetivo a la vista, logros con aviso y lista en ajustes
 - [x] Hito cada 5 niveles de máquina con premio
 - [x] Ranking mundial: código listo (Firebase); falta que Mikel cree el proyecto (`docs/RANKING.md`)
-- [ ] Tutorial de los primeros 2 minutos: flechas y mensajes que guían (tocar la pila, comprar, abrir un puesto, abrir la segunda zona)
+- [x] Tutorial de los primeros 2 minutos: flechas y mensajes que guían (tocar la pila, comprar, abrir un puesto, abrir la segunda zona)
 - [ ] Interfaz coherente: iconos SVG propios en lugar de emojis, tipografía y botones con relieve en todo, paneles con transición, cifras que cuentan hacia arriba
 - [ ] «Juice»: monedas que vuelan al contador al cobrar, números flotantes por camión, destello al comprar, temblor suave al abrir una zona
 - [ ] Apertura de zona animada (se levanta el andamio y entra la máquina)
