@@ -65,6 +65,49 @@ Cosas a decidir sea cual sea (mi recomendación entre paréntesis):
 
 Mi recomendación: **R1** si quieres web y Android con el mismo ranking; **R3** si prefieres lo más simple y solo en Android.
 
+### Parte 13 — Parpadeo en el Pixel 10: cómo dibujar lo animado (2026-10-19)
+
+Con Capacitor la app usa el mismo motor que Chrome (WebView), así que el parpadeo **no se arregla solo al pasar a Android**: depende de cómo dibujamos. Ahora todo es SVG con unos 4000 nodos y decenas de animaciones CSS, y un móvil con pantalla de alta densidad lo repinta casi entero en cada fotograma. Ya reduje los nodos que se recrean (carretillas, camiones y AGV); si sigue, las opciones son:
+
+- **G1 — Seguir afinando el SVG** (coste: bajo, 1 sesión). Menos animaciones CSS a la vez (solo las líneas visibles en pantalla), ocultar lo que queda fuera de la cámara, partir las imágenes estáticas enormes en trozos. Mejora segura pero puede no bastar.
+- **G2 — Lo animado en un `<canvas>` 2D** (coste: medio, 3-4 sesiones). Fondo y suelo siguen siendo imágenes estáticas; carretillas, camiones, máquinas, personas y efectos se pintan en un canvas con `requestAnimationFrame`. Un solo elemento a repintar, rendimiento muy estable. Pierde la facilidad de tocar elementos SVG (habría que hacer nosotros la detección de toques, que ya hacemos con las zonas).
+- **G3 — PixiJS (WebGL, licencia MIT, gratis)** (coste: alto, 5-6 sesiones). Todo en GPU, lo mejor para muchas animaciones y efectos de luz de noche. Añade ~150 KB y hay que rehacer el dibujado de las formas isométricas como sprites generados.
+- **G4 — Medir primero**: añado un contador de fotogramas por segundo (activable con `?fps=1`) para que me digas cuántos hace el Pixel y en qué momento baja (zoom, noche, muchas máquinas). Con ese dato elijo entre G1-G3.
+
+Recomendación: **G4 ahora + G1**, y pasar a **G2** si el contador confirma que hay caídas de fotogramas.
+
+### Parte 14 — Logística visible: carretillas, huellas y camiones (2026-10-19)
+
+Ahora las carretillas van al muelle pero lo que «descargan» no se ve entrar en la huella de su producto, y el camión se carga de la nada. Opciones:
+
+- **L1 — Las carretillas sueltan su producto en la huella del producto** (se ve cómo sube el número) y el camión de expedición se llena cogiendo de las huellas, producto a producto.
+- **L2 — Como L1, y además cada huella tiene un tope visible** (el muelle llena una huella y se para esa línea): añade una decisión (mejorar el muelle por producto) pero cambia las reglas de la simulación.
+- **L3 — Dejarlo como está** (solo informativo).
+
+Recomendación: **L1** (no cambia reglas, solo lo que se ve).
+
+### Parte 15 — Qué pasa al subir grados de máquina (2026-10-19)
+
+Cada 5 niveles de máquina ahora se transforma (6 grados, hasta el nivel 30). El nivel de máquina cuesta ×4 y dobla la producción, así que llegar al grado 2 ya cuesta millones. Opciones para dar sentido al grado:
+
+- **M1 — Solo estético** (como ahora): se ve mejor.
+- **M2 — Bonus por grado**: cada grado da un +25 % extra de valor del producto de la línea (sube el incentivo de llegar al múltiplo de 5).
+- **M3 — Un hito con premio**: en cada múltiplo de 5 se da una recompensa única (por ejemplo 10 min de producción de esa línea o una carretilla gratis).
+- **M4 — M2 + M3**.
+
+Recomendación: **M3** (premio pequeño y claro, no rompe el equilibrio).
+
+### Parte 16 — Objetivos y logros (2026-10-19)
+
+Para dar razones de volver y ayudar a saber qué hacer ahora:
+
+- **O1 — Objetivo actual en pantalla**: una línea fija (por ejemplo «Abre Laminado: $15K») que se actualiza sola.
+- **O2 — Misiones diarias** (3 al día: «cobra 5 camiones», «sube 2 niveles», «toca 100 veces») con premio de minutos de producción.
+- **O3 — Logros permanentes** (insignias por hitos: primera zona, 100 K, máquina grado 3…), con lista en ⚙.
+- **O4 — O1 + O3** (sin misiones diarias, más tranquilo).
+
+Recomendación: **O4**.
+
 
 ## Hecho
 
