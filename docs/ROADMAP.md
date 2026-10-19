@@ -18,9 +18,10 @@ Terminado: la URL pública muestra la pantalla del juego en el móvil y en PC, l
 Terminado: puedo tocar para ganar, comprar los primeros generadores y ver crecer la moneda; la partida se guarda.
 
 - [x] Simulación: chatarra, zonas, carretillas, muelle, camiones, mejoras y dólares
-- [ ] Pantalla principal en vertical
-- [ ] Guardado automático
-- [ ] Ganancias con el juego cerrado
+- [x] Pantalla principal en vertical (primera versión en DOM, sin 3D todavía)
+- [x] Guardado automático
+- [x] Ganancias con el juego cerrado
+- [ ] Dibujado 3D con Three.js y modelos CC0 de la pantalla principal
 
 ## Fase 2 — Contenido de la primera versión
 

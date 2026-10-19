@@ -42,6 +42,9 @@ try {
     await page.goto(URL);
     await sleep(1500);
     await page.screenshot({ path: `smoke/${d.name}-inicio.png` });
+    for (let i = 0; i < 30; i++) await page.click('#pile');
+    await sleep(3000);
+    await page.screenshot({ path: `smoke/${d.name}-jugando.png` });
     await context.close();
   }
   await browser.close();
