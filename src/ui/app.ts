@@ -20,6 +20,7 @@ import { FORKLIFT, helperFace, productIcon, truck } from './icons';
 import { createYard } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { pack, unpack } from '../sim/offline';
+import { fromCode, toCode } from '../sim/transfer';
 import { t } from './texts';
 import { isMuted, play, setMuted } from './sound';
 
@@ -75,6 +76,7 @@ export function startApp(root: HTMLElement): void {
   let state!: GameState;
   const rewarded = async (): Promise<boolean> => state.hasPass || (await showRewardedAd());
   let busy = false;
+  let importing = false;
   const result = unpack(readSave(), Date.now());
   state = result.state;
   root.innerHTML = `
@@ -91,6 +93,11 @@ export function startApp(root: HTMLElement): void {
       <section id="sheet" hidden>
         <div class="sheet-head"><h2>${t('shop.title')}</h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
         <div id="shop"></div>
+        <div id="transfer">
+          <b>${t('transfer.title')}</b>
+          <small>${t('transfer.help')}</small>
+          <div><button id="copy-code" type="button">${t('transfer.copy')}</button><button id="paste-code" type="button">${t('transfer.paste')}</button></div>
+        </div>
       </section>
     </main>`;
   const $ = (id: string) => root.querySelector<HTMLElement>('#' + id)!;
@@ -131,6 +138,27 @@ export function startApp(root: HTMLElement): void {
     } finally {
       busy = false;
     }
+  });
+  $('copy-code').addEventListener('click', async () => {
+    const code = toCode(pack(state, Date.now()));
+    try {
+      await navigator.clipboard.writeText(code);
+      alert(t('transfer.copied'));
+    } catch {
+      prompt(t('transfer.copyManual'), code);
+    }
+  });
+  $('paste-code').addEventListener('click', () => {
+    const json = fromCode(prompt(t('transfer.pastePrompt')) ?? '');
+    if (json === null) return alert(t('transfer.invalid'));
+    if (!confirm(t('transfer.confirm'))) return;
+    importing = true;
+    try {
+      localStorage.setItem(KEY, json);
+    } catch {
+      return alert(t('transfer.invalid'));
+    }
+    location.reload();
   });
   $('shop').addEventListener('click', (e) => {
     const id = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]')?.dataset.id;
@@ -217,7 +245,7 @@ export function startApp(root: HTMLElement): void {
   const loop = (now: number) => {
     advance(state, Math.min((now - last) / 1000, 1));
     last = now;
-    if (now - lastSave > AUTOSAVE_MS) {
+    if (now - lastSave > AUTOSAVE_MS && !importing) {
       writeSave(state);
       lastSave = now;
     }
@@ -226,7 +254,9 @@ export function startApp(root: HTMLElement): void {
   };
   requestAnimationFrame(loop);
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) writeSave(state);
+    if (document.hidden && !importing) writeSave(state);
   });
-  window.addEventListener('pagehide', () => writeSave(state));
+  window.addEventListener('pagehide', () => {
+    if (!importing) writeSave(state);
+  });
 }

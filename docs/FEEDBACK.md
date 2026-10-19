@@ -22,11 +22,22 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 - [x] **Ayudantes con experiencia y niveles** (2026-10-19): un nivel nuevo disponible cada hora de trabajo de su zona, que se paga en dólares; cada nivel da +10 % de valor y +5 % de velocidad; nivel máximo 25. **Hecho** en la simulación y en la pantalla.
 
+- [x] **Partida en varios dispositivos, primera parte** (2026-10-19, lo pide Mikel): código de partida que se copia y se pega en otro dispositivo, sin servidor. **Hecho.** Falta la sincronización automática (ver propuesta).
+
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-Nada pendiente de decidir por ahora.
+### Parte 8 — Sincronizar la partida sola entre dispositivos
+
+Hoy la partida vive en el navegador de cada dispositivo; para pasarla hay que copiar el código (ya hecho). Para que se sincronice sola hace falta una cuenta y un sitio donde guardarla. Política de coste cero y «sin backend propio»:
+
+- **S1 — Solo el código manual.** Se queda como está. Gratis, sin cuentas; pero hay que copiar a mano.
+- **S2 — Google Play Games (Android).** Guardado en la nube de Google al empaquetar con Capacitor: gratis, sin servidor nuestro, la cuenta es la de Google. No sirve para la versión web.
+- **S3 — Firebase (plan gratuito) con inicio de sesión de Google.** Sincroniza web y Android; gratis al principio, pero es un servicio externo con límites y hay que escribir una política de privacidad.
+- **S4 — S2 en Android y código manual en la web.** Lo más barato; la web queda sin sincronización automática.
+
+Si hay dos partidas distintas, propongo quedarse con la que más ha ganado en total. Responde con la letra (p. ej. «S4»).
 
 ## Hecho
 

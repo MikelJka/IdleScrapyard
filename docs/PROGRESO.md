@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Partida en otro dispositivo
+
+- Mikel pregunta si la partida es multidispositivo: hasta ahora no (solo `localStorage`). Primera parte sin servidor: `src/sim/transfer.ts` convierte el guardado en un código `CHAT1:…` y lo valida al leerlo; tests en `tests/transfer.test.ts`.
+- En el panel «Mejoras» hay «Copiar código» y «Pegar código» (pide confirmación, sustituye la partida y recarga; no se autoguarda encima).
+- Qué probar: copiar el código en el móvil, pegarlo en el PC y ver que llega la partida.
+- Siguiente: Mikel elige cómo sincronizar solo (Parte 8 en FEEDBACK.md: S1-S4).
+
 ## 2026-10-19 — Sonidos
 
 - `src/ui/sound.ts`: efectos sintetizados con Web Audio (sin archivos ni licencias): toque en la pila, compra, cobro de un camión y recompensas (premio diario, ×2, camión dorado). Botón 🔊/🔇 en la barra de arriba; se recuerda el silencio.

@@ -69,3 +69,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #shop button.unlock { background: linear-gradient(180deg, #d98b2b, #a8601a); border-color: #f2b45c; }
 #shop button.helper { background: linear-gradient(180deg, #3f8f7a, #2d6156); border-color: #6cc4ad; }
 .ad-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); color: var(--ink); font-size: 20px; z-index: 10; }
+#transfer { margin-top: 10px; padding-top: 10px; border-top: 2px solid #5f4a33; color: #f3e3c3; display: flex; flex-direction: column; gap: 4px; }
+#transfer small { opacity: 0.75; }
+#transfer div { display: flex; gap: 8px; }
+#transfer button { flex: 1; min-height: 44px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
