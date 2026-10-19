@@ -52,6 +52,8 @@ export interface GameState {
   /** Unidades y valor en dólares de lo que espera en el muelle. */
   dockUnits: number;
   dockValue: number;
+  /** Unidades de cada producto (por id de zona) que esperan en el muelle; suman `dockUnits`. */
+  dockByZone: Record<string, number>;
   /** Segundos que faltan para que llegue el siguiente camión de expedición. */
   truckCooldown: number;
   zones: Record<string, ZoneState>;
@@ -93,6 +95,7 @@ export function newGame(): GameState {
     dockLevel: 0,
     dockUnits: 0,
     dockValue: 0,
+    dockByZone: {},
     truckCooldown: 0,
     zones,
     hasPass: false,
@@ -136,6 +139,30 @@ export function zoneRate(def: ZoneDef, zone: ZoneState): number {
   const speed = (1 + zone.speed * u.speed.effectPerLevel) * (1 + zone.helperLevel * ECONOMY.helpers.speedPerLevel);
   const level = Math.pow(u.machineLevel.outputMultiplierPerLevel, zone.machineLevel);
   return (zone.machines * speed * level) / def.cycleSeconds;
+}
+
+export type ZoneStatus = 'locked' | 'working' | 'starved' | 'full';
+
+/** Qué le pasa a una línea: trabaja, no tiene chatarra que aplastar o tiene el palé lleno (esperando carretillas). */
+export function zoneStatus(state: GameState, def: ZoneDef): ZoneStatus {
+  const zone = state.zones[def.id];
+  if (!zone.unlocked) return 'locked';
+  if (zone.buffer >= zoneCapacity(zone) - 0.01) return 'full';
+  if (state.scrap < def.scrapPerUnit) return 'starved';
+  return 'working';
+}
+
+/** Dónde se atasca la fábrica: falta chatarra, los palés están llenos (faltan carretillas) o fluye bien. */
+export function bottleneck(state: GameState): 'scrap' | 'carts' | 'none' {
+  const open = ZONES.filter((d) => state.zones[d.id].unlocked);
+  if (open.some((d) => zoneStatus(state, d) === 'starved')) return 'scrap';
+  if (open.some((d) => zoneStatus(state, d) === 'full')) return 'carts';
+  return 'none';
+}
+
+/** Chatarra por segundo que las máquinas podrían aplastar si no faltara. */
+export function scrapDemand(state: GameState): number {
+  return ZONES.reduce((sum, d) => sum + zoneRate(d, state.zones[d.id]) * d.scrapPerUnit, 0);
 }
 
 export function scrapPerSecond(state: GameState): number {
@@ -189,6 +216,7 @@ export function claimGoldenTruck(state: GameState): number {
   state.totalEarned += value;
   state.dockUnits = 0;
   state.dockValue = 0;
+  state.dockByZone = {};
   state.goldenVisible = 0;
   return value;
 }
@@ -259,12 +287,16 @@ function step(state: GameState, dt: number): void {
     carry -= units;
     state.dockUnits += units;
     state.dockValue += units * unitValue(def, zone);
+    state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + units;
   }
 
   state.truckCooldown = Math.max(0, state.truckCooldown - dt);
   const load = dockLoad(state);
   if (state.truckCooldown === 0 && state.dockUnits >= load) {
     const value = (state.dockValue * load) / state.dockUnits;
+    // El camión se lleva de cada producto la parte que le toca.
+    const keep = (state.dockUnits - load) / state.dockUnits;
+    for (const id of Object.keys(state.dockByZone)) state.dockByZone[id] *= keep;
     state.dockUnits -= load;
     state.dockValue -= value;
     // El empujón dobla lo que pagan los camiones de expedición.
@@ -381,5 +413,5 @@ export function load(json: string): GameState {
   const base = newGame();
   const zones = { ...base.zones };
   for (const id of Object.keys(zones)) zones[id] = { ...zones[id], ...(data.zones?.[id] ?? {}) };
-  return { ...base, ...data, version: SAVE_VERSION, zones };
+  return { ...base, ...data, dockByZone: { ...(data.dockByZone ?? {}) }, version: SAVE_VERSION, zones };
 }

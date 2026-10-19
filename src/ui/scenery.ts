@@ -6,7 +6,7 @@ import { block, cyl, iso, pts, rblock, tile } from './iso';
 export const HORIZON = -232;
 
 /** Límites del suelo de la nave (en baldosas). */
-const HALL = { x0: -0.6, x1: 19.4, y0: -0.6, y1: 15.0, wall: 4.6, ridge: 6.6 };
+export const HALL = { x0: -0.6, x1: 19.4, y0: -0.6, y1: 15.0, wall: 4.6, ridge: 6.6 };
 
 /** Carriles y vías (en baldosas, eje y), compartidos con el dibujado. */
 export const PORT = { trackY: 22.1, quayY: 25, trainSpeed: 1.6, trainPeriod: 75 };
@@ -55,6 +55,7 @@ export function skySvg(): string {
   const h = 1700 + HORIZON;
   return `<defs>${grad('skyDay', '#6aa8e0', '#a9d3f0', '#f3ead2')}${grad('skyDusk', '#5d6fa8', '#e9a070', '#f6cf90')}${grad('skyNight', '#0a1230', '#18284f', '#2c3f6b')}
       <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b48e" stop-opacity="0"/><stop offset="1" stop-color="#d9b48e" stop-opacity="0.55"/></linearGradient>
+      <radialGradient id="pool"><stop offset="0" stop-color="#fff0b0" stop-opacity="0.55"/><stop offset="0.6" stop-color="#ffe08a" stop-opacity="0.22"/><stop offset="1" stop-color="#ffe08a" stop-opacity="0"/></radialGradient>
       <radialGradient id="glow"><stop offset="0" stop-color="#ffe9a0" stop-opacity="0.9"/><stop offset="1" stop-color="#ffe9a0" stop-opacity="0"/></radialGradient></defs>
     <rect id="skyDayR" x="-4000" y="-1700" width="8000" height="${h}" fill="url(#skyDay)"/>
     <rect id="skyDuskR" x="-4000" y="-1700" width="8000" height="${h}" fill="url(#skyDusk)" opacity="0"/>
@@ -209,6 +210,21 @@ function lampBody(l: Lamp): string {
 }
 
 /** Luces de noche de las farolas: se enciende al atardecer. */
+/** Focos del techo de la nave: de noche iluminan el suelo y lo que hay dentro (se enseñan con la noche). */
+export function spotlightsSvg(): string {
+  let s = '';
+  for (const x of [3.5, 9.5, 15.5]) {
+    for (const y of [2.2, 7.6, 12.8]) {
+      const [fx, fy] = iso(x, y, 0);
+      const [lx, ly] = iso(x, y, HALL.wall - 0.5);
+      s += `<ellipse cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" rx="130" ry="64" fill="url(#pool)"/>`;
+      s += `<polygon points="${(lx - 5).toFixed(1)},${ly.toFixed(1)} ${(lx + 5).toFixed(1)},${ly.toFixed(1)} ${(fx + 85).toFixed(1)},${fy.toFixed(1)} ${(fx - 85).toFixed(1)},${fy.toFixed(1)}" fill="#fff2b8" opacity="0.09"/>`;
+      s += `<circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="26" fill="url(#glow)"/><ellipse cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" rx="8" ry="3.5" fill="#fff6c8" stroke="#2a1d14" stroke-width="0.8"/>`;
+    }
+  }
+  return s;
+}
+
 export function lampGlowSvg(): string {
   return LAMPS.map((l) => {
     const [x, y] = iso(l.x, l.y + 0.1, 1.75);

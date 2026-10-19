@@ -4,20 +4,28 @@ import {
   ZONES,
   activateBoost,
   advance,
+  bottleneck,
   buy,
   canBoost,
   claimDaily,
   claimGoldenTruck,
   dailyReward,
+  dockLoad,
+  helperLevelsReady,
   incomePerSecond,
   purchases,
+  scrapDemand,
+  scrapPerSecond,
   streakDayFor,
   tap,
+  zoneCapacity,
+  zoneRate,
+  zoneStatus,
   type GameState,
 } from '../sim/game';
 import { HELPER_LOOKS } from './look';
 import { FORKLIFT, helperFace, productIcon, truck } from './icons';
-import { createYard } from './yard';
+import { createYard, machineGrade } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/offline';
 import { fromCode, toCode } from '../sim/transfer';
@@ -78,14 +86,17 @@ export function startApp(root: HTMLElement): void {
         <div class="money"><span class="coin">$</span><span id="dollars"></span></div>
         <span id="rate"></span>
         <button id="mute" type="button"></button>
+        <button id="settings" type="button" aria-label="${t('settings.title')}">⚙️</button>
       </header>
+      <div id="stats"></div>
       <div id="welcome" hidden></div>
       <aside id="extras"></aside>
-      <button id="open-shop" type="button"><span class="cart">🛒</span><span>${t('shop.title')}</span><b id="shop-badge" hidden></b></button>
+      <p id="tip">${t('tip')}</p>
       <section id="sheet" hidden>
-        <div class="sheet-head"><h2>${t('shop.title')}</h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
+        <div class="sheet-head"><h2 id="sheet-title"></h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
+        <div id="panel-info"></div>
         <div id="shop"></div>
-        <div id="transfer">
+        <div id="transfer" hidden>
           <b>${t('transfer.title')}</b>
           <small>${t('transfer.help')}</small>
           <div><button id="copy-code" type="button">${t('transfer.copy')}</button><button id="paste-code" type="button">${t('transfer.paste')}</button></div>
@@ -153,8 +164,31 @@ export function startApp(root: HTMLElement): void {
     showMute();
     play('buy');
   });
-  $('open-shop').addEventListener('click', () => ($('sheet').hidden = false));
-  $('close-shop').addEventListener('click', () => ($('sheet').hidden = true));
+  // Panel de mejoras del puesto tocado (zona, «dock» o «trucks») o ajustes.
+  let panel: string | null = null;
+  let lastShop = '';
+  let lastInfo = '';
+  const panelTitle = (sel: string): string => {
+    if (sel === 'settings') return t('settings.title');
+    if (sel === 'dock') return t('panel.dock');
+    if (sel === 'trucks') return t('panel.trucks');
+    return ZONES.find((z) => z.id === sel)?.name ?? '';
+  };
+  const openPanel = (sel: string | null) => {
+    panel = sel;
+    lastShop = lastInfo = '';
+    $('sheet').hidden = sel === null;
+    $('transfer').hidden = sel !== 'settings';
+    scene.setSelected(sel === 'settings' ? null : sel);
+    if (sel) $('sheet-title').textContent = panelTitle(sel);
+    if (sel && sel !== 'settings') scene.focus(sel);
+  };
+  scene.onSelect((sel) => {
+    play('tap');
+    openPanel(panel === sel ? null : sel);
+  });
+  $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
+  $('close-shop').addEventListener('click', () => openPanel(null));
   scene.el.querySelector('#golden')!.addEventListener('click', async () => {
     if (busy || state.goldenVisible <= 0) return;
     busy = true;
@@ -229,7 +263,7 @@ export function startApp(root: HTMLElement): void {
   let lastEarned = state.totalEarned;
   let lastCooldown = state.truckCooldown;
   let lastExtras = '';
-  let lastShop = '';
+  let lastStats = '';
   function render(): void {
     // Los botones de extras solo se redibujan si cambian, para no perder el toque.
     const extras = renderExtras();
@@ -244,7 +278,19 @@ export function startApp(root: HTMLElement): void {
     if (state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > lastCooldown) play('cash');
     lastEarned = state.totalEarned;
     lastCooldown = state.truckCooldown;
-    const shop = purchases(state)
+    renderStats();
+    celebrateLevels();
+    if (panel === null || panel === 'settings') return;
+    const sel = panel;
+    const mine = purchases(state).filter((p) =>
+      sel === 'dock' ? p.kind === 'cart' || p.kind === 'dock' : sel === 'trucks' ? p.kind === 'scrapTruck' : p.zoneId === sel,
+    );
+    const info = renderInfo(sel);
+    if (info !== lastInfo) {
+      $('panel-info').innerHTML = info;
+      lastInfo = info;
+    }
+    const shop = mine
       .map((p) => {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
         const name = p.kind === 'helper' ? t('buy.helper', { helper: def!.helper.name }) : t('buy.' + p.kind);
@@ -255,13 +301,64 @@ export function startApp(root: HTMLElement): void {
       .join('');
     // Solo se redibuja si cambia algo, para que los toques no se pierdan.
     if (shop !== lastShop) {
-      $('shop').innerHTML = shop;
+      $('shop').innerHTML = shop || `<p class="empty">${t('panel.empty')}</p>`;
       lastShop = shop;
-      const affordable = purchases(state).filter((p) => p.cost <= state.dollars).length;
-      const badge = $('shop-badge');
-      badge.hidden = affordable === 0;
-      badge.textContent = String(affordable);
     }
+  }
+
+  /** Cuánta chatarra hay y dónde se atasca la fábrica. */
+  function renderStats(): void {
+    const pallets = ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0);
+    const jam = bottleneck(state);
+    const html = `<b>${t('stats.scrap', { n: fmt(state.scrap), in: fmt(scrapPerSecond(state)), need: fmt(scrapDemand(state)) })}</b><br>${t('stats.stock', {
+      pallets: fmt(pallets),
+      dock: fmt(state.dockUnits),
+      load: dockLoad(state),
+    })}${jam === 'none' ? '' : ` · <span class="jam">${t('jam.' + jam)}</span>`}`;
+    if (html !== lastStats) {
+      lastStats = html;
+      $('stats').innerHTML = html;
+    }
+  }
+
+  /** Animación al llegar a un nivel múltiplo de 5 de cualquier mejora. */
+  const FIELDS = [
+    ['speed', 'level.speed'],
+    ['capacity', 'level.capacity'],
+    ['machines', 'level.machines'],
+    ['machineLevel', 'level.machineLevel'],
+    ['helperLevel', 'level.helper'],
+  ] as const;
+  const seen: Record<string, number> = {};
+  function celebrateLevels(): void {
+    for (const z of ZONES) {
+      const zone = state.zones[z.id];
+      for (const [field, key] of FIELDS) {
+        const now = zone[field];
+        const id = z.id + field;
+        const prev = seen[id];
+        seen[id] = now;
+        if (prev === undefined || now <= prev || now % 5 !== 0) continue;
+        scene.celebrate(z.id, t('levelUp', { what: t(key), n: now }), field === 'machineLevel');
+        play('reward');
+      }
+    }
+  }
+
+  function renderInfo(sel: string): string {
+    const def = ZONES.find((z) => z.id === sel);
+    if (!def) return sel === 'dock' ? `<p>${t('info.dock', { cart: state.carts, load: dockLoad(state) })}</p>` : `<p>${t('info.trucks', { n: state.scrapTrucks })}</p>`;
+    const zone = state.zones[def.id];
+    if (!zone.unlocked) return `<p>${t('info.locked', { cost: fmt(def.unlockCost) })}</p>`;
+    const status = zoneStatus(state, def);
+    const ready = helperLevelsReady(zone);
+    return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${def.helper.name}</b> · Nv ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${def.helper.bio}</small></div></div>
+      <ul class="rows">
+        <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
+        <li>${t('info.rate')}: <b>${fmt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (Nv ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
+        <li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>
+        <li>${t('info.nextGrade', { n: 5 - (zone.machineLevel % 5) })}</li>
+      </ul>`;
   }
 
   let last = performance.now();

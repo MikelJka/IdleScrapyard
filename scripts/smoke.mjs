@@ -45,6 +45,10 @@ try {
     for (let i = 0; i < 30; i++) await page.click('#pile');
     await sleep(3000);
     await page.screenshot({ path: `smoke/${d.name}-jugando.png` });
+    // Tocar un puesto abre sus mejoras.
+    await page.evaluate(() => document.querySelector('[data-sel="crusher"] polygon:last-child').dispatchEvent(new MouseEvent('click', { bubbles: true })));
+    await sleep(600);
+    await page.screenshot({ path: `smoke/${d.name}-puesto.png` });
     await context.close();
   }
   await browser.close();

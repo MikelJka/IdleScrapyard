@@ -2,6 +2,20 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-19 — Pedidos tras probar en el Pixel 10: líneas, muelle, noche y niveles
+
+- Mikel contesta que sigue parpadeando (menos). El Android empaquetado con Capacitor usa el mismo motor (WebView de Chromium), así que **no lo quita por sí solo**: lo que pesa es dibujar miles de nodos SVG con animaciones; si persiste, habrá que dibujar lo animado en canvas. Sigue anotado como posible tarea (opción N4 de la Parte 11).
+- Simulación (`game.ts`): `dockByZone` (unidades de cada producto en el muelle; el camión se lleva su parte; partidas antiguas válidas), `zoneStatus` (trabajando / sin chatarra / palé lleno), `bottleneck` y `scrapDemand`. Tests nuevos.
+- Pantalla: barra con pila, chatarra que entra, la que piden las máquinas, palés y muelle, y el cuello de botella; cada línea muestra piezas/s y estado, y su palé las unidades; una huella de salida por producto en el muelle con sus unidades.
+- Carretillas: arreglado el bug que las dejaba girando sobre sí mismas (el viaje terminaba nada más empezar); ahora hacen el viaje completo y cada línea abierta tiene la suya a la vista.
+- Máquinas: se ven una a una hasta 9 (cuadrícula) y «+N» si hay más; cada 5 niveles de máquina se transforman (depósitos, segunda chimenea, dorado, neón, corona, aura).
+- Subida de nivel múltiplo de 5 en cualquier mejora: anillo, estrellas, texto y sonido; la máquina rebota.
+- Noche: la nave se queda menos oscura y 9 focos del techo iluminan el suelo y lo de dentro (`?hora=23` para probar).
+- Mejoras por línea: tocar un puesto (o el muelle, o la carretera de camiones) abre su panel con ayudante, estado y compras; se resalta el puesto y la cámara lo sube sobre el panel; marca verde en lo que se puede comprar. Desaparece el botón compartido; los ajustes (código de partida) pasan al ⚙.
+- Propuesta nueva Parte 12 (ranking mundial: Firebase, Supabase, Play Games o sin servidor).
+- Qué probar: todo lo anterior en el Pixel; sobre todo tocar puestos, ver crecer el número de máquinas y subir una máquina a nivel 5.
+- Siguiente: lo que decida Mikel (Partes 11 y 12).
+
 ## 2026-10-19 — Menos parpadeo en el móvil (Pixel 10)
 
 - Mikel avisa: en su Google Pixel 10 la escena se ve «glitch» y las animaciones parpadean. No se puede reproducir sin el móvil (Chromium sin pantalla no usa la GPU), así que se atacan las causas probables.

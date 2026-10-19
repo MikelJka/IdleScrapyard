@@ -33,6 +33,8 @@ Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 - [x] Pase de chatarrero (en la web, de prueba)
 - [x] Sonidos (sintetizados, con botón de silencio)
 - [x] Más animaciones (vuelco de chatarra, máquinas trabajando, coches, ciudad de fondo, nave en rayos X)
+- [x] Panel de mejoras por línea (se toca el puesto), estado y cuello de botella a la vista, huellas de salida por producto, focos de noche y máquinas que se transforman cada 5 niveles
+- [ ] Ranking mundial (a decidir: Parte 12 de FEEDBACK.md)
 - [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
 - Prestigio: no en la primera versión (decidido por Mikel)
 

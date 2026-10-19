@@ -1,11 +1,12 @@
 // Chatarrería en vista isométrica (2D con bloques que parecen 3D). Solo lee el estado de la simulación.
 // Fondo: carretera con los camiones de chatarra. Centro: las líneas de cada zona. Frente: muelle y camiones de expedición.
-import { ECONOMY, ZONES, dockLoad, zoneCapacity, type GameState, type ZoneDef } from '../sim/game';
+import { ECONOMY, ZONES, dockLoad, purchases, zoneCapacity, zoneRate, zoneStatus, type GameState, type ZoneDef } from '../sim/game';
 import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
 import { productIcon } from './icons';
 import { PROP_HEIGHT, propIso } from './props';
 import {
+  HALL,
   HORIZON,
   PORT,
   cityMarkup,
@@ -21,6 +22,7 @@ import {
   portFrontSvg,
   scaffoldSvg,
   skySvg,
+  spotlightsSvg,
   staticImage,
   terrainSvg,
 } from './scenery';
@@ -105,11 +107,39 @@ export function personIso(look: HelperLook): string {
     ${top}${extra}</g>`;
 }
 
-/** Máquina de una zona: cambia con su nivel (0 oxidada, 1 pintada, 2 con panel y luz, 3+ de lujo dorada). */
+/** Grado de una máquina: sube uno cada 5 niveles de máquina y la transforma (máximo 6). */
+export function machineGrade(level: number): number {
+  return Math.min(6, Math.floor(level / 5));
+}
+
+/** Piezas que se añaden a la máquina en cada grado (cada 5 niveles): depósitos, segunda chimenea, dorado, neón, corona y aura. */
+function gradeExtras(h: number, roof: string, grade: number): string {
+  let s = '';
+  if (grade >= 1) s += block(-0.2, 0.25, 0, 0.18, 0.6, 0.6, '#5f7d91') + block(-0.2, 0.25, 0.6, 0.18, 0.6, 0.05, '#2a1d14', { edge: false });
+  if (grade >= 2) s += block(0.12, 0.78, h, 0.14, 0.14, 0.75, shade(roof, 1)) + block(0.12, 0.4, h + 0.35, 0.14, 0.42, 0.1, '#7a7a7a');
+  if (grade >= 3) s += block(-0.04, -0.04, 0, 1.03, 1.18, 0.07, '#f2b705') + block(1.0, 0.25, 0, 0.16, 0.6, 0.6, '#f2b705');
+  if (grade >= 4) {
+    s += block(0, 1.1, h - 0.12, 0.95, 0.03, 0.06, '#6be3ff', { edge: false });
+    const [nx, ny] = iso(0.48, 1.12, h - 0.09);
+    s += `<circle class="shimmer" cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="7" fill="#6be3ff" opacity="0.45"/>`;
+  }
+  if (grade >= 5) {
+    const [cx, cy] = iso(0.45, 0.5, h + 0.95);
+    s += `<path class="shimmer" d="M${cx.toFixed(1)} ${(cy - 9).toFixed(1)} l2.6 6 l6.4 0.6 l-4.9 4.2 l1.6 6.3 l-5.7 -3.4 l-5.7 3.4 l1.6 -6.3 l-4.9 -4.2 l6.4 -0.6Z" fill="#ffd76a" stroke="#7a4a10" stroke-width="0.9"/>`;
+  }
+  if (grade >= 6) {
+    const [ax, ay] = iso(0.5, 0.55, 0);
+    s = `<ellipse class="shimmer" cx="${ax.toFixed(1)}" cy="${(ay + 3).toFixed(1)}" rx="46" ry="21" fill="url(#glow)"/>` + s;
+  }
+  return s;
+}
+
+/** Máquina de una zona: cambia con su nivel (0 oxidada, 1 pintada, 2 con panel y luz, 3+ de lujo dorada) y se transforma cada 5 niveles. */
 function machineIso(id: string, level: number): string {
   const look = ZONE_LOOKS[id] ?? { wall: '#999', roof: '#555' };
   const tier = Math.min(3, level);
-  const h = [0.7, 0.85, 1.0, 1.1][tier];
+  const grade = machineGrade(level);
+  const h = [0.7, 0.85, 1.0, 1.1][tier] + grade * 0.05;
   const color = tier === 0 ? '#8a7a6a' : look.wall;
   let s = block(0, 0, 0, 0.95, 1.1, h, color);
   // Boca por donde entra la chatarra.
@@ -130,6 +160,7 @@ function machineIso(id: string, level: number): string {
     s += block(-0.02, -0.02, h, 0.99, 1.14, 0.05, '#f2b705');
     s += block(0.1, 0.1, h + 0.05, 0.14, 0.14, 0.45, '#f2b705');
   }
+  s += gradeExtras(h, look.roof, grade);
   // Partes que se mueven cuando la línea trabaja: prensa, engranaje, chispas y humo de la chimenea.
   s += `<g class="press">${block(0.12, 0.22, h, 0.5, 0.45, 0.16, '#3b3b3b')}</g>`;
   const [spx, spy] = iso(0.47, -0.04, h - 0.15);
@@ -142,6 +173,15 @@ function machineIso(id: string, level: number): string {
   const [px, py] = iso(0.62, 1.1, h * 0.5);
   s += `<g transform="translate(${px.toFixed(1)} ${py.toFixed(1)}) scale(0.62)"><rect x="-11" y="-10" width="22" height="20" rx="3" fill="#fff3dc" stroke="#2a1d14"/>${productIcon(id)}</g>`;
   return `<ellipse cx="${iso(0.5, 0.55)[0]}" cy="${iso(0.5, 0.55)[1] + 3}" rx="30" ry="13" fill="#000" opacity="0.15"/>${s}`;
+}
+
+const MAX_SHOWN = 9;
+
+/** Cuadrícula de máquinas de un puesto según cuántas se ven. */
+function machineGrid(n: number): { cols: number; scale: number; dx: number; dy: number } {
+  if (n <= 2) return { cols: Math.max(1, n), scale: 1.35, dx: 1.6, dy: 0 };
+  if (n <= 4) return { cols: 2, scale: 1.0, dx: 1.55, dy: 0.95 };
+  return { cols: 3, scale: 0.78, dx: 1.05, dy: 0.72 };
 }
 
 const BELT_ATTR = 'fill="#5a5550" stroke="#2a1d14" stroke-width="0.8"';
@@ -176,7 +216,6 @@ function staticYard(): string {
   for (const c of COL_X) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Muelle de carga.
   s += block(0.2, DOCK_Y, 0, 19, 1.4, 0.3, '#8a6a4a');
-  for (let b = 0; b < 4; b++) s += tile(2 + b * 4.6, DOCK_Y + 0.2, 2.2, 1, 'fill="none" stroke="#f4c430" stroke-width="1.5" stroke-dasharray="5 4"', 0.3);
   // Carretera de delante.
   s += tile(-10, FRONT_Y - 0.6, 44, 3.4, 'fill="#5b4632"');
   s += `<polyline points="${[iso(-10, FRONT_Y + 1.1), iso(30, FRONT_Y + 1.1)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
@@ -210,6 +249,37 @@ export interface Yard {
   el: SVGSVGElement;
   update(state: GameState): void;
   pop(text: string, where: 'pile' | 'dock'): void;
+  /** Se llama con el id de la zona («crusher»…), «dock» o «trucks» al tocar un puesto. */
+  onSelect(cb: (sel: string) => void): void;
+  /** Resalta el puesto abierto en el panel (o ninguno). */
+  setSelected(sel: string | null): void;
+  /** Mueve la cámara para que el puesto quede en la parte de arriba, sobre el panel abierto. */
+  focus(sel: string): void;
+  /** Animación de subida de nivel en un puesto. `big` para las de máquina (cada 5 niveles). */
+  celebrate(zoneId: string, text: string, big: boolean): void;
+}
+
+/** Envolvente convexa de puntos (para el contorno de una caja isométrica). */
+function hull(points: [number, number][]): [number, number][] {
+  const pts = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o: number[], a: number[], b: number[]) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const half = (list: [number, number][]) => {
+    const out: [number, number][] = [];
+    for (const p of list) {
+      while (out.length >= 2 && cross(out[out.length - 2], out[out.length - 1], p) <= 0) out.pop();
+      out.push(p);
+    }
+    out.pop();
+    return out;
+  };
+  return [...half(pts), ...half([...pts].reverse())];
+}
+
+/** Contorno (como texto de puntos SVG) de una caja del suelo con altura. */
+function boxOutline(x: number, y: number, w: number, d: number, h: number): string {
+  const corners: [number, number][] = [];
+  for (const z of [0, h]) for (const [cx, cy] of [[x, y], [x + w, y], [x + w, y + d], [x, y + d]]) corners.push(iso(cx, cy, z));
+  return hull(corners).map((q) => q.map((v) => v.toFixed(1)).join(',')).join(' ');
 }
 
 interface Obj {
@@ -238,13 +308,16 @@ export function createYard(container: HTMLElement): Yard {
     ${staticImage(hallBackSvg(), ...hallBox)}
     ${staticImage(hallInteriorSvg(), ...hallBox)}
     <g id="objects"></g>
+    <g id="hits"></g>
     ${staticImage(hallFrameSvg(), ...hallBox)}
     <g id="front"></g>
     <g id="train"></g>
     ${staticImage(portFrontSvg(), -900, 200, 1800, 760)}
     <g id="lampglow" opacity="0" pointer-events="none">${lampGlowSvg()}</g>
     <rect id="duskR" x="-4000" y="-1700" width="8000" height="5000" fill="#ff8a3c" opacity="0" pointer-events="none"/>
-    <rect id="nightR" x="-4000" y="-1700" width="8000" height="5000" fill="#0b1738" opacity="0" pointer-events="none"/>
+    <path id="nightR" fill-rule="evenodd" fill="#0b1738" opacity="0" pointer-events="none" d="M-4000 -1700 H4000 V3300 H-4000Z ${boxOutline(HALL.x0, HALL.y0, HALL.x1 - HALL.x0, HALL.y1 - HALL.y0, HALL.wall).split(' ').map((q, i) => (i ? 'L' : 'M') + q.replace(',', ' ')).join(' ')}Z"/>
+    <polygon id="nightHall" points="${boxOutline(HALL.x0, HALL.y0, HALL.x1 - HALL.x0, HALL.y1 - HALL.y0, HALL.wall)}" fill="#0b1738" opacity="0" pointer-events="none"/>
+    <g id="spots" opacity="0" pointer-events="none">${spotlightsSvg()}</g>
     <g id="labels"></g>
     <g id="pops"></g>`;
   container.appendChild(svg);
@@ -370,10 +443,6 @@ export function createYard(container: HTMLElement): Yard {
   golden.id = 'golden';
   golden.dataset.action = 'golden';
 
-  // Productos que esperan en el muelle.
-  const dockCrates = mk(objectsG, '');
-  objs.push({ el: dockCrates, depth: TRUCK_PARK_X + DOCK_Y + 1 });
-  let cratesKey = '';
 
   // Vehículos guiados (AGV) que llevan contenedores de chatarra por rutas fijas pintadas en el suelo.
   const agvs = [
@@ -407,6 +476,10 @@ export function createYard(container: HTMLElement): Yard {
     fx: SVGElement[];
     flows: SVGElement[];
     torso: SVGElement | null;
+    stat: SVGTextElement | null;
+    cnt: SVGTextElement | null;
+    statText: string;
+    cntText: string;
   }
   const floorLayer = q('ground');
   const lines: Line[] = ZONES.map((def, i) => {
@@ -429,11 +502,79 @@ export function createYard(container: HTMLElement): Yard {
       fx: [],
       flows: [],
       torso: null,
+      stat: null,
+      cnt: null,
+      statText: '',
+      cntText: '',
     };
     line.worker.setAttribute('transform', at(st.x + 1.3, st.y + 2.3));
     line.pallet.setAttribute('transform', at(st.x + 2.45, st.y + 2.45));
     objs.push({ el: line.machines, depth: st.x + st.y + 1.2 }, { el: line.worker, depth: st.x + st.y + 3.6 }, { el: line.pallet, depth: st.x + st.y + 5.5 });
     return line;
+  });
+
+  // Zonas que se tocan para abrir sus mejoras: cada puesto, el muelle (carretillas y carga) y la carretera (camiones de chatarra).
+  const hitsG = q('hits');
+  const selOutlines = new Map<string, SVGElement>();
+  const badges = new Map<string, SVGElement>();
+  const addHit = (sel: string, outline: string, badgeAt: [number, number]) => {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'tappable');
+    g.dataset.sel = sel;
+    g.innerHTML = `<polygon class="sel" points="${outline}" fill="#ffd76a" fill-opacity="0.12" stroke="#ffd76a" stroke-width="2.4" stroke-dasharray="8 5" display="none"/><polygon points="${outline}" fill="#000" fill-opacity="0"/>`;
+    hitsG.appendChild(g);
+    selOutlines.set(sel, g.firstElementChild as SVGElement);
+    const badge = mk(labels, `<circle r="9" fill="#3fbf5a" stroke="#fff" stroke-width="1.6"/><path d="M-4.5 2.5 L0 -3.5 L4.5 2.5Z" fill="#fff"/>`, 'badge');
+    badge.setAttribute('transform', `translate(${badgeAt[0].toFixed(1)} ${badgeAt[1].toFixed(1)})`);
+    badge.setAttribute('display', 'none');
+    badge.setAttribute('pointer-events', 'none');
+    badges.set(sel, badge);
+  };
+  ZONES.forEach((def, i) => {
+    const st = station(i);
+    const [bx, by] = iso(st.x + 0.1, st.y + SIZE - 0.1, 0.2);
+    addHit(def.id, boxOutline(st.x, st.y, SIZE, SIZE, 2.2), [bx, by - 18]);
+  });
+  addHit('dock', boxOutline(0.2, DOCK_Y, 19, 1.4, 0.3), iso(19.2, DOCK_Y + 0.7, 0.8));
+  addHit('trucks', boxOutline(-6, BACK_Y - 1.4, 24, 3, 0.1), iso(17.5, BACK_Y - 0.2, 0.6));
+  for (const [text, x, y] of [['🚚 Camiones de chatarra', 5.5, BACK_Y - 0.7], ['📦 Muelle y carretillas', 16.2, DOCK_Y + 1.7]] as const) {
+    const [tx, ty] = iso(x, y, 0.4);
+    const tag = mk(labels, `<text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${text}</text>`);
+    tag.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)})`);
+    tag.setAttribute('pointer-events', 'none');
+  }
+  let onSelect: (sel: string) => void = () => {};
+  svg.addEventListener('click', (e) => {
+    const sel = (e.target as Element).closest<SVGElement>('[data-sel]')?.dataset.sel;
+    if (sel) onSelect(sel);
+  });
+
+  // Huellas de salida del muelle: una por producto, con sus unidades.
+  interface Pad {
+    id: string;
+    floor: SVGGElement;
+    stack: SVGGElement;
+    count: SVGGElement;
+    countText: SVGTextElement;
+    shown: number;
+    text: string;
+  }
+  const PAD_W = 2.0;
+  const pads: Pad[] = ZONES.map((def, k) => {
+    const px = 0.9 + k * 2.3;
+    const py = DOCK_Y + 0.15;
+    const look = ZONE_LOOKS[def.id] ?? { wall: '#999', roof: '#555' };
+    const floor = mk(floorLayer, tile(px, py, PAD_W, 1.1, `fill="${shade(look.wall, 0.8)}" stroke="#f4c430" stroke-width="1.6" stroke-dasharray="6 4"`, 0.3), 'pad');
+    floor.setAttribute('display', 'none');
+    const stack = mk(objectsG, '');
+    stack.setAttribute('transform', at(px, py));
+    objs.push({ el: stack, depth: px + py + 1.4 });
+    const count = mk(labels, `<text text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke"></text>`);
+    const [cx, cy] = iso(px + PAD_W / 2, py + 1.25, 0.3);
+    count.setAttribute('transform', `translate(${cx.toFixed(1)} ${cy.toFixed(1)})`);
+    count.setAttribute('display', 'none');
+    count.setAttribute('pointer-events', 'none');
+    return { id: def.id, floor, stack, count, countText: count.firstElementChild as SVGTextElement, shown: -1, text: '' };
   });
 
   // Carretillas.
@@ -459,6 +600,7 @@ export function createYard(container: HTMLElement): Yard {
       l.machines.innerHTML = `<g transform="${at(st.x, st.y)}">${scaffoldSvg(0, 0, SIZE)}</g>`;
       l.press = l.gears = l.fx = l.flows = [];
       l.torso = null;
+      l.stat = l.cnt = null;
       const [x, y] = iso(st.x + SIZE / 2, st.y + SIZE / 2, 0.4);
       l.label.innerHTML = `<g transform="translate(${x} ${y})" opacity="${isNext ? 1 : 0.6}"><rect x="-10" y="-5" width="20" height="15" rx="3" fill="#c9a24a" stroke="#2a1d14"/><path d="M-6 -5 V-9 Q0 -16 6 -9 V-5" stroke="#2a1d14" stroke-width="2.2" fill="none"/>
         ${isNext ? `<text y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.name}</text><text y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke">$${fmtShort(l.def.unlockCost)}</text>` : `<text y="24" text-anchor="middle" font-size="9" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">Próximamente</text>`}</g>`;
@@ -467,23 +609,34 @@ export function createYard(container: HTMLElement): Yard {
     l.floor.innerHTML =
       tile(st.x, st.y, SIZE, SIZE, `fill="${shade(look.wall, 0.75)}" opacity="0.35"`) +
       tile(st.x + 0.1, st.y + 0.1, SIZE - 0.2, SIZE - 0.2, 'fill="none" stroke="#f4c430" stroke-width="2.2" stroke-dasharray="7 6"');
-    const n = Math.min(2, zone.machines);
+    // Las máquinas se ven una a una hasta 9 (cuadrícula de 1-2, 2×2 o 3×3), para que se note la diferencia entre pocas y muchas.
+    const n = Math.min(MAX_SHOWN, zone.machines);
+    const { cols, scale, dx, dy } = machineGrid(n);
+    const cells = Array.from({ length: n }, (_, j) => ({ c: j % cols, r: Math.floor(j / cols) }));
     let belts = '';
     let machines = '';
-    for (let j = 0; j < n; j++) {
-      const mx = st.x + 0.2 + j * 1.6;
-      belts += tile(mx + 0.4, BELT_Y[st.row] + 0.4, 0.5, st.y + 0.3 - BELT_Y[st.row] - 0.4, BELT_ATTR);
-      const [fx0, fy0] = iso(mx + 0.65, BELT_Y[st.row] + 0.4);
-      const [fx1, fy1] = iso(mx + 0.65, st.y + 0.3);
+    for (let c = 0; c < Math.min(cols, n); c++) {
+      const mx = st.x + 0.2 + c * dx;
+      belts += tile(mx + 0.4 * scale, BELT_Y[st.row] + 0.4, 0.5, st.y + 0.3 - BELT_Y[st.row] - 0.4, BELT_ATTR);
+      const [fx0, fy0] = iso(mx + 0.4 * scale + 0.25, BELT_Y[st.row] + 0.4);
+      const [fx1, fy1] = iso(mx + 0.4 * scale + 0.25, st.y + 0.3);
       belts += `<polyline class="flow" points="${fx0.toFixed(1)},${fy0.toFixed(1)} ${fx1.toFixed(1)},${fy1.toFixed(1)}" fill="none" stroke="${look.wall}" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="4 14"/>`;
-      machines += `<g transform="${at(mx - st.x, 0.3)} scale(1.35)">${machineIso(l.def.id, zone.machineLevel)}</g>`;
+    }
+    // Pintadas de atrás hacia delante.
+    cells.sort((a, b) => a.c + a.r - (b.c + b.r));
+    for (const { c, r } of cells) machines += `<g transform="${at(0.2 + c * dx, 0.25 + r * dy)} scale(${scale})">${machineIso(l.def.id, zone.machineLevel)}</g>`;
+    if (zone.machines > MAX_SHOWN) {
+      const [bx, by] = iso(2.9, 2.0, 0.1);
+      machines += `<g transform="translate(${bx.toFixed(1)} ${by.toFixed(1)})"><rect x="-16" y="-8" width="32" height="15" rx="7" fill="#2a1d14" opacity="0.9"/><text y="3" text-anchor="middle" font-size="9.5" font-weight="900" fill="#ffd76a">+${zone.machines - MAX_SHOWN}</text></g>`;
     }
     l.belts.innerHTML = belts;
     l.machines.innerHTML = `<g transform="${at(st.x, st.y)}">${machines}</g>`;
     l.worker.innerHTML = `<g transform="scale(1.45)">${personIso(HELPER_LOOKS[l.def.helper.id])}</g>`;
     const [lx, ly] = iso(st.x + 0.3, st.y + SIZE + 0.2);
     const extra = zone.machines > 1 ? ` · ${zone.machines} máq.` : '';
-    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text></g>
+    const [cx, cy] = iso(st.x + 2.85, st.y + 2.85, 1.7);
+    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text><text class="stat" y="12" text-anchor="middle" font-size="9.5" font-weight="900" fill="#8be28b" stroke="#2a1d14" stroke-width="3" paint-order="stroke"></text></g>
+      <g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><text class="cnt" text-anchor="middle" font-size="10" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke"></text></g>
       <g class="lvl" transform="translate(${iso(st.x + 1.3, st.y + 2.3, 2.75)[0]} ${iso(st.x + 1.3, st.y + 2.3, 2.75)[1]})"><rect x="-17" y="-9" width="34" height="15" rx="7.5" fill="#2a1d14" opacity="0.85"/><text y="2.5" text-anchor="middle" font-size="9" font-weight="900" fill="#ffd76a"></text></g>`;
     l.palletShown = -1;
     l.press = [...l.machines.querySelectorAll<SVGElement>('.press')];
@@ -491,10 +644,14 @@ export function createYard(container: HTMLElement): Yard {
     l.fx = [...l.machines.querySelectorAll<SVGElement>('.fx')];
     l.flows = [...l.belts.querySelectorAll<SVGElement>('.flow')];
     l.torso = l.worker.querySelector<SVGElement>('.torso');
+    l.stat = l.label.querySelector<SVGTextElement>('.stat');
+    l.cnt = l.label.querySelector<SVGTextElement>('.cnt');
+    l.statText = l.cntText = '';
   }
 
   let lastDepthOrder = '';
   let lastHourCheck = -1;
+  let lastBadgeCheck = -1;
   let lastEarned = -1;
   let mainLevel = 0;
 
@@ -541,7 +698,9 @@ export function createYard(container: HTMLElement): Yard {
       q('skyNightR').setAttribute('opacity', night.toFixed(3));
       q('skyDuskR').setAttribute('opacity', Math.min(1, dusk * (1 - night * 0.6)).toFixed(3));
       q('duskR').setAttribute('opacity', (dusk * 0.14).toFixed(3));
-      q('nightR').setAttribute('opacity', (night * 0.45).toFixed(3));
+      q('nightR').setAttribute('opacity', (night * 0.55).toFixed(3));
+      q('nightHall').setAttribute('opacity', (night * 0.24).toFixed(3));
+      q('spots').setAttribute('opacity', Math.min(1, night * 1.6 + dusk * 0.5).toFixed(3));
       q('cityLit').setAttribute('opacity', Math.min(1, night * 1.6 + dusk * 0.5).toFixed(3));
       q('lampglow').setAttribute('opacity', Math.min(1, night * 1.5 + dusk * 0.6).toFixed(3));
       clouds.setAttribute('opacity', (1 - night * 0.8).toFixed(2));
@@ -622,7 +781,7 @@ export function createYard(container: HTMLElement): Yard {
     lines.forEach((l, i) => {
       const zone = state.zones[l.def.id];
       if (zone.unlocked) openIds.push(l.def.id);
-      const key = `${zone.unlocked ? 1 : 0}-${zone.machineLevel}-${Math.min(2, zone.machines)}-${zone.machines}-${l.def.id === nextLocked ? 1 : 0}`;
+      const key = `${zone.unlocked ? 1 : 0}-${zone.machineLevel}-${Math.min(MAX_SHOWN, zone.machines)}-${zone.machines}-${l.def.id === nextLocked ? 1 : 0}`;
       if (key !== l.key) {
         l.key = key;
         buildLine(l, state, i, l.def.id === nextLocked);
@@ -650,6 +809,19 @@ export function createYard(container: HTMLElement): Yard {
       const lvl = l.label.querySelector('.lvl text');
       const txt = `Nv ${zone.helperLevel}`;
       if (lvl && lvl.textContent !== txt) lvl.textContent = txt;
+      const status = zoneStatus(state, l.def);
+      const rate = zoneRate(l.def, zone);
+      const statTxt = status === 'starved' ? '✖ sin chatarra' : status === 'full' ? '■ palé lleno' : `▶ ${rate < 10 ? rate.toFixed(1) : fmtShort(rate)}/s`;
+      if (l.stat && statTxt !== l.statText) {
+        l.statText = statTxt;
+        l.stat.textContent = statTxt;
+        l.stat.setAttribute('fill', status === 'starved' ? '#ff8a7a' : status === 'full' ? '#ffb347' : '#8be28b');
+      }
+      const cntTxt = `${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}`;
+      if (l.cnt && cntTxt !== l.cntText) {
+        l.cntText = cntTxt;
+        l.cnt.textContent = cntTxt;
+      }
       const stack = Math.ceil(Math.min(1, zone.buffer / zoneCapacity(zone)) * 8);
       if (stack !== l.palletShown) {
         l.palletShown = stack;
@@ -663,7 +835,8 @@ export function createYard(container: HTMLElement): Yard {
     // Carretillas: cada una atiende una zona abierta. Si hay producto (o la zona está produciendo) sale a trabajar,
     // gira en cada extremo y lleva solo lo que hay; si no, espera junto al palé.
     const open = ZONES.map((z, i) => ({ z, i })).filter(({ z }) => state.zones[z.id].unlocked);
-    const nCarts = Math.min(8, state.carts);
+    // Cada línea abierta tiene al menos una carretilla a la vista que le recoge el producto.
+    const nCarts = Math.min(8, Math.max(state.carts, open.length));
     while (carts.length < nCarts) {
       const g = mk(objectsG, '');
       const o: Obj = { el: g, depth: 0 };
@@ -691,11 +864,11 @@ export function createYard(container: HTMLElement): Yard {
         const crowded = carts.some((o, j) => j !== k && j < nCarts && o.trip && o.home === c.home && t - o.t0 < 2.2);
         if (!crowded) {
           c.trip = true;
-          c.t0 = t - (CYC - TURN); // empieza girando junto al palé, donde carga
+          c.t0 = t; // empieza girando junto al palé (donde carga) y da una vuelta completa al muelle
           c.loadN = Math.max(1, Math.min(3, Math.ceil((zone.buffer / zoneCapacity(zone)) * 3)));
         }
       }
-      const u = c.trip ? Math.min(CYC - 1e-6, t - c.t0) : 0;
+      const u = c.trip ? (CYC - TURN + (t - c.t0)) % CYC : 0;
       const pose = c.trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
       const dockMid = MOVE + TURN / 2;
       const midTurn = CYC - TURN / 2;
@@ -753,12 +926,42 @@ export function createYard(container: HTMLElement): Yard {
     }
     shipTruck.setAttribute('transform', at(tx, FRONT_Y));
 
-    // Productos que esperan en el muelle mientras no hay camión.
-    const stock = shipPhase === 'park' ? 0 : Math.round(Math.min(1, state.dockUnits / load) * TRUCK_SLOTS);
-    const ck = `${stock}|${openIds.join()}`;
-    if (ck !== cratesKey) {
-      cratesKey = ck;
-      dockCrates.innerHTML = Array.from({ length: stock }, (_, k) => `<g transform="${at(TRUCK_PARK_X + (k % 3) * 0.55, DOCK_Y + 0.35 + Math.floor(k / 3) * 0.5, 0.3)}">${propIso(openIds[k % openIds.length])}</g>`).join('');
+    // Huellas de salida: cuánto hay de cada producto esperando en el muelle.
+    const load0 = dockLoad(state);
+    for (const pad of pads) {
+      const open = state.zones[pad.id].unlocked;
+      if (!open) {
+        if (pad.shown !== -2) {
+          pad.shown = -2;
+          pad.floor.setAttribute('display', 'none');
+          pad.count.setAttribute('display', 'none');
+          pad.stack.innerHTML = '';
+        }
+        continue;
+      }
+      const have = state.dockByZone[pad.id] ?? 0;
+      const shown = have < 0.5 ? 0 : Math.min(6, Math.ceil(Math.min(1, have / load0) * 6));
+      if (shown !== pad.shown) {
+        if (pad.shown < 0) {
+          pad.floor.removeAttribute('display');
+          pad.count.removeAttribute('display');
+        }
+        pad.shown = shown;
+        pad.stack.innerHTML = Array.from({ length: shown }, (_, k) => `<g transform="${at(0.2 + (k % 3) * 0.6, 0.12 + Math.floor(k / 3) * 0.5, 0.3)}">${propIso(pad.id)}</g>`).join('');
+      }
+      const txt = `×${Math.floor(have)}`;
+      if (txt !== pad.text) {
+        pad.text = txt;
+        pad.countText.textContent = txt;
+      }
+    }
+
+    // Marca verde en lo que se puede mejorar ahora mismo.
+    if (nowMs - lastBadgeCheck > 400) {
+      lastBadgeCheck = nowMs;
+      const can = new Set<string>();
+      for (const p of purchases(state)) if (p.cost <= state.dollars) can.add(p.zoneId ?? (p.kind === 'scrapTruck' ? 'trucks' : 'dock'));
+      badges.forEach((b, sel) => b.setAttribute('display', can.has(sel) ? '' : 'none'));
     }
 
     // Camión dorado.
@@ -922,5 +1125,49 @@ export function createYard(container: HTMLElement): Yard {
     true,
   );
 
-  return { el: svg, update, pop };
+  function celebrate(zoneId: string, text: string, big: boolean): void {
+    const i = ZONES.findIndex((z) => z.id === zoneId);
+    if (i < 0) return;
+    const st = station(i);
+    const [cx, cy] = iso(st.x + 1.7, st.y + 1.2, 1.2);
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', `translate(${cx.toFixed(1)} ${cy.toFixed(1)})`);
+    const n = big ? 14 : 7;
+    let html = `<ellipse class="ring" rx="${big ? 70 : 44}" ry="${big ? 35 : 22}" fill="none" stroke="#ffd76a" stroke-width="${big ? 6 : 4}"/>`;
+    if (big) html += `<ellipse class="ring late" rx="50" ry="25" fill="#fff6c8" fill-opacity="0.35" stroke="#fff" stroke-width="3"/>`;
+    for (let k = 0; k < n; k++) {
+      const a = (k / n) * Math.PI * 2;
+      const r = big ? 70 : 44;
+      html += `<path class="chip star" d="M0 -6 l1.8 4.2 l4.2 1.8 l-4.2 1.8 l-1.8 4.2 l-1.8 -4.2 l-4.2 -1.8 l4.2 -1.8Z" fill="${['#ffd76a', '#fff6c8', '#8be28b', '#6be3ff'][k % 4]}" style="--dx:${(Math.cos(a) * r).toFixed(0)}px;--dy:${(Math.sin(a) * r * 0.55 - 14).toFixed(0)}px"/>`;
+    }
+    html += `<text class="pop" y="-30" text-anchor="middle" style="font-size:${big ? 22 : 16}px">${text}</text>`;
+    g.innerHTML = html;
+    pops.appendChild(g);
+    setTimeout(() => g.remove(), 1500);
+    if (big) {
+      const m = lines[i].machines;
+      m.classList.remove('levelup');
+      void m.getBoundingClientRect();
+      m.classList.add('levelup');
+      setTimeout(() => m.classList.remove('levelup'), 1000);
+    }
+  }
+
+  function focus(sel: string): void {
+    const i = ZONES.findIndex((z) => z.id === sel);
+    const [px, py] = i >= 0 ? iso(station(i).x + SIZE / 2, station(i).y + SIZE / 2, 0.8) : sel === 'dock' ? iso(10, DOCK_Y, 0.3) : iso(6, BACK_Y, 0);
+    cam.x = px;
+    cam.y = py + ((container.clientHeight || 640) * 0.22) / cam.scale;
+    apply();
+  }
+
+  return {
+    el: svg,
+    update,
+    focus,
+    pop,
+    celebrate,
+    onSelect: (cb) => (onSelect = cb),
+    setSelected: (sel) => selOutlines.forEach((el, id) => el.setAttribute('display', id === sel ? '' : 'none')),
+  };
 }

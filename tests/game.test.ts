@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ECONOMY, advance, buy, dockLoad, load, newGame, purchases, serialize, tap } from '../src/sim/game';
+import { ECONOMY, ZONES, advance, bottleneck, buy, dockLoad, load, newGame, purchases, scrapDemand, serialize, tap, zoneStatus } from '../src/sim/game';
 import { DEFAULT_BOT, playBot } from '../src/sim/bot';
 
 describe('cadena de la chatarra', () => {
@@ -136,5 +136,52 @@ describe('ayudantes', () => {
     const s = load(JSON.stringify({ zones: { crusher: { unlocked: true, machines: 3 } } }));
     expect(s.zones.crusher.machines).toBe(3);
     expect(s.zones.crusher.helperLevel).toBe(0);
+  });
+});
+
+describe('muelle por producto', () => {
+  it('lo que espera en el muelle suma lo mismo por producto y en total', () => {
+    const s = newGame();
+    s.scrap = 100;
+    advance(s, 4);
+    const sum = Object.values(s.dockByZone).reduce((a, b) => a + b, 0);
+    expect(s.dockUnits).toBeGreaterThan(0);
+    expect(sum).toBeCloseTo(s.dockUnits, 6);
+  });
+
+  it('el camión se lleva de cada producto su parte', () => {
+    const s = newGame();
+    s.dockUnits = 30;
+    s.dockByZone = { crusher: 20, smelter: 10 };
+    s.dockValue = 60;
+    advance(s, 1);
+    const sum = Object.values(s.dockByZone).reduce((a, b) => a + b, 0);
+    expect(sum).toBeCloseTo(s.dockUnits, 6);
+    expect(s.dockByZone.crusher / s.dockByZone.smelter).toBeCloseTo(2, 6);
+  });
+
+  it('una partida antigua sin muelle por producto se carga', () => {
+    expect(load(JSON.stringify({ dockUnits: 3 })).dockByZone).toEqual({});
+  });
+});
+
+describe('cuello de botella', () => {
+  it('sin chatarra se atasca por la chatarra y con el palé lleno por las carretillas', () => {
+    const s = newGame();
+    expect(bottleneck(s)).toBe('scrap');
+    expect(zoneStatus(s, ZONES[0])).toBe('starved');
+    s.scrap = 50;
+    expect(zoneStatus(s, ZONES[0])).toBe('working');
+    expect(bottleneck(s)).toBe('none');
+    s.zones.crusher.buffer = 999;
+    expect(zoneStatus(s, ZONES[0])).toBe('full');
+    expect(bottleneck(s)).toBe('carts');
+  });
+
+  it('la demanda de chatarra crece con las máquinas', () => {
+    const s = newGame();
+    const one = scrapDemand(s);
+    s.zones.crusher.machines = 3;
+    expect(scrapDemand(s)).toBeCloseTo(one * 3, 6);
   });
 });
