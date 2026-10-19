@@ -34,7 +34,17 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-Nada pendiente de decidir por ahora.
+### Parte 11 — Qué hacemos ahora (2026-10-19)
+
+Todo lo aprobado está hecho salvo «pulir» y comprobar la web en el móvil. Para la siguiente sesión, ¿qué prefieres?
+
+- **N1 — Equilibrio:** ajusto precios y tiempos con una simulación de partida (cuánto tarda cada zona en estar al máximo) y te propongo una tabla de números para aprobar.
+- **N2 — Android:** empaquetar con Capacitor y generar el archivo para Google Play en GitHub Actions (sin anuncios reales aún).
+- **N3 — Textos en inglés:** pasar todos los textos a un archivo de traducciones (es/en) con selector de idioma.
+- **N4 — Rendimiento:** medir y aligerar la escena para móviles flojos (el parpadeo del vídeo), sin cambiar el juego.
+- **N5 — Otra cosa:** dime tu idea.
+
+Responde con las letras (p. ej. «N1N4»).
 
 ## Hecho
 
