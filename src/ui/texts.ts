@@ -12,6 +12,8 @@ const es: Record<string, string> = {
   'buy.unlock': 'Abrir zona nueva',
   'shop.title': 'Mejoras',
   close: 'Cerrar',
+  'sound.on': 'Silenciar',
+  'sound.off': 'Activar sonido',
   'boost.short': '×2 · 30 min',
   'boost.activeShort': '×2 · {minutes} min',
   'boost.waitShort': '{minutes} min',

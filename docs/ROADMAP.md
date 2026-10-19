@@ -31,7 +31,8 @@ Terminado: la primera versión se juega de principio a fin y engancha a Mikel.
 - [x] Ayudantes con experiencia y niveles
 - [x] Retención: racha de 7 días, empujón ×2 y camión dorado
 - [x] Pase de chatarrero (en la web, de prueba)
-- [ ] Sonidos y más animaciones (vuelco de chatarra, monedas al cobrar)
+- [x] Sonidos (sintetizados, con botón de silencio)
+- [ ] Más animaciones (vuelco de chatarra)
 - [ ] Equilibrio: ajustar precios jugando de verdad (precios de los ayudantes y espera del empujón provisionales)
 - Prestigio: no en la primera versión (decidido por Mikel)
 
