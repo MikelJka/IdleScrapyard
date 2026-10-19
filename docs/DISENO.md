@@ -94,3 +94,6 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - **Mejoras de cada zona** (2026-10-19, con dólares): velocidad, capacidad, número de máquinas y nivel de las máquinas.
 - **Nivel de los ayudantes** (2026-10-19): la experiencia por trabajar desbloquea el siguiente nivel y se paga en dólares para subirlo.
 - **Qué mejoran los ayudantes** (2026-10-19): el valor de lo producido y la velocidad de su zona.
+- **Zonas de la primera versión** (2026-10-19): 4, industriales. Aplastado → bloques de chatarra (1 $), fundido → lingotes (4 $), chapa (15 $) y tubos (60 $). Los precios son un punto de partida y se ajustan con pruebas. Más adelante: vigas (250 $), piezas de motor (1 K $), motores (4 K $) y coches reconstruidos (15 K $).
+- **Ayudantes fijos** (2026-10-19): un personaje con nombre y personalidad por zona.
+- **Camiones** (2026-10-19): todos iguales; se mejora la carga que esperan en el muelle antes de salir.
