@@ -157,9 +157,44 @@ export function startApp(root: HTMLElement): void {
       }
     });
   }
+  // Tutorial de los primeros minutos: un mensaje abajo que guía paso a paso (se salta si ya se ha jugado).
+  const TUT_KEY = 'chatarrero.tut';
+  let tut = (() => {
+    try {
+      const v = localStorage.getItem(TUT_KEY);
+      if (v !== null) return Number(v);
+    } catch {
+      // sin almacenamiento
+    }
+    return state.totalEarned > 0 ? 4 : 0;
+  })();
+  let taps = 0;
+  const setTut = (n: number) => {
+    tut = n;
+    try {
+      localStorage.setItem(TUT_KEY, String(n));
+    } catch {
+      // sin almacenamiento
+    }
+  };
+  let lastTip = '';
+  function renderTip(): void {
+    let text = t('tip');
+    if (tut === 0) text = t('tut.tap', { n: Math.min(taps, 5) });
+    else if (tut === 1) text = state.dollars >= 10 ? t('tut.station') : t('tut.money');
+    else if (tut === 2) text = t('tut.buy');
+    else if (tut === 3) text = t('tut.close');
+    if (tut === 0 && taps >= 5) setTut(1);
+    if (text !== lastTip) {
+      lastTip = text;
+      $('tip').textContent = text;
+      $('tip').classList.toggle('tut', tut < 4);
+    }
+  }
   const scene = createYard($('scene-wrap'));
   scene.el.querySelector('#pile')!.addEventListener('click', () => {
     tap(state);
+    taps++;
     play('tap');
     buzz(8);
     scene.pop('+' + ECONOMY.tap.scrap, 'pile');
@@ -204,6 +239,7 @@ export function startApp(root: HTMLElement): void {
   };
   scene.onSelect((sel) => {
     play('tap');
+    if (tut === 1 && sel === 'crusher' && panel !== sel) setTut(2);
     openPanel(panel === sel ? null : sel);
   });
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
@@ -259,7 +295,10 @@ export function startApp(root: HTMLElement): void {
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => (el.hidden = true), 3500);
   }
-  $('close-shop').addEventListener('click', () => openPanel(null));
+  $('close-shop').addEventListener('click', () => {
+    if (tut === 3) setTut(4);
+    openPanel(null);
+  });
   scene.el.querySelector('#golden')!.addEventListener('click', async () => {
     if (busy || state.goldenVisible <= 0) return;
     busy = true;
@@ -292,6 +331,7 @@ export function startApp(root: HTMLElement): void {
   $('shop').addEventListener('click', (e) => {
     const id = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]')?.dataset.id;
     if (id && buy(state, id)) {
+      if (tut === 2) setTut(3);
       play('buy');
       buzz(15);
     }
@@ -353,6 +393,7 @@ export function startApp(root: HTMLElement): void {
     lastEarned = state.totalEarned;
     lastCooldown = state.truckCooldown;
     renderStats();
+    renderTip();
     celebrateLevels();
     for (const a of checkAchievements(state)) {
       toast(t('achieve.got', { name: a.name }));
