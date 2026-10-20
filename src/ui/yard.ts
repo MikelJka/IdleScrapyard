@@ -256,6 +256,8 @@ export interface Yard {
   setSelected(sel: string | null): void;
   /** Mueve la cámara para que el puesto quede en la parte de arriba, sobre el panel abierto. */
   focus(sel: string): void;
+  /** Calidad baja: sin nubes, pájaros, autopista ni tren (menos que dibujar en móviles flojos). */
+  setLowQuality(low: boolean): void;
   /** Animación de subida de nivel en un puesto. `big` para las de máquina (cada 5 niveles). */
   celebrate(zoneId: string, text: string, big: boolean): void;
 }
@@ -407,6 +409,8 @@ export function createYard(container: HTMLElement): Yard {
     hint.setAttribute('transform', `translate(${x} ${y})`);
   }
 
+  /** Parte del mapa que se ve ahora (se actualiza al mover la cámara): lo que queda fuera no se anima. */
+  const view = { x0: -1e9, x1: 1e9, y0: -1e9, y1: 1e9 };
   const objs: Obj[] = [{ el: pile, depth: PILE.x + PILE.y + 2 }];
 
   // Camiones de chatarra (atrás): llegan, se acercan a la pila, vuelcan la caja y se van.
@@ -814,18 +818,22 @@ export function createYard(container: HTMLElement): Yard {
       l.phase += dtv * l.level * 11;
       l.gearAngle = (l.gearAngle + dtv * l.level * 320) % 360;
       const wave = 0.5 + 0.5 * Math.sin(l.phase);
-      for (const e of l.press) e.style.translate = `0 ${(l.level * wave * 7).toFixed(2)}px`;
-      for (const e of l.gears) e.style.rotate = `${l.gearAngle.toFixed(1)}deg`;
-      const shown = l.level > 0;
-      for (const e of l.fx) {
-        e.style.display = shown ? '' : 'none';
-        e.style.opacity = l.level.toFixed(2);
+      const [mx, my] = iso(station(i).x + SIZE / 2, station(i).y + SIZE / 2);
+      const inView = mx > view.x0 - 130 && mx < view.x1 + 130 && my > view.y0 - 130 && my < view.y1 + 130;
+      if (inView) {
+        for (const e of l.press) e.style.translate = `0 ${(l.level * wave * 7).toFixed(2)}px`;
+        for (const e of l.gears) e.style.rotate = `${l.gearAngle.toFixed(1)}deg`;
+        const shown = l.level > 0;
+        for (const e of l.fx) {
+          e.style.display = shown ? '' : 'none';
+          e.style.opacity = l.level.toFixed(2);
+        }
+        for (const e of l.flows) {
+          e.style.display = shown ? '' : 'none';
+          e.style.opacity = (0.95 * l.level).toFixed(2);
+        }
+        if (l.torso) l.torso.style.translate = `0 ${(-2 * l.level * (0.5 + 0.5 * Math.sin(l.phase * 1.3))).toFixed(2)}px`;
       }
-      for (const e of l.flows) {
-        e.style.display = shown ? '' : 'none';
-        e.style.opacity = (0.95 * l.level).toFixed(2);
-      }
-      if (l.torso) l.torso.style.translate = `0 ${(-2 * l.level * (0.5 + 0.5 * Math.sin(l.phase * 1.3))).toFixed(2)}px`;
       const lvl = l.label.querySelector('.lvl text');
       const txt = `${tr('lvl')} ${zone.helperLevel}`;
       if (lvl && lvl.textContent !== txt) lvl.textContent = txt;
@@ -1086,6 +1094,10 @@ export function createYard(container: HTMLElement): Yard {
     const vw = w / cam.scale;
     const vh = h / cam.scale;
     svg.setAttribute('viewBox', `${(cam.x - vw / 2).toFixed(1)} ${(cam.y - vh / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+    view.x0 = cam.x - vw / 2;
+    view.x1 = cam.x + vw / 2;
+    view.y0 = cam.y - vh / 2;
+    view.y1 = cam.y + vh / 2;
   }
   apply();
   new ResizeObserver(apply).observe(container);
@@ -1187,6 +1199,9 @@ export function createYard(container: HTMLElement): Yard {
     pop,
     celebrate,
     onSelect: (cb) => (onSelect = cb),
+    setLowQuality: (low) => {
+      for (const g of [clouds, birds, hway, q('train')]) g.setAttribute('display', low ? 'none' : '');
+    },
     setSelected: (sel) => selOutlines.forEach((el, id) => el.setAttribute('display', id === sel ? '' : 'none')),
   };
 }

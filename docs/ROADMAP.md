@@ -55,12 +55,12 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [ ] Logística visible (L1): las carretillas sueltan su producto en su huella y el camión se llena de las huellas
 - [ ] Música ambiental sintetizada (suave, con volumen propio) y sonidos por tipo de línea
 - [ ] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
-- [ ] Rendimiento: ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
+- [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
 - [ ] Iluminación y sombras suaves en toda la escena, no solo de noche (degradados, ambient occlusion falso bajo las máquinas)
 - [ ] Estadísticas del jugador (tiempo jugado, camiones, mejor racha) en ajustes
 - [ ] Accesibilidad: texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
-- [ ] Textos en inglés con selector de idioma
-- [ ] Equilibrio con el bot: tabla de tiempos por zona y grado de máquina, propuesta de números para Mikel
+- [x] Textos en inglés con selector de idioma
+- [x] Equilibrio con el bot: simulación de jugador hecha (`scripts/balance.ts`), propuesta en la Parte 18; falta que Mikel elija
 - [ ] Pruebas: la prueba de humo comprueba el panel por línea, el ranking apagado y la noche; tests de interfaz sencillos
 
 ## Fase 3 — Android y monetización
@@ -71,7 +71,7 @@ Terminado: el juego está en la prueba cerrada de Google Play con anuncios de pr
 - [x] Anuncios y compras decididos (empujón, camión dorado, pase a 2,99 €)
 - [ ] Anuncios reales con AdMob y compra del pase con Google Play Billing
 - [ ] Consentimiento de anuncios (UE) y política de privacidad
-- [ ] Textos en inglés
+- [x] Textos en inglés
 - [ ] Ficha de la tienda: textos, icono y capturas
 
 ## Fase 4 — Publicación

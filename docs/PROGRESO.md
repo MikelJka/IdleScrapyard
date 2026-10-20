@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — T3, simulación de jugador, inglés y rendimiento
+
+- Mikel eligió T3. Cada línea tiene sus carretillas (extra y «tanda» de +5 piezas por viaje) y el palé de salida solo suma cuando llega la tanda entera (viaje de 10 s). Mejoras en el menú de cada línea. Partidas antiguas migradas.
+- Simulación de jugador (`scripts/balance.ts`): resultados y opciones en la Parte 18 de FEEDBACK.md (todo abierto en ~9 días casual / ~2,4 días atento; nivel 30 de máquina imposible; R2 cambia a ~3,6 h la zona 4).
+- Inglés: selector en ajustes, todos los textos y nombres. Prueba que exige las traducciones.
+- Rendimiento (`scripts/perf.mjs`): el coste es pintar el SVG; líneas fuera de pantalla sin animar, 30 fps en táctiles, «Calidad baja» automática o fija en ajustes. ~11 → ~25 fps en la prueba lenta.
+- Propuestas nuevas: Parte 18 (números y estímulos), 19 (nombre global) y 20 (material de anuncio).
+- Qué probar: comprar carretillas en una línea y ver las tandas llegar al muelle; cambiar a English en ajustes; ver si baja el parpadeo.
+
 ## 2026-10-20 — Apertura de zona animada
 
 - Fase 2b: al abrir una zona el andamio sube y se desvanece mientras la máquina entra desde arriba con un pequeño rebote (se respeta «reducir movimiento»).

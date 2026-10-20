@@ -110,6 +110,10 @@ export function startApp(root: HTMLElement): void {
           <b>${t('settings.language')}</b>
           <div><button type="button" data-lang="es" ${getLang() === 'es' ? 'aria-pressed="true"' : ''}>Español</button><button type="button" data-lang="en" ${getLang() === 'en' ? 'aria-pressed="true"' : ''}>English</button></div>
         </div>
+        <div id="quality" hidden>
+          <b>${t('settings.quality')}</b>
+          <div><button type="button" data-q="auto">${t('settings.qualityAuto')}</button><button type="button" data-q="low">${t('settings.qualityLow')}</button></div>
+        </div>
         <div id="transfer" hidden>
           <b>${t('transfer.title')}</b>
           <small>${t('transfer.help')}</small>
@@ -233,6 +237,7 @@ export function startApp(root: HTMLElement): void {
     $('sheet').hidden = sel === null;
     $('transfer').hidden = sel !== 'settings';
     $('lang').hidden = sel !== 'settings';
+    $('quality').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -254,6 +259,16 @@ export function startApp(root: HTMLElement): void {
     if (!next || next === getLang()) return;
     setLang(next);
     writeSave(state);
+    location.reload();
+  });
+  $('quality').addEventListener('click', (e) => {
+    const q = (e.target as HTMLElement).closest<HTMLElement>('button[data-q]')?.dataset.q;
+    if (!q) return;
+    try {
+      localStorage.setItem('chatarrero.quality', q);
+    } catch {
+      /* vale solo para esta sesión */
+    }
     location.reload();
   });
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
@@ -458,7 +473,12 @@ export function startApp(root: HTMLElement): void {
     }
     $('dollars').textContent = fmt(shownDollars);
     $('rate').textContent = t('incomeRate', { n: fmt(incomePerSecond(state)) });
-    scene.update(state);
+    // En pantallas táctiles (o si va justo) la escena se redibuja a 30 por segundo: se mueve igual y se pinta la mitad.
+    const sceneNow = performance.now();
+    if (sceneNow - lastSceneAt >= sceneEveryMs) {
+      lastSceneAt = sceneNow;
+      scene.update(state);
+    }
     // Sonido al cobrar un camión (el dinero sube y el camión se reinicia).
     if (state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > lastCooldown) {
       play('cash');
@@ -562,6 +582,24 @@ export function startApp(root: HTMLElement): void {
   }
 
   let last = performance.now();
+  let lastSceneAt = 0;
+  let sceneEveryMs = window.matchMedia?.('(pointer: coarse)').matches ? 32 : 0;
+  // Calidad: automática (baja si los fotogramas tardan más de 45 ms durante 3 s) o fija en baja desde ajustes.
+  const QUALITY_KEY = 'chatarrero.quality';
+  let lowForced = false;
+  try {
+    lowForced = localStorage.getItem(QUALITY_KEY) === 'low';
+  } catch {
+    /* sin almacenamiento: automática */
+  }
+  let lowQuality = lowForced;
+  const applyQuality = (): void => {
+    scene.setLowQuality(lowQuality);
+    $('scene-wrap').classList.toggle('lowq', lowQuality);
+  };
+  applyQuality();
+  let slowSince = 0;
+  let frameMs = 16;
   let lastSave = last;
   const showFps = new URLSearchParams(location.search).has('fps');
   let frames = 0;
@@ -580,6 +618,16 @@ export function startApp(root: HTMLElement): void {
         frames = 0;
         worst = 0;
         fpsAt = now;
+      }
+    }
+    frameMs = frameMs * 0.9 + Math.min(200, now - last) * 0.1;
+    if (frameMs > 22) sceneEveryMs = Math.max(sceneEveryMs, 32);
+    if (frameMs > 45 || lowForced) sceneEveryMs = Math.max(sceneEveryMs, 50);
+    if (!lowQuality) {
+      slowSince = frameMs > 45 ? slowSince || now : 0;
+      if (slowSince && now - slowSince > 3000) {
+        lowQuality = true;
+        applyQuality();
       }
     }
     advance(state, Math.min((now - last) / 1000, 1));

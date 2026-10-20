@@ -35,9 +35,10 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 - [x] **Propuestas de la noche, decididas «como mejor veas»** (2026-10-19): G4 + G1 (contador `?fps=1` hecho), L1 (en el roadmap), M3 (premio cada 5 niveles de máquina: 10 min de producción de la línea; **hecho**) y O4 (objetivo a la vista + logros; **hecho**).
 
 - [x] **Pantalla más limpia: KPI en el panel de la línea** (2026-10-20, Mikel): quitados de la pantalla los textos de estado y «0/200» de cada línea y la barra con pila, entrada y demanda; ahora salen al tocar la línea (chatarra que entra, pila, lo que podría aplastar, palés, muelle y atascos). La pila muestra «+N/s» cuando está vacía. **Hecho.**
-- [ ] **Logística por tandas y mejoras dentro de cada línea** (2026-10-20, Mikel): las carretillas llegan al muelle en tandas (10, 15, 20… según el nivel de sus carretillas) y el palé de salida solo suma al llegar; las mejoras de carretillas y camión de salida van en el menú de cada línea. Es un cambio de reglas: ver Parte 17.
-- [ ] **Revisar números de chatarra** (2026-10-20, Mikel: entran 31/s y la pantalla decía que las líneas consumían 517/s): 517/s es lo que las máquinas podrían aplastar, no lo que consumen (consumen lo que entra); ya se rotula así. Falta decidir el equilibrio (Parte 11, N1).
-- [ ] **Parpadeos** (2026-10-20, Mikel: mejor, pero siguen): seguir midiendo con `?fps=1` (Parte 11, N4).
+- [x] **Logística por tandas y mejoras dentro de cada línea (T3)** (2026-10-20, Mikel elige T3 con tanda de 10 + 5 por nivel y precios iguales): cada línea tiene sus carretillas y su nivel de tanda; cada viaje dura 10 s y el palé de salida del muelle solo suma cuando llega la tanda entera. Las mejoras «Carretilla extra» y «Tanda de carretillas» están en el menú de cada línea; el camión de salida sigue siendo común (menú del muelle). El palé siempre admite una tanda entera. Partidas antiguas: las carretillas comunes se reparten entre las líneas abiertas. **Hecho.**
+- [x] **Revisar números de chatarra** (2026-10-20, Mikel: entran 31/s y la pantalla decía que las líneas consumían 517/s): 517/s es lo que las máquinas podrían aplastar, no lo que consumen; ya se rotula así. **Hecho** el rótulo; el equilibrio sigue en la Parte 18.
+- [x] **Rendimiento (N4)** (2026-10-20): medido con `scripts/perf.mjs` (CPU ×4, partida de 2 días): el coste es dibujar el SVG (el 90 %; el código del juego, un 7 %), sobre todo las 5 400 piezas de máquinas y trabajadores. Ahora: las líneas fuera de la pantalla no se animan, la escena se redibuja a 30/s en táctiles (y a 20/s si va justo), y hay «Calidad baja» (sin nubes, pájaros, autopista, tren ni animaciones CSS y bordes sin suavizar) que se activa sola tras 3 s a menos de ~22 fps y se puede fijar en ajustes. Resultado en la prueba lenta: de ~11 a ~25 fps. **Hecho**; si siguen los parpadeos en el móvil, el siguiente paso es dibujar las máquinas en `<canvas>` (aviso de Mikel).
+- [x] **Textos en inglés (N3)** (2026-10-20): selector Español/English en ajustes (por defecto el idioma del navegador); todos los textos, nombres de zonas, ayudantes y logros traducidos; una prueba exige que no falte ninguna traducción. **Hecho.**
 
 ## Propuestas para Mikel
 
@@ -55,7 +56,45 @@ Todo lo aprobado está hecho salvo «pulir» y comprobar la web en el móvil. Pa
 
 Responde con las letras (p. ej. «N1N4»).
 
-### Parte 17 — Logística por tandas y mejoras por línea (2026-10-20)
+### Parte 18 — Resultado de la simulación de jugador y qué ajustar (2026-10-20)
+
+Simulación (`npx vite-node scripts/balance.ts`): dos jugadores que compran como el bot de pruebas. **Casual** = 4 sesiones de 5 min al día; **atento** = una sesión de 4 min cada 40 min, 16 h al día. El juego cerrado produce hasta 1 h.
+
+- Todas las zonas abiertas: **casual ~9 días, atento ~2,4 días** (zona 2 a las ~4 h / ~1 h; zona 4 a ~2 días / ~15 h).
+- Después no queda nada nuevo: el dinero crece hasta 1e12-1e13 $ en 60 días y las compras se quedan en subir números (camiones de chatarra ~240, muelle nv ~130).
+- Lo más largo sin comprar nada: ~2 días (casual) y ~3 días (atento) justo antes de abrir una zona cara: ahí falta un estímulo.
+- **Máquinas:** cuestan ×4 por nivel y solo doblan una línea, así que el bot nunca las compra. Con 1,5e13 $ ganados la línea 1 llegaría a nivel ~17; el logro «Máquina de leyenda» (nivel 30) cuesta ~3e20 $: **imposible**. Hay que bajar el ×4 o el logro.
+- **Ritmo R2:** con las carretillas por línea la zona 4 llega a ~3,6 h jugando atento sin parar (antes ~6 h). Ajustado el test a «más de 3 h».
+
+Opciones (responde con las letras):
+- **B1 — Ritmo:** (a) dejarlo como está; (b) subir el precio de abrir las zonas 3 y 4 ×1,5 para volver a ~6 h.
+- **B2 — Máquinas:** (a) crecimiento ×4 → ×2,2 (el nivel 30 cuesta ~5e12 $, alcanzable en 1-2 meses); (b) dejar ×4 y bajar el logro a nivel 15; (c) otra idea.
+- **B3 — Más estímulos (entretenimiento):** (a) **Pedidos especiales** cada ~15 min (entrega 50 bloques en 2 min → premio doble); (b) **cofre de hito por hora jugada** con premio sorpresa; (c) **zonas 9-12** más allá de los coches (reconstruidos → motos, barcos, aviones, trenes), cada una con ayudante; (d) **objetivos diarios** (3 al día) con premio; (e) **camión VIP** que aparece sin anuncio y paga mucho si se toca a tiempo. Mi recomendación: a + b + c.
+
+### Parte 19 — Nombre global (2026-10-20)
+
+«Chatarrero» solo se entiende en español. Google Play permite un título distinto por idioma, así que se puede mantener «Chatarrero» en español y poner uno global en inglés, o cambiar todo. Opciones (hay que comprobar que no estén ocupadas en Play y como marca antes de decidir):
+
+- **G1 — Idle Scrapyard** (ya es el nombre del repositorio; claro para buscar en la tienda).
+- **G2 — Scrap Empire: Idle Factory** (promete progresión y fábrica).
+- **G3 — Scrapyard Tycoon Idle** (descriptivo, muy buscable, pero genérico).
+- **G4 — Crusher Inc.** (corto, de marca; menos descriptivo).
+- **G5 — Dejarlo en «Chatarrero»** como marca del juego en todos los idiomas.
+
+Elige letra; el logo universal (sin texto, solo el icono) sirve con cualquiera.
+
+### Parte 20 — Material para anunciar el juego (2026-10-20, N5)
+
+Todo a coste cero y generado por código desde el propio juego (Playwright + SVG), en español e inglés:
+
+- **M1 — Capturas con rótulos para Play Store:** 6-8 capturas de 1080×1920 con frase corta encima («Aplasta, funde, ¡y cobra!»), sacadas de partidas de ejemplo (inicio, línea llena, noche, muelle con camión dorado). Más el gráfico de función 1024×500.
+- **M2 — Logo universal:** icono sin texto (ya hay `public/icon.svg`) en 512×512 y variantes (fondo liso, adaptativo de Android, monocromo) y un rótulo con el nombre elegido en G.
+- **M3 — Vídeo de 20-30 s:** grabación del juego con una partida guionizada (Playwright graba vídeo), con rótulos y sonidos del propio juego; sale en MP4/WebM vertical. Play pide enlace de YouTube, así que lo subirías tú. Es factible, pero queda menos pulido que a mano.
+- **M4 — Página web de prensa** en GitHub Pages con las capturas, el vídeo y el texto de la ficha.
+
+Elige (p. ej. «M1M2M4» o «todo»).
+
+### Parte 17 — Logística por tandas y mejoras por línea (decidida: T3, hecha)
 
 Hoy las carretillas y el muelle son globales: cada carretilla lleva 1 unidad/s y el palé baja de forma continua, por eso sale siempre a 0. Para que llegue en tandas:
 
@@ -63,7 +102,7 @@ Hoy las carretillas y el muelle son globales: cada carretilla lleva 1 unidad/s y
 - **T2 — Tandas globales:** se mantiene la flota común pero cada viaje es una tanda (10, 15, 20… por nivel de carretillas, común); las mejoras siguen en el muelle.
 - **T3 — Como T1, pero el camión de salida sigue siendo común** (un muelle, mejoras de carretilla por línea).
 
-Dime la letra y los números de tanda (¿10 +5 por nivel te vale?) y precios (¿igual que ahora?).
+
 
 ## Hecho
 
