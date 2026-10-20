@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Estaciones propias en el anexo
+
+- Las carretillas de las zonas 9 y 10 ya no comparten pasillo ni andén: la del Taller de vagones descarga en el andén del tren y la del Astillero en el muelle del barco, cada una por su pasillo amarillo (`ANNEX_LANE_X` en `src/ui/yard.ts`). Solo cambia el dibujo.
+- Qué probar: abrir las zonas 9 y 10 y ver cada carretilla llegar a su estación.
+- Sigue: equilibrar tren y barco, tests de interfaz sencillos.
+
 ## 2026-10-20 — El barco zarpa
 
 - El barco del puerto ya no es decorado fijo: cuando sale el cargamento de la zona 10 se va hacia la derecha, queda fuera unos segundos y vuelve por la izquierda (`shipSvg` en `src/ui/scenery.ts`, animación en `src/ui/yard.ts`).

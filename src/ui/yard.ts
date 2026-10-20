@@ -43,6 +43,8 @@ const BACK_Y = -2.6;
 const FRONT_Y = 17.2;
 const PILE = { x: 2.2, y: 1.9 };
 const TRUCK_PARK_X = 7.5;
+/** Pasillo de las carretillas de cada línea del anexo: la 9 descarga en el andén y la 10 en el muelle del barco. */
+const ANNEX_LANE_X = [24.8, 26.0];
 
 function fmtShort(n: number): string {
   if (n < 1000) return String(Math.floor(n));
@@ -218,10 +220,15 @@ function staticYard(): string {
     s += `<polyline points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" stroke="#3f8fc4" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round" opacity="0.7" fill="none"/>`;
   }
   // Pasillos de las carretillas.
-  for (const c of COL_X) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
+  for (const c of COL_X.slice(0, 4)) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Muelle de carga.
   s += block(0.2, DOCK_Y, 0, 19, 1.4, 0.3, '#8a6a4a');
-  s += block(24.2, DOCK_Y, 0, 2.6, 1.4, 0.3, '#6f6a62'); // andén del anexo (tren y barco)
+  // Estaciones propias del anexo: andén del tren (zona 9) y muelle del barco (zona 10), cada una al final de su pasillo.
+  s += block(24.2, DOCK_Y, 0, 1.2, 1.4, 0.3, '#6f6a62');
+  s += block(25.4, DOCK_Y, 0, 1.4, 1.4, 0.3, '#4f6f86');
+  s += tile(24.3, DOCK_Y + 0.1, 1.0, 1.2, 'fill="none" stroke="#f4c430" stroke-width="1.4" stroke-dasharray="5 3"', 0.3);
+  s += tile(25.5, DOCK_Y + 0.1, 1.2, 1.2, 'fill="none" stroke="#f4c430" stroke-width="1.4" stroke-dasharray="5 3"', 0.3);
+  for (const x of ANNEX_LANE_X) s += tile(x - 0.25, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Carretera de delante.
   s += tile(-10, FRONT_Y - 0.6, 44, 3.4, 'fill="#5b4632"');
   s += `<polyline points="${[iso(-10, FRONT_Y + 1.1), iso(30, FRONT_Y + 1.1)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
@@ -938,7 +945,7 @@ export function createYard(container: HTMLElement): Yard {
       // El viaje empieza girando junto al palé (donde carga) y da la vuelta al muelle.
       const u = c.bound ? (CYC - TURN + (ECONOMY.carts.tripSeconds - c.bound.left)) % CYC : 0;
       const trip = c.bound !== null;
-      const pose = trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
+      const pose = trip ? cartPose(u, p0, src.z.transport ? ANNEX_LANE_X[Math.min(1, src.i - 8)] : st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
       const dockMid = MOVE + TURN / 2;
       const midTurn = CYC - TURN / 2;
       const carrying = trip && (u < dockMid || u >= midTurn) ? c.loadN : 0;
