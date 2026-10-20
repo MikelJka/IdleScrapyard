@@ -672,8 +672,8 @@ export function createYard(container: HTMLElement): Yard {
   let mainLevel = 0;
 
   // Un viaje de carretilla dura CYC s: ir (MOVE), girar en el muelle (TURN), volver (MOVE) y girar junto al palé (TURN).
-  const MOVE = 3.4;
-  const TURN = 0.6;
+  const MOVE = 4.2; // CYC = 10 s, lo que tarda el viaje de una carretilla en la simulación (`economy.json`)
+  const TURN = 0.8;
   const CYC = 2 * MOVE + 2 * TURN;
   const lerp = (a: number, b: number, f: number) => a + (b - a) * Math.min(1, Math.max(0, f));
 
@@ -854,8 +854,10 @@ export function createYard(container: HTMLElement): Yard {
     // Carretillas: cada una atiende una zona abierta. Si hay producto (o la zona está produciendo) sale a trabajar,
     // gira en cada extremo y lleva solo lo que hay; si no, espera junto al palé.
     const open = ZONES.map((z, i) => ({ z, i })).filter(({ z }) => state.zones[z.id].unlocked);
-    // Cada línea abierta tiene al menos una carretilla a la vista que le recoge el producto.
-    const nCarts = Math.min(8, Math.max(state.carts, open.length));
+    // Cada línea abierta enseña hasta 3 de sus carretillas (las primeras de cada línea antes); el viaje sigue a la simulación.
+    const slots: { z: ZoneDef; i: number; j: number }[] = [];
+    for (let j = 0; j < 3; j++) for (const o of open) if (j < state.zones[o.z.id].carts) slots.push({ z: o.z, i: o.i, j });
+    const nCarts = Math.min(8, slots.length);
     while (carts.length < nCarts) {
       const g = mk(objectsG, '');
       const o: Obj = { el: g, depth: 0 };
@@ -868,7 +870,7 @@ export function createYard(container: HTMLElement): Yard {
         c.o.depth = -99;
         return;
       }
-      const src = open[k % open.length];
+      const src = slots[k];
       if (c.home !== src.z.id) {
         c.home = src.z.id;
         c.trip = false;
@@ -876,16 +878,13 @@ export function createYard(container: HTMLElement): Yard {
       const zone = state.zones[src.z.id];
       const st = station(src.i);
       const p0 = { x: st.x + 3.0, y: st.y + 2.7 };
-      const flowing = zone.buffer > 0.05 || (working && zone.buffer < zoneCapacity(zone) - 0.01);
       if (c.trip && t - c.t0 >= CYC) c.trip = false;
-      if (!c.trip && flowing) {
-        // No sale otra carretilla de la misma zona hasta que la anterior se haya alejado.
-        const crowded = carts.some((o, j) => j !== k && j < nCarts && o.trip && o.home === c.home && t - o.t0 < 2.2);
-        if (!crowded) {
-          c.trip = true;
-          c.t0 = t; // empieza girando junto al palé (donde carga) y da una vuelta completa al muelle
-          c.loadN = Math.max(1, Math.min(3, Math.ceil((zone.buffer / zoneCapacity(zone)) * 3)));
-        }
+      const trip = zone.trips[src.j];
+      if (!c.trip && trip) {
+        // Sale cuando la simulación la manda de viaje; empieza girando junto al palé (donde carga) y da la vuelta al muelle.
+        c.trip = true;
+        c.t0 = t - Math.max(0, ECONOMY.carts.tripSeconds - trip.left);
+        c.loadN = Math.max(1, Math.min(3, Math.ceil(trip.load / 10)));
       }
       const u = c.trip ? (CYC - TURN + (t - c.t0)) % CYC : 0;
       const pose = c.trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };

@@ -2,7 +2,7 @@
  * Jugador simulado para probar el ritmo: toca la pila mientras juega activo y
  * compra lo que más dólares por segundo añade por dólar gastado; abre cada zona en cuanto puede.
  */
-import { ECONOMY, ZONES, advance, buy, dockLoad, incomePerSecond, purchases, scrapPerSecond, tap, type GameState, type Purchase } from './game';
+import { ECONOMY, ZONES, advance, buy, cartThroughput, dockLoad, zoneRate, incomePerSecond, purchases, scrapPerSecond, tap, type GameState, type Purchase } from './game';
 
 export interface BotOptions {
   /** Toques por segundo mientras juega activo. */
@@ -27,7 +27,14 @@ function score(state: GameState, p: Purchase, taps: number): number {
   return (steadyIncome(after, taps) - steadyIncome(state, taps)) / p.cost;
 }
 
-function shop(state: GameState, taps: number): void {
+/** La línea produce más de lo que sus carretillas pueden llevar. */
+function cartLimited(state: GameState, zoneId: string): boolean {
+  const z = state.zones[zoneId];
+  const def = ZONES.find((d) => d.id === zoneId)!;
+  return cartThroughput(z) <= zoneRate(def, z) * 1.01;
+}
+
+export function shop(state: GameState, taps: number): void {
   for (;;) {
     const list = purchases(state);
     const unlock = list.find((p) => p.kind === 'unlock');
@@ -49,11 +56,10 @@ function shop(state: GameState, taps: number): void {
     }
     // Varios topes iguales (chatarra, carretillas, muelle): ninguna compra sola mejora; sube el más barato.
     const supply = scrapPerSecond(state) + taps * ECONOMY.tap.scrap;
-    const carts = state.carts * ECONOMY.carts.unitsPerSecond;
     const dock = dockLoad(state) / ECONOMY.dock.returnSeconds;
-    const min = Math.min(supply, carts, dock);
+    const min = Math.min(supply, dock);
     const binding = list.filter(
-      (p) => (p.kind === 'scrapTruck' && supply <= min * 1.01) || (p.kind === 'cart' && carts <= min * 1.01) || (p.kind === 'dock' && dock <= min * 1.01),
+      (p) => (p.kind === 'scrapTruck' && supply <= min * 1.01) || ((p.kind === 'carts' || p.kind === 'cartLevel') && cartLimited(state, p.zoneId!)) || (p.kind === 'dock' && dock <= min * 1.01),
     );
     const cheapest = binding.sort((a, b) => a.cost - b.cost)[0];
     if (!cheapest || cheapest.cost > state.dollars) return;

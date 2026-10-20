@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ECONOMY, ZONES, advance, bottleneck, buy, checkAchievements, currentGoal, dockLoad, load, newGame, purchases, scrapDemand, serialize, tap, zoneStatus } from '../src/sim/game';
+import { ECONOMY, ZONES, advance, bottleneck, cartBatch, zoneCapacity, buy, checkAchievements, currentGoal, dockLoad, load, newGame, purchases, scrapDemand, serialize, tap, zoneStatus } from '../src/sim/game';
 import { DEFAULT_BOT, playBot } from '../src/sim/bot';
 
 describe('cadena de la chatarra', () => {
@@ -12,22 +12,48 @@ describe('cadena de la chatarra', () => {
   it('la chatarra se aplasta, llega al muelle y un camión la convierte en dólares', () => {
     const s = newGame();
     for (let i = 0; i < 30; i++) tap(s);
-    advance(s, 12);
-    // 1 bloque por segundo a 1 $: el primer camión sale al juntar la carga del muelle.
+    advance(s, 25);
+    // 1 bloque por segundo a 1 $: la primera tanda de 10 llega al muelle a los 20 s y el camión sale.
     expect(s.dollars).toBeCloseTo(dockLoad(s) * 1, 5);
   });
 
   it('sin camión no se cobra hasta que el muelle tiene la carga', () => {
     const s = newGame();
+    s.zones.crusher.carts = 0;
     for (let i = 0; i < 5; i++) tap(s);
     advance(s, 20);
     expect(s.dollars).toBe(0);
-    expect(s.dockUnits).toBeCloseTo(5, 5);
+    expect(s.dockUnits).toBe(0);
+    expect(s.zones.crusher.buffer).toBeCloseTo(5, 5);
+  });
+
+  it('las piezas solo suman al muelle cuando la carretilla llega con la tanda entera', () => {
+    const s = newGame();
+    s.dockLevel = 3;
+    for (let i = 0; i < 10; i++) tap(s);
+    advance(s, 15);
+    expect(s.dockUnits).toBe(0);
+    expect(s.zones.crusher.trips).toHaveLength(1);
+    advance(s, 6);
+    expect(s.dockUnits).toBe(10);
+  });
+
+  it('la tanda crece con el nivel de carretillas y el palé siempre la admite', () => {
+    const z = newGame().zones.crusher;
+    expect(cartBatch(z)).toBe(10);
+    z.cartLevel = 4;
+    expect(cartBatch(z)).toBe(30);
+    expect(zoneCapacity(z)).toBeGreaterThanOrEqual(30);
+  });
+
+  it('una partida antigua con carretillas comunes las reparte entre las líneas abiertas', () => {
+    const s = load(JSON.stringify({ carts: 4, zones: { crusher: { unlocked: true }, smelter: { unlocked: true } } }));
+    expect(s.zones.crusher.carts + s.zones.smelter.carts).toBe(4);
   });
 
   it('la zona deja de producir con el almacén lleno si no hay carretillas', () => {
     const s = newGame();
-    s.carts = 0;
+    s.zones.crusher.carts = 0;
     for (let i = 0; i < 100; i++) tap(s);
     advance(s, 100);
     expect(s.zones.crusher.buffer).toBeCloseTo(ECONOMY.zoneUpgrades.capacity.startCapacity, 5);
@@ -54,8 +80,8 @@ describe('compras', () => {
 
   it('no se compra sin dólares', () => {
     const s = newGame();
-    expect(buy(s, 'cart')).toBe(false);
-    expect(s.carts).toBe(ECONOMY.carts.start);
+    expect(buy(s, 'carts:crusher')).toBe(false);
+    expect(s.zones.crusher.carts).toBe(ECONOMY.carts.start);
   });
 
   it('solo se ofrece abrir la siguiente zona', () => {
@@ -75,7 +101,7 @@ describe('partida guardada', () => {
     const s = load(JSON.stringify({ version: 1, dollars: 50 }));
     expect(s.dollars).toBe(50);
     expect(s.zones.crusher.unlocked).toBe(true);
-    expect(s.carts).toBe(ECONOMY.carts.start);
+    expect(s.zones.crusher.carts).toBe(ECONOMY.carts.start);
   });
 });
 
@@ -84,7 +110,8 @@ describe('ritmo R2 (decidido por Mikel)', () => {
     const at = playBot(newGame(), 12 * 3600, { ...DEFAULT_BOT, stopWhenAllOpen: true });
     expect(at.smelter / 60).toBeGreaterThan(6);
     expect(at.smelter / 60).toBeLessThan(15);
-    expect(at.pipes / 3600).toBeGreaterThan(4.5);
+    // Con las carretillas por línea (T3) la zona 4 llega antes que el ~6 h de R2; ver Parte 18 de FEEDBACK.md.
+    expect(at.pipes / 3600).toBeGreaterThan(3);
     expect(at.pipes / 3600).toBeLessThan(8);
   });
 });
@@ -95,7 +122,7 @@ describe('ayudantes', () => {
   it('con una hora de trabajo de su zona se puede pagar el siguiente nivel', () => {
     const s = newGame();
     s.scrapTrucks = 10;
-    s.carts = 10;
+    s.zones.crusher.carts = 10;
     advance(s, h.secondsPerLevel - 10);
     expect(purchases(s).some((p) => p.id === 'helper:crusher')).toBe(false);
     advance(s, 20);
@@ -114,12 +141,13 @@ describe('ayudantes', () => {
   it('cada nivel sube un 10 % el valor y un 5 % la velocidad', () => {
     const s = newGame();
     s.zones.crusher.helperLevel = 3;
-    s.carts = 0;
+    s.zones.crusher.carts = 0;
     for (let i = 0; i < 100; i++) tap(s);
     advance(s, 1);
     expect(s.zones.crusher.buffer).toBeCloseTo(1 + 3 * h.speedPerLevel, 10);
-    s.carts = 1;
-    advance(s, 1);
+    s.zones.crusher.carts = 1;
+    s.dockLevel = 10;
+    advance(s, 30);
     expect(s.dockValue / s.dockUnits).toBeCloseTo(1 + 3 * h.valuePerLevel, 10);
   });
 
@@ -143,7 +171,8 @@ describe('muelle por producto', () => {
   it('lo que espera en el muelle suma lo mismo por producto y en total', () => {
     const s = newGame();
     s.scrap = 100;
-    advance(s, 4);
+    s.dockLevel = 3;
+    advance(s, 22);
     const sum = Object.values(s.dockByZone).reduce((a, b) => a + b, 0);
     expect(s.dockUnits).toBeGreaterThan(0);
     expect(sum).toBeCloseTo(s.dockUnits, 6);

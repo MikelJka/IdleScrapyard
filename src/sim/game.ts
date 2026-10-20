@@ -37,6 +37,11 @@ export interface ZoneState {
   helperLevel: number;
   /** Segundos que ha trabajado la zona desde el último nivel desbloqueado del ayudante. */
   helperXp: number;
+  /** Carretillas de la línea y nivel de sus tandas (más piezas por viaje). */
+  carts: number;
+  cartLevel: number;
+  /** Carretillas de viaje: segundos que les faltan para llegar al muelle y piezas que llevan. */
+  trips: { left: number; load: number }[];
   /** Mayor múltiplo de 5 de nivel de máquina cuyo premio ya se cobró. */
   milestone: number;
 }
@@ -50,7 +55,6 @@ export interface GameState {
   /** Chatarra en la pila del desguace. */
   scrap: number;
   scrapTrucks: number;
-  carts: number;
   dockLevel: number;
   /** Unidades y valor en dólares de lo que espera en el muelle. */
   dockUnits: number;
@@ -87,6 +91,9 @@ export function newGame(): GameState {
       buffer: 0,
       helperLevel: 0,
       helperXp: 0,
+      carts: ECONOMY.carts.start,
+      cartLevel: 0,
+      trips: [],
       milestone: 0,
     };
   }
@@ -97,7 +104,6 @@ export function newGame(): GameState {
     totalEarned: 0,
     scrap: 0,
     scrapTrucks: 0,
-    carts: ECONOMY.carts.start,
     dockLevel: 0,
     dockUnits: 0,
     dockValue: 0,
@@ -120,7 +126,18 @@ const ZONES_BY_PROFIT = [...ZONES].sort((a, b) => b.unitValue / b.scrapPerUnit -
 
 export function zoneCapacity(zone: ZoneState): number {
   const c = ECONOMY.zoneUpgrades.capacity;
-  return c.startCapacity + zone.capacity * c.effectPerLevel;
+  return Math.max(c.startCapacity + zone.capacity * c.effectPerLevel, cartBatch(zone));
+}
+
+/** Piezas que lleva cada carretilla por viaje: crece con su nivel (el palé siempre es al menos tan grande como una tanda). */
+export function cartBatch(zone: ZoneState): number {
+  const c = ECONOMY.carts;
+  return c.batch + zone.cartLevel * c.batchPerLevel;
+}
+
+/** Piezas por segundo que las carretillas de la línea pueden llevar al muelle. */
+export function cartThroughput(zone: ZoneState): number {
+  return (zone.carts * cartBatch(zone)) / ECONOMY.carts.tripSeconds;
 }
 
 /** Multiplicador del valor de lo producido por el nivel del ayudante. */
@@ -188,10 +205,10 @@ export function tap(state: GameState): void {
 /** Dólares por segundo a ritmo estable: la chatarra va a la zona que más paga, limitada por carretillas y muelle. Sin empujón. */
 export function incomePerSecond(state: GameState, tapsPerSecond = 0): number {
   let scrap = scrapPerSecond(state) + tapsPerSecond * ECONOMY.tap.scrap;
-  let carry = Math.min(state.carts * ECONOMY.carts.unitsPerSecond, dockLoad(state) / ECONOMY.dock.returnSeconds);
+  let carry = dockLoad(state) / ECONOMY.dock.returnSeconds;
   let income = 0;
   for (const def of ZONES_BY_PROFIT) {
-    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry);
+    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry, cartThroughput(state.zones[def.id]));
     scrap -= units * def.scrapPerUnit;
     carry -= units;
     income += units * unitValue(def, state.zones[def.id]);
@@ -284,17 +301,22 @@ function step(state: GameState, dt: number): void {
     zone.buffer += units;
   }
 
-  let carry = state.carts * ECONOMY.carts.unitsPerSecond * dt;
+  // Carretillas: cada una espera a tener una tanda completa en el palé, hace el viaje y solo al llegar suma al muelle.
   for (const def of ZONES_BY_PROFIT) {
-    if (carry <= 0) break;
     const zone = state.zones[def.id];
-    const units = Math.min(carry, zone.buffer);
-    if (units <= 0) continue;
-    zone.buffer -= units;
-    carry -= units;
-    state.dockUnits += units;
-    state.dockValue += units * unitValue(def, zone);
-    state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + units;
+    if (!zone.unlocked) continue;
+    for (const trip of zone.trips) trip.left -= dt;
+    for (const trip of zone.trips.filter((x) => x.left <= 0)) {
+      state.dockUnits += trip.load;
+      state.dockValue += trip.load * unitValue(def, zone);
+      state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + trip.load;
+    }
+    zone.trips = zone.trips.filter((x) => x.left > 0);
+    const batch = cartBatch(zone);
+    while (zone.trips.length < zone.carts && zone.buffer >= batch - 1e-9) {
+      zone.buffer -= batch;
+      zone.trips.push({ left: ECONOMY.carts.tripSeconds, load: batch });
+    }
   }
 
   state.truckCooldown = Math.max(0, state.truckCooldown - dt);
@@ -324,7 +346,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'cart' | 'dock' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
+export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -342,7 +364,6 @@ function growthCost(base: number, count: number, growth = ECONOMY.costGrowth): n
 export function purchases(state: GameState): Purchase[] {
   const list: Purchase[] = [
     { id: 'scrapTruck', kind: 'scrapTruck', cost: growthCost(ECONOMY.scrapTrucks.baseCost, state.scrapTrucks) },
-    { id: 'cart', kind: 'cart', cost: growthCost(ECONOMY.carts.baseCost, state.carts - ECONOMY.carts.start) },
     { id: 'dock', kind: 'dock', cost: growthCost(ECONOMY.dock.baseCost, state.dockLevel) },
   ];
   const u = ECONOMY.zoneUpgrades;
@@ -357,6 +378,8 @@ export function purchases(state: GameState): Purchase[] {
     }
     const s = def.upgradeCostScale;
     list.push(
+      { id: `carts:${def.id}`, kind: 'carts', zoneId: def.id, cost: s * growthCost(ECONOMY.carts.baseCost, zone.carts - ECONOMY.carts.start) },
+      { id: `cartLevel:${def.id}`, kind: 'cartLevel', zoneId: def.id, cost: s * growthCost(ECONOMY.carts.baseCost, zone.cartLevel) },
       { id: `speed:${def.id}`, kind: 'speed', zoneId: def.id, cost: s * growthCost(u.speed.baseCost, zone.speed) },
       { id: `capacity:${def.id}`, kind: 'capacity', zoneId: def.id, cost: s * growthCost(u.capacity.baseCost, zone.capacity) },
       { id: `machines:${def.id}`, kind: 'machines', zoneId: def.id, cost: s * growthCost(u.machines.baseCost, zone.machines - 1) },
@@ -399,7 +422,7 @@ function achievementProgress(state: GameState, kind: AchievementDef['kind']): nu
     case 'machineLevel':
       return Math.max(...zs.map((z) => z.machineLevel));
     case 'carts':
-      return state.carts;
+      return zs.reduce((n, z) => n + (z.unlocked ? z.carts : 0), 0);
     case 'helperLevel':
       return Math.max(...zs.map((z) => z.helperLevel));
     case 'machines':
@@ -438,9 +461,6 @@ export function buy(state: GameState, id: string): boolean {
     case 'scrapTruck':
       state.scrapTrucks++;
       break;
-    case 'cart':
-      state.carts++;
-      break;
     case 'dock':
       state.dockLevel++;
       break;
@@ -449,6 +469,8 @@ export function buy(state: GameState, id: string): boolean {
       zone!.machines = 1;
       break;
     case 'speed':
+    case 'carts':
+    case 'cartLevel':
     case 'capacity':
     case 'machines':
       zone![p.kind]++;
@@ -482,5 +504,12 @@ export function load(json: string): GameState {
   const base = newGame();
   const zones = { ...base.zones };
   for (const id of Object.keys(zones)) zones[id] = { ...zones[id], ...(data.zones?.[id] ?? {}) };
+  // Partidas antiguas: las carretillas eran comunes; se reparten entre las líneas abiertas.
+  const old = (data as { carts?: number }).carts;
+  if (typeof old === 'number') {
+    const open = Object.values(zones).filter((z) => z.unlocked && data.zones && z.carts === ECONOMY.carts.start);
+    for (const z of open) z.carts = Math.max(1, Math.round(old / open.length));
+  }
+  for (const z of Object.values(zones)) z.trips = (z.trips ?? []).map((x) => ({ ...x }));
   return { ...base, ...data, dockByZone: { ...(data.dockByZone ?? {}) }, version: SAVE_VERSION, zones };
 }

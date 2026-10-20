@@ -11,7 +11,9 @@
   "carts": {
     "start": 1,
     "baseCost": 15,
-    "unitsPerSecond": 1
+    "tripSeconds": 10,
+    "batch": 10,
+    "batchPerLevel": 5
   },
   "dock": {
     "baseLoad": 10,

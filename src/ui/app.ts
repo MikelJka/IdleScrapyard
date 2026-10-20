@@ -5,6 +5,7 @@ import {
   activateBoost,
   advance,
   bottleneck,
+  cartBatch,
   buy,
   ACHIEVEMENTS,
   canBoost,
@@ -67,10 +68,10 @@ function writeSave(state: GameState): void {
 function shopIcon(kind: string, zoneId?: string): string {
   const def = zoneId ? ZONES.find((z) => z.id === zoneId) : undefined;
   let inner = '';
-  if (kind === 'helper' && def) inner = helperFace(HELPER_LOOKS[def.helper.id]);
+  if (kind === 'carts' || kind === 'cartLevel') inner = `<g transform="scale(0.8) translate(-1 9)">${FORKLIFT}</g>`;
+  else if (kind === 'helper' && def) inner = helperFace(HELPER_LOOKS[def.helper.id]);
   else if (def) inner = `<g transform="scale(1.3)">${productIcon(def.id)}</g>`;
   else if (kind === 'scrapTruck') inner = `<g transform="scale(0.42) translate(2 10)">${truck('#7d8b6a', '#9fb07f')}</g>`;
-  else if (kind === 'cart') inner = `<g transform="scale(0.8) translate(-1 9)">${FORKLIFT}</g>`;
   else if (kind === 'dock') inner = `<g><rect x="-11" y="-2" width="10" height="9" fill="#c58a4a" stroke="#2a1d14"/><rect x="1" y="-2" width="10" height="9" fill="#c58a4a" stroke="#2a1d14"/><rect x="-5" y="-11" width="10" height="9" fill="#c58a4a" stroke="#2a1d14"/></g>`;
   return `<svg class="icon" viewBox="-16 -16 32 32" aria-hidden="true">${inner}</svg>`;
 }
@@ -462,7 +463,7 @@ export function startApp(root: HTMLElement): void {
     if (panel === null || panel === 'settings') return;
     const sel = panel;
     const mine = purchases(state).filter((p) =>
-      sel === 'dock' ? p.kind === 'cart' || p.kind === 'dock' : sel === 'trucks' ? p.kind === 'scrapTruck' : p.zoneId === sel,
+      sel === 'dock' ? p.kind === 'dock' : sel === 'trucks' ? p.kind === 'scrapTruck' : p.zoneId === sel,
     );
     const info = renderInfo(sel);
     if (info !== lastInfo) {
@@ -473,7 +474,7 @@ export function startApp(root: HTMLElement): void {
       .map((p) => {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
         const name = p.kind === 'helper' ? t('buy.helper', { helper: def!.helper.name }) : t('buy.' + p.kind);
-        const sub = def ? (p.kind === 'unlock' ? def.product : def.name) : t('sub.' + p.kind);
+        const sub = p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? def.product : def.name) : t('sub.' + p.kind);
         const cls = p.kind === 'unlock' ? 'unlock' : p.kind === 'helper' ? 'helper' : '';
         return `<button type="button" class="${cls}" data-id="${p.id}" ${p.cost > state.dollars ? 'disabled' : ''}>${shopIcon(p.kind, p.zoneId)}<span class="what"><b>${name}</b><small>${sub}</small></span><span class="price">$${fmt(p.cost)}</span></button>`;
       })
@@ -528,7 +529,7 @@ export function startApp(root: HTMLElement): void {
 
   function renderInfo(sel: string): string {
     const def = ZONES.find((z) => z.id === sel);
-    if (!def) return sel === 'dock' ? `<p>${t('info.dock', { cart: state.carts, load: dockLoad(state) })}</p>` : `<p>${t('info.trucks', { n: state.scrapTrucks })}</p>`;
+    if (!def) return sel === 'dock' ? `<p>${t('info.dock', { load: dockLoad(state) })}</p>` : `<p>${t('info.trucks', { n: state.scrapTrucks })}</p>`;
     const zone = state.zones[def.id];
     if (!zone.unlocked) return `<p>${t('info.locked', { cost: fmt(def.unlockCost) })}</p>`;
     const status = zoneStatus(state, def);
@@ -538,6 +539,7 @@ export function startApp(root: HTMLElement): void {
       <ul class="rows">
         <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
         <li>${t('info.rate')}: <b>${fmt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (Nv ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
+        <li>${t('info.carts', { n: zone.carts, batch: cartBatch(zone), trip: ECONOMY.carts.tripSeconds })}</li>
         <li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>
         <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: fmt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>
         <li>${t('info.stock', { pallets: fmt(ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0)), dock: fmt(state.dockUnits), load: dockLoad(state) })}</li>

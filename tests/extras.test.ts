@@ -19,7 +19,7 @@ import { pack, unpack } from '../src/sim/offline';
 function producing() {
   const s = newGame();
   s.scrapTrucks = 4;
-  s.carts = 3;
+  s.zones.crusher.carts = 3;
   return s;
 }
 
