@@ -589,6 +589,24 @@ export function createYard(container: HTMLElement): Yard {
   }
   const carts: Cart[] = [];
 
+  /** Apertura de zona: el andamio se levanta y se desvanece mientras la máquina entra desde arriba. */
+  function animateOpening(l: Line, scaffold: string): void {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || !l.machines.animate) return;
+    l.machines.animate(
+      [
+        { transform: 'translateY(-46px)', opacity: 0 },
+        { transform: 'translateY(4px)', opacity: 1, offset: 0.7 },
+        { transform: 'translateY(0)', opacity: 1 },
+      ],
+      { duration: 900, easing: 'ease-out' },
+    );
+    const ghost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    ghost.setAttribute('pointer-events', 'none');
+    ghost.innerHTML = scaffold;
+    l.machines.parentNode?.insertBefore(ghost, l.machines.nextSibling);
+    ghost.animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(-60px)', opacity: 0 }], { duration: 900, easing: 'ease-in' }).onfinish = () => ghost.remove();
+  }
+
   function buildLine(l: Line, state: GameState, i: number, isNext: boolean): void {
     const st = station(i);
     const zone = state.zones[l.def.id];
@@ -781,8 +799,11 @@ export function createYard(container: HTMLElement): Yard {
       if (zone.unlocked) openIds.push(l.def.id);
       const key = `${zone.unlocked ? 1 : 0}-${zone.machineLevel}-${Math.min(MAX_SHOWN, zone.machines)}-${zone.machines}-${l.def.id === nextLocked ? 1 : 0}`;
       if (key !== l.key) {
+        const opening = l.key.startsWith('0-') && zone.unlocked;
+        const scaffold = opening ? l.machines.innerHTML : '';
         l.key = key;
         buildLine(l, state, i, l.def.id === nextLocked);
+        if (opening) animateOpening(l, scaffold);
       }
       if (!zone.unlocked) return;
       const running = working && zone.buffer < zoneCapacity(zone) - 0.01;

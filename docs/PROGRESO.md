@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Apertura de zona animada
+
+- Fase 2b: al abrir una zona el andamio sube y se desvanece mientras la máquina entra desde arriba con un pequeño rebote (se respeta «reducir movimiento»).
+- Qué probar: abrir una zona nueva desde su puesto.
+- Siguiente: logística visible (L1) o lo que Mikel decida de la Parte 17 (tandas) y la Parte 11.
+
 ## 2026-10-20 — KPI al seleccionar la línea
 
 - Mikel: pantalla sucia, «0/200» sin sentido, pila siempre a 0 y 517/s frente a 31/s. Quitados de la pantalla los textos por línea y la barra de KPI; solo queda el objetivo. Al tocar una línea salen chatarra que entra, pila, capacidad de aplastado, palés, muelle y atascos. La pila vacía muestra «+N/s». La pila a 0 es real: las líneas gastan todo lo que entra (517/s era capacidad, no consumo).
