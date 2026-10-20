@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Prueba de humo ampliada
+
+- `scripts/smoke.mjs` comprueba ahora que el panel de la línea no está vacío, que el ranking apagado muestra su aviso y que con `?hora=22` la nave se oscurece; guarda capturas `*-ranking.png` y `*-noche.png`.
+- Qué probar: la prueba de humo no se pudo ejecutar entera en esta sesión (se quedó colgada al arrancar el navegador); el build y los 68 tests pasan. Revisar que «Probar rama» la pase.
+- Sigue: nada aprobado pendiente; esperan Mikel el proyecto de Firebase y la comprobación en el móvil.
+
 ## 2026-10-20 — Iluminación y sombras suaves
 
 - Sombra suave (degradado radial) bajo las máquinas de cada puesto y luz de sol en degradado sobre la nave, de día y de noche. Cambio solo de dibujo (`src/ui/yard.ts`).

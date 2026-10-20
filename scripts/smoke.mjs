@@ -49,6 +49,19 @@ try {
     await page.evaluate(() => document.querySelector('[data-sel="crusher"] polygon:last-child').dispatchEvent(new MouseEvent('click', { bubbles: true })));
     await sleep(600);
     await page.screenshot({ path: `smoke/${d.name}-puesto.png` });
+    // El panel por línea debe abrirse con contenido.
+    if (!(await page.evaluate(() => document.querySelector('#panel-info')?.textContent?.trim().length ?? 0))) problems.push(`${d.name}: el panel de la línea está vacío`);
+    // Ranking apagado: el botón abre el panel con el aviso, sin errores.
+    await page.click('#ranking-btn');
+    await sleep(400);
+    if (!(await page.evaluate(() => document.querySelector('#ranking')?.textContent?.trim().length ?? 0))) problems.push(`${d.name}: el ranking no muestra nada`);
+    await page.screenshot({ path: `smoke/${d.name}-ranking.png` });
+    // Noche: ?hora=22 oscurece la nave.
+    await page.goto(`${URL}?hora=22`);
+    await sleep(2000);
+    const dark = await page.evaluate(() => Number(document.querySelector('#nightHall')?.getAttribute('opacity') ?? 0));
+    if (!(dark > 0.1)) problems.push(`${d.name}: de noche la nave no se oscurece (${dark})`);
+    await page.screenshot({ path: `smoke/${d.name}-noche.png` });
     await context.close();
   }
   await browser.close();
