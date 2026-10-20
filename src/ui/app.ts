@@ -37,7 +37,7 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
-import { buzz, isMuted, play, setMuted } from './sound';
+import { buzz, isMuted, isMusicOn, play, setMuted, setMusicOn, syncMusic } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
 const AUTOSAVE_MS = 10_000;
@@ -116,6 +116,10 @@ export function startApp(root: HTMLElement): void {
         <div id="lang" hidden>
           <b>${t('settings.language')}</b>
           <div><button type="button" data-lang="es" ${getLang() === 'es' ? 'aria-pressed="true"' : ''}>Español</button><button type="button" data-lang="en" ${getLang() === 'en' ? 'aria-pressed="true"' : ''}>English</button></div>
+        </div>
+        <div id="music" hidden>
+          <b>${t('settings.music')}</b>
+          <div><button type="button" data-m="1" ${isMusicOn() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-m="0" ${isMusicOn() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
         </div>
         <div id="quality" hidden>
           <b>${t('settings.quality')}</b>
@@ -245,6 +249,7 @@ export function startApp(root: HTMLElement): void {
     $('transfer').hidden = sel !== 'settings';
     $('lang').hidden = sel !== 'settings';
     $('quality').hidden = sel !== 'settings';
+    $('music').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -268,6 +273,14 @@ export function startApp(root: HTMLElement): void {
     writeSave(state);
     location.reload();
   });
+  $('music').addEventListener('click', (e) => {
+    const m = (e.target as HTMLElement).closest<HTMLElement>('button[data-m]');
+    if (!m) return;
+    setMusicOn(m.dataset.m === '1');
+    $('music').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === m)));
+  });
+  // La música arranca con el primer toque (los navegadores no dejan sonar antes).
+  document.addEventListener('pointerdown', () => syncMusic(), { once: true });
   $('quality').addEventListener('click', (e) => {
     const q = (e.target as HTMLElement).closest<HTMLElement>('button[data-q]')?.dataset.q;
     if (!q) return;

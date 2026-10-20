@@ -31,6 +31,7 @@ export function isMuted(): boolean {
 
 export function setMuted(value: boolean): void {
   muted = value;
+  syncMusic();
   try {
     localStorage.setItem(KEY, value ? '1' : '0');
   } catch {
@@ -59,5 +60,88 @@ export function play(name: Sfx): void {
     });
   } catch {
     /* sin audio: se juega igual */
+  }
+}
+
+// Música ambiental: acordes suaves de ondas sinusoidales en bucle, con su propio interruptor y volumen.
+const MUSIC_KEY = 'chatarrero.music';
+const CHORDS = [
+  [110, 165, 220, 277],
+  [87.3, 131, 175, 220],
+  [98, 147, 196, 247],
+  [82.4, 123, 165, 207],
+];
+const CHORD_SECONDS = 6;
+let musicOn = (() => {
+  try {
+    return localStorage.getItem(MUSIC_KEY) !== '0';
+  } catch {
+    return true;
+  }
+})();
+let musicGain: GainNode | null = null;
+let musicTimer: ReturnType<typeof setInterval> | null = null;
+let chordIdx = 0;
+let nextChord = 0;
+
+export function isMusicOn(): boolean {
+  return musicOn;
+}
+
+export function setMusicOn(value: boolean): void {
+  musicOn = value;
+  try {
+    localStorage.setItem(MUSIC_KEY, value ? '1' : '0');
+  } catch {
+    /* sin almacenamiento: se juega igual */
+  }
+  syncMusic();
+}
+
+/** Arranca o para la música según el interruptor y el silencio general; llamar tras un gesto del jugador. */
+export function syncMusic(): void {
+  const want = musicOn && !muted && typeof AudioContext !== 'undefined';
+  if (!want) {
+    if (musicTimer) clearInterval(musicTimer);
+    musicTimer = null;
+    if (musicGain && ctx) musicGain.gain.setTargetAtTime(0, ctx.currentTime, 0.3);
+    return;
+  }
+  try {
+    ctx ??= new AudioContext();
+    if (ctx.state === 'suspended') void ctx.resume();
+    if (!musicGain) {
+      musicGain = ctx.createGain();
+      musicGain.connect(ctx.destination);
+    }
+    musicGain.gain.setTargetAtTime(0.5, ctx.currentTime, 0.5);
+    if (musicTimer) return;
+    nextChord = ctx.currentTime + 0.1;
+    const tick = () => {
+      while (ctx && nextChord < ctx.currentTime + 2) {
+        scheduleChord(nextChord);
+        nextChord += CHORD_SECONDS;
+      }
+    };
+    tick();
+    musicTimer = setInterval(tick, 1000);
+  } catch {
+    /* sin audio: se juega igual */
+  }
+}
+
+function scheduleChord(start: number): void {
+  const c = ctx!;
+  for (const freq of CHORDS[chordIdx++ % CHORDS.length]) {
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.linearRampToValueAtTime(0.03, start + 2);
+    g.gain.linearRampToValueAtTime(0.0001, start + CHORD_SECONDS + 1.5);
+    osc.connect(g).connect(musicGain!);
+    osc.start(start);
+    osc.stop(start + CHORD_SECONDS + 1.6);
   }
 }

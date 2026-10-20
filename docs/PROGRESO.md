@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Música ambiental
+
+- Música suave sintetizada (acordes de ondas sinusoidales en bucle, sin archivos de terceros). Arranca con el primer toque; el botón de silencio la calla y en ajustes hay un interruptor «Música» propio (es/en).
+- Qué probar: tocar la pantalla y oír el fondo; ajustes → Música → No.
+- Falta: sonidos por tipo de línea, volumen graduable y resto de ajustes completos.
+
 ## 2026-10-20 — Pedidos especiales, tren y barco
 
 - Mikel eligió Z1, 2b, precios y pedidos OK. Zonas 9 (vagones, por tren) y 10 (contenedores, por barco): el tren y el barco se llenan y salen llenos, pagan ×1,5 y ×3; mejora de carga en el menú de cada línea. Anexo nuevo en el mapa a la derecha de la nave; el tren del fondo pasa al salir cargado.
