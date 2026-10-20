@@ -52,7 +52,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Interfaz coherente (**hecho: iconos SVG propios en la barra de arriba y los botones de extras**; **hecho también: tutorial, objetivo, atascos, logros y anuncios al volver sin emojis**; **hecho también: botones con relieve y paneles con transición**; **hecho también: los dólares cuentan hacia arriba**): iconos SVG propios en lugar de emojis, tipografía y botones con relieve en todo, paneles con transición, cifras que cuentan hacia arriba
 - [x] «Juice» (**hecho: monedas que vuelan al contador al cobrar, destello al comprar, rebote de la cifra y temblor al abrir una zona**): monedas que vuelan al contador al cobrar, números flotantes por camión, destello al comprar, temblor suave al abrir una zona
 - [x] Apertura de zona animada (se levanta el andamio y entra la máquina)
-- [ ] Logística visible (L1): las carretillas sueltan su producto en su huella y el camión se llena de las huellas
+- [x] Logística visible (L1) (**hecho**: huellas por producto con carretillas que cargan, y la caja del camión se llena con lo que hay en cada huella): las carretillas sueltan su producto en su huella y el camión se llena de las huellas
 - [ ] Música ambiental sintetizada (suave, con volumen propio) y sonidos por tipo de línea
 - [ ] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
 - [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)

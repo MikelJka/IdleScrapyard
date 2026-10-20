@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Logística visible (L1)
+
+- Fase 2b: la caja del camión de expedición se llena con lo que hay en cada huella del muelle (en proporción) en vez de repartir los productos a partes iguales; al salir conserva su carga. Las huellas y las carretillas con carga ya estaban hechas.
+- Qué probar: ver cómo el camión lleva más de los productos que más se acumulan en el muelle.
+- Siguiente: música ambiental o accesibilidad (Fase 2b). Siguen sin respuesta las Partes 11, 18, 19 y 20.
+
 ## 2026-10-20 — Estadísticas del jugador
 
 - Fase 2b: en ajustes, sobre los logros, salen tiempo de partida, dinero ganado, camiones enviados (incluye dorados) y mejor racha. Partidas antiguas empiezan en 0 en lo nuevo. Con test; textos en es/en.

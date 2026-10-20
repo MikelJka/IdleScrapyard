@@ -437,6 +437,7 @@ export function createYard(container: HTMLElement): Yard {
   // Camión de expedición (delante): carga los productos poco a poco y se va.
   const shipTruck = mk(front, '');
   let shipKey = '';
+  let shipMix: string[] = [];
   let shipPhase: 'park' | 'leave' | 'return' = 'park';
   let shipT = 0;
   let shipFill = 0;
@@ -945,7 +946,17 @@ export function createYard(container: HTMLElement): Yard {
     if (shipPhase === 'leave') tx = TRUCK_PARK_X + (shipT / 2.4) * 24;
     else if (shipPhase === 'return') tx = TRUCK_PARK_X - 24 + (shipT / 2.4) * 24;
     const count = shipPhase === 'leave' ? TRUCK_SLOTS : shipPhase === 'return' ? 0 : Math.round(shipFill * TRUCK_SLOTS);
-    const ids = Array.from({ length: count }, (_, k) => openIds[k % openIds.length]);
+    // La caja se llena con lo que hay en cada huella (a partes proporcionales); al salir conserva lo último que llevaba.
+    if (shipPhase === 'park') {
+      const total = openIds.reduce((a, id) => a + (state.dockByZone[id] ?? 0), 0);
+      shipMix = [];
+      if (total > 0) {
+        for (const id of openIds) for (let n = Math.round(((state.dockByZone[id] ?? 0) / total) * TRUCK_SLOTS); n > 0; n--) shipMix.push(id);
+      }
+      if (shipMix.length === 0) shipMix = openIds.slice();
+      while (shipMix.length < TRUCK_SLOTS) shipMix.push(shipMix[shipMix.length % Math.max(1, shipMix.length)] ?? openIds[0]);
+    }
+    const ids = Array.from({ length: count }, (_, k) => shipMix[k] ?? openIds[0]);
     const sk = ids.join(',');
     if (sk !== shipKey) {
       shipKey = sk;
