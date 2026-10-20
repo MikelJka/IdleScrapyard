@@ -49,7 +49,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Hito cada 5 niveles de máquina con premio
 - [x] Ranking mundial: código listo (Firebase); falta que Mikel cree el proyecto (`docs/RANKING.md`)
 - [x] Tutorial de los primeros 2 minutos: flechas y mensajes que guían (tocar la pila, comprar, abrir un puesto, abrir la segunda zona)
-- [ ] Interfaz coherente: iconos SVG propios en lugar de emojis, tipografía y botones con relieve en todo, paneles con transición, cifras que cuentan hacia arriba
+- [ ] Interfaz coherente (**hecho: iconos SVG propios en la barra de arriba y los botones de extras**; faltan los emojis de los textos y avisos): iconos SVG propios en lugar de emojis, tipografía y botones con relieve en todo, paneles con transición, cifras que cuentan hacia arriba
 - [ ] «Juice»: monedas que vuelan al contador al cobrar, números flotantes por camión, destello al comprar, temblor suave al abrir una zona
 - [ ] Apertura de zona animada (se levanta el andamio y entra la máquina)
 - [ ] Logística visible (L1): las carretillas sueltan su producto en su huella y el camión se llena de las huellas

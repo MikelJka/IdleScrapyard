@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Iconos SVG propios en la interfaz (primera parte)
+
+- Fase 2b, «Interfaz coherente»: los emojis de la barra de arriba (ranking, ajustes, sonido) y de los botones de extras (empujón, regalo diario, pase) pasan a iconos SVG propios con contorno y sombra (`uiIcon` en `src/ui/icons.ts`).
+- Qué probar: la barra de arriba y los tres botones de abajo a la izquierda se ven nítidos y del mismo estilo; el de sonido cambia al silenciar.
+- Siguiente: quitar los emojis que quedan en textos y avisos (tutorial, objetivo, logros, rótulos del mapa), botones con relieve y cifras que cuentan hacia arriba.
+
 ## 2026-10-19 — Ranking con Firebase, hitos, logros y calidad profesional
 
 - Mikel: mejor el parpadeo; Firebase para el ranking; propuestas de la noche «como mejor veas»; amplía el roadmap y mejora la calidad general: «que sea un videojuego profesional y no parezca tan indie».

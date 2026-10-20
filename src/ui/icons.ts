@@ -84,3 +84,42 @@ export const FORKLIFT = `<g>
   <circle cx="-5" cy="-1" r="3" fill="#2a1d14"/><circle cx="3" cy="-1" r="3" fill="#2a1d14"/>
 </g>`;
 
+
+/** Iconos de la interfaz (barra de arriba y botones de extras), 24×24, con relieve y contorno propios. */
+export type UiIconName = 'trophy' | 'gear' | 'sound-on' | 'sound-off' | 'timer' | 'ad' | 'hourglass' | 'gift' | 'star';
+
+export function uiIcon(name: UiIconName): string {
+  const o = 'stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"';
+  let body = '';
+  switch (name) {
+    case 'trophy':
+      body = `<path d="M7 4h10v5a5 5 0 0 1-10 0Z" fill="#f2c14e" ${o}/><path d="M7 6H4q0 5 4 5.5M17 6h3q0 5-4 5.5" fill="none" ${o}/><path d="M12 14v3M8 20h8l-1-3H9Z" fill="#d99a1f" ${o}/><path d="M9.5 6v3" stroke="#fff3c4" stroke-width="1.4" stroke-linecap="round"/>`;
+      break;
+    case 'gear':
+      body = `<path d="M12 3l1.6 2.2 2.7-.6.9 2.6 2.6.9-.6 2.7L21 12l-2.2 1.6.6 2.7-2.6.9-.9 2.6-2.7-.6L12 21l-1.6-2.2-2.7.6-.9-2.6-2.6-.9.6-2.7L3 12l2.2-1.6-.6-2.7 2.6-.9.9-2.6 2.7.6Z" fill="#b9c2c9" ${o}/><circle cx="12" cy="12" r="3.2" fill="#4d6070" ${o}/>`;
+      break;
+    case 'sound-on':
+    case 'sound-off':
+      body = `<path d="M4 9h3.5L12 5v14l-4.5-4H4Z" fill="#e6c98a" ${o}/>` +
+        (name === 'sound-on'
+          ? `<path d="M15 9.5q2 2.5 0 5M17.5 7q4 5 0 10" fill="none" ${o}/>`
+          : `<path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="#e0584a" stroke-width="2" stroke-linecap="round"/>`);
+      break;
+    case 'timer':
+      body = `<circle cx="12" cy="13" r="7.5" fill="#fff6d8" ${o}/><path d="M12 8.5V13l3 2M9.5 3h5" fill="none" ${o}/>`;
+      break;
+    case 'ad':
+      body = `<rect x="3" y="5" width="18" height="12" rx="2" fill="#3a4a5c" ${o}/><path d="M10 8.5v5l4.5-2.5Z" fill="#fff" ${o}/><path d="M8 20h8" fill="none" ${o}/>`;
+      break;
+    case 'hourglass':
+      body = `<path d="M7 3h10M7 21h10M8 3c0 5 4 5 4 9s-4 4-4 9M16 3c0 5-4 5-4 9s4 4 4 9" fill="#f2d79a" ${o}/>`;
+      break;
+    case 'gift':
+      body = `<rect x="4" y="10" width="16" height="10" rx="1.5" fill="#e0584a" ${o}/><rect x="3" y="7" width="18" height="4" rx="1.2" fill="#f07a6c" ${o}/><path d="M12 7v13" stroke="#f2c14e" stroke-width="3"/><path d="M12 7c-4-5-7-1-3 0M12 7c4-5 7-1 3 0" fill="none" ${o}/>`;
+      break;
+    case 'star':
+      body = `<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8Z" fill="#f2c14e" ${o}/>`;
+      break;
+  }
+  return `<svg class="uiicon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">${body}</svg>`;
+}
