@@ -34,6 +34,11 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 - [ ] **Calidad profesional** (2026-10-19, Mikel: «que sea un videojuego profesional y no parezca tan indie», «mejora la calidad general del juego», «amplía el roadmap para seguir esta noche sin mí»): aprobada la Fase 2b del ROADMAP.md entera, tarea por tarea y sin preguntar; los cambios de reglas o de números siguen pasando por propuesta.
 - [x] **Propuestas de la noche, decididas «como mejor veas»** (2026-10-19): G4 + G1 (contador `?fps=1` hecho), L1 (en el roadmap), M3 (premio cada 5 niveles de máquina: 10 min de producción de la línea; **hecho**) y O4 (objetivo a la vista + logros; **hecho**).
 
+- [x] **Pantalla más limpia: KPI en el panel de la línea** (2026-10-20, Mikel): quitados de la pantalla los textos de estado y «0/200» de cada línea y la barra con pila, entrada y demanda; ahora salen al tocar la línea (chatarra que entra, pila, lo que podría aplastar, palés, muelle y atascos). La pila muestra «+N/s» cuando está vacía. **Hecho.**
+- [ ] **Logística por tandas y mejoras dentro de cada línea** (2026-10-20, Mikel): las carretillas llegan al muelle en tandas (10, 15, 20… según el nivel de sus carretillas) y el palé de salida solo suma al llegar; las mejoras de carretillas y camión de salida van en el menú de cada línea. Es un cambio de reglas: ver Parte 17.
+- [ ] **Revisar números de chatarra** (2026-10-20, Mikel: entran 31/s y la pantalla decía que las líneas consumían 517/s): 517/s es lo que las máquinas podrían aplastar, no lo que consumen (consumen lo que entra); ya se rotula así. Falta decidir el equilibrio (Parte 11, N1).
+- [ ] **Parpadeos** (2026-10-20, Mikel: mejor, pero siguen): seguir midiendo con `?fps=1` (Parte 11, N4).
+
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
@@ -50,7 +55,15 @@ Todo lo aprobado está hecho salvo «pulir» y comprobar la web en el móvil. Pa
 
 Responde con las letras (p. ej. «N1N4»).
 
-Nada pendiente de decidir por ahora.
+### Parte 17 — Logística por tandas y mejoras por línea (2026-10-20)
+
+Hoy las carretillas y el muelle son globales: cada carretilla lleva 1 unidad/s y el palé baja de forma continua, por eso sale siempre a 0. Para que llegue en tandas:
+
+- **T1 — Carretillas por línea:** cada línea tiene sus carretillas y su palé; la carretilla recoge una tanda (10 al principio, +5 por nivel de carretilla) y solo al llegar al muelle suma al palé de salida. Mejoras de carretilla (nivel, número) y del camión de salida dentro del menú de cada línea.
+- **T2 — Tandas globales:** se mantiene la flota común pero cada viaje es una tanda (10, 15, 20… por nivel de carretillas, común); las mejoras siguen en el muelle.
+- **T3 — Como T1, pero el camión de salida sigue siendo común** (un muelle, mejoras de carretilla por línea).
+
+Dime la letra y los números de tanda (¿10 +5 por nivel te vale?) y precios (¿igual que ahora?).
 
 ## Hecho
 

@@ -1,6 +1,6 @@
 // Chatarrería en vista isométrica (2D con bloques que parecen 3D). Solo lee el estado de la simulación.
 // Fondo: carretera con los camiones de chatarra. Centro: las líneas de cada zona. Frente: muelle y camiones de expedición.
-import { ECONOMY, ZONES, dockLoad, purchases, zoneCapacity, zoneRate, zoneStatus, type GameState, type ZoneDef } from '../sim/game';
+import { ECONOMY, ZONES, dockLoad, purchases, scrapPerSecond, zoneCapacity, zoneRate, zoneStatus, type GameState, type ZoneDef } from '../sim/game';
 import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
 import { productIcon } from './icons';
@@ -634,9 +634,7 @@ export function createYard(container: HTMLElement): Yard {
     l.worker.innerHTML = `<g transform="scale(1.45)">${personIso(HELPER_LOOKS[l.def.helper.id])}</g>`;
     const [lx, ly] = iso(st.x + 0.3, st.y + SIZE + 0.2);
     const extra = zone.machines > 1 ? ` · ${zone.machines} máq.` : '';
-    const [cx, cy] = iso(st.x + 2.85, st.y + 2.85, 1.7);
-    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text><text class="stat" y="12" text-anchor="middle" font-size="9.5" font-weight="900" fill="#8be28b" stroke="#2a1d14" stroke-width="3" paint-order="stroke"></text></g>
-      <g transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)})"><text class="cnt" text-anchor="middle" font-size="10" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke"></text></g>
+    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text></g>
       <g class="lvl" transform="translate(${iso(st.x + 1.3, st.y + 2.3, 2.75)[0]} ${iso(st.x + 1.3, st.y + 2.3, 2.75)[1]})"><rect x="-17" y="-9" width="34" height="15" rx="7.5" fill="#2a1d14" opacity="0.85"/><text y="2.5" text-anchor="middle" font-size="9" font-weight="900" fill="#ffd76a"></text></g>`;
     l.palletShown = -1;
     l.press = [...l.machines.querySelectorAll<SVGElement>('.press')];
@@ -725,7 +723,7 @@ export function createYard(container: HTMLElement): Yard {
     const s = 0.85 + Math.min(0.3, Math.log10(1 + state.scrap) / 10);
     pileBody.setAttribute('transform', `scale(${s.toFixed(3)})`);
     const [plx, ply] = iso(PILE.x + 1.8, PILE.y + 2.6, 0);
-    pileLabel.innerHTML = `<text x="${plx}" y="${ply}" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${fmtShort(state.scrap)} chatarra</text>`;
+    pileLabel.innerHTML = `<text x="${plx}" y="${ply}" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${state.scrap >= 1 ? `${fmtShort(state.scrap)} chatarra` : `+${fmtShort(scrapPerSecond(state))}/s`}</text>`;
     hint.setAttribute('visibility', state.scrapTrucks === 0 ? 'visible' : 'hidden');
 
     // Camiones de chatarra: llegan por detrás, maniobran hasta la pila, vuelcan la caja y se van vacíos.

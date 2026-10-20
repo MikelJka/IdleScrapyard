@@ -18,7 +18,6 @@ import {
   helperLevelsReady,
   incomePerSecond,
   purchases,
-  scrapDemand,
   scrapPerSecond,
   streakDayFor,
   tap,
@@ -488,8 +487,6 @@ export function startApp(root: HTMLElement): void {
 
   /** Cuánta chatarra hay y dónde se atasca la fábrica. */
   function renderStats(): void {
-    const pallets = ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0);
-    const jam = bottleneck(state);
     const goal = currentGoal(state);
     const goalTxt =
       goal.kind === 'unlock'
@@ -497,11 +494,7 @@ export function startApp(root: HTMLElement): void {
         : goal.kind === 'machineLevel'
           ? t('goal.level', { name: ZONES.find((z) => z.id === goal.zoneId)!.name, level: goal.level, cost: fmt(goal.cost) })
           : '';
-    const html = `<b>${t('stats.scrap', { n: fmt(state.scrap), in: fmt(scrapPerSecond(state)), need: fmt(scrapDemand(state)) })}</b><br>${t('stats.stock', {
-      pallets: fmt(pallets),
-      dock: fmt(state.dockUnits),
-      load: dockLoad(state),
-    })}${jam === 'none' ? '' : ` · <span class="jam">${inlineIcon('warning', t('jam.' + jam))}</span>`}${goalTxt ? `<br><span class="goal">${inlineIcon('target', goalTxt)}</span>` : ''}`;
+    const html = goalTxt ? `<span class="goal">${inlineIcon('target', goalTxt)}</span>` : '';
     if (html !== lastStats) {
       lastStats = html;
       $('stats').innerHTML = html;
@@ -539,12 +532,16 @@ export function startApp(root: HTMLElement): void {
     const zone = state.zones[def.id];
     if (!zone.unlocked) return `<p>${t('info.locked', { cost: fmt(def.unlockCost) })}</p>`;
     const status = zoneStatus(state, def);
+    const jam = bottleneck(state);
     const ready = helperLevelsReady(zone);
     return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${def.helper.name}</b> · Nv ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${def.helper.bio}</small></div></div>
       <ul class="rows">
         <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
         <li>${t('info.rate')}: <b>${fmt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (Nv ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
         <li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>
+        <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: fmt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>
+        <li>${t('info.stock', { pallets: fmt(ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0)), dock: fmt(state.dockUnits), load: dockLoad(state) })}</li>
+        ${jam === 'none' ? '' : `<li class="jam">${inlineIcon('warning', t('jam.' + jam))}</li>`}
         <li>${t('info.nextGrade', { n: 5 - (zone.machineLevel % 5) })}</li>
       </ul>`;
   }

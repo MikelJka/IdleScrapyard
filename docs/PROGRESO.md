@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — KPI al seleccionar la línea
+
+- Mikel: pantalla sucia, «0/200» sin sentido, pila siempre a 0 y 517/s frente a 31/s. Quitados de la pantalla los textos por línea y la barra de KPI; solo queda el objetivo. Al tocar una línea salen chatarra que entra, pila, capacidad de aplastado, palés, muelle y atascos. La pila vacía muestra «+N/s». La pila a 0 es real: las líneas gastan todo lo que entra (517/s era capacidad, no consumo).
+- Propuesta nueva: Parte 17 (tandas de carretillas y mejoras por línea).
+- Qué probar: tocar una línea; ver que el mapa queda limpio.
+
 ## 2026-10-20 — Temblor al abrir una zona
 
 - Fase 2b, «Juice» (cerrado): al comprar la apertura de una zona el mapa tiembla suavemente (se respeta «reducir movimiento»).
