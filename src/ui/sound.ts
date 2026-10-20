@@ -22,8 +22,46 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
 
 /** Vibración corta en el móvil (si el aparato lo permite). */
 export function buzz(ms = 12): void {
-  if (!muted) navigator.vibrate?.(ms);
+  if (!muted && vibrationOn) navigator.vibrate?.(ms);
 }
+
+/** Interruptores de ajustes guardados (por defecto activados salvo «reducir movimiento»). */
+function readPref(key: string, fallback: boolean): boolean {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v === '1';
+  } catch {
+    return fallback;
+  }
+}
+function writePref(key: string, value: boolean): void {
+  try {
+    localStorage.setItem(key, value ? '1' : '0');
+  } catch {
+    /* sin almacenamiento: se juega igual */
+  }
+}
+const SFX_KEY = 'chatarrero.sfx';
+const VIBRATION_KEY = 'chatarrero.vibration';
+const MOTION_KEY = 'chatarrero.reduceMotion';
+let sfxOn = readPref(SFX_KEY, true);
+let vibrationOn = readPref(VIBRATION_KEY, true);
+export const isSfxOn = (): boolean => sfxOn;
+export const isVibrationOn = (): boolean => vibrationOn;
+export function setSfxOn(value: boolean): void {
+  sfxOn = value;
+  writePref(SFX_KEY, value);
+}
+export function setVibrationOn(value: boolean): void {
+  vibrationOn = value;
+  writePref(VIBRATION_KEY, value);
+}
+/** «Reducir movimiento»: lo pide el sistema o el jugador en ajustes (se aplica al recargar). */
+export function reduceMotion(): boolean {
+  return readPref(MOTION_KEY, false) || (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false);
+}
+export const isReduceMotionSet = (): boolean => readPref(MOTION_KEY, false);
+export const setReduceMotion = (value: boolean): void => writePref(MOTION_KEY, value);
 
 export function isMuted(): boolean {
   return muted;
@@ -40,7 +78,7 @@ export function setMuted(value: boolean): void {
 }
 
 export function play(name: Sfx): void {
-  if (muted || typeof AudioContext === 'undefined') return;
+  if (muted || !sfxOn || typeof AudioContext === 'undefined') return;
   try {
     ctx ??= new AudioContext();
     if (ctx.state === 'suspended') void ctx.resume();

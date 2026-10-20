@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Ajustes completos
+
+- En ajustes hay interruptores propios para efectos de sonido, vibración y «Reducir movimiento» (este último, al activarlo, recarga y quita rebotes, destellos y animaciones de máquinas; también se respeta la preferencia del sistema). Textos es/en.
+- Qué probar: ajustes → desactivar Efectos y Vibración; activar Reducir movimiento y ver el mapa más quieto.
+- Falta: sonidos por tipo de línea, volumen graduable, accesibilidad (texto grande, alto contraste).
+
 ## 2026-10-20 — Música ambiental
 
 - Música suave sintetizada (acordes de ondas sinusoidales en bucle, sin archivos de terceros). Arranca con el primer toque; el botón de silencio la calla y en ajustes hay un interruptor «Música» propio (es/en).
