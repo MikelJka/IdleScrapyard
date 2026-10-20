@@ -275,7 +275,10 @@ export function startApp(root: HTMLElement): void {
   $('ranking-btn').addEventListener('click', () => openPanel(panel === 'ranking' ? null : 'ranking'));
 
   function drawAchievements(): void {
-    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '★' : '○'} ${esc(achievementName(a))}</li>`).join('')}</ul>`;
+    const h = Math.floor(state.time / 3600);
+    const time = h > 0 ? `${h} h ${Math.floor((state.time % 3600) / 60)} min` : `${Math.floor(state.time / 60)} min`;
+    const stats = `<b>${t('stats.title')}</b><ul class="stats"><li>${t('stats.time', { time })}</li><li>${t('stats.earned', { n: fmt(state.totalEarned) })}</li><li>${t('stats.trucks', { n: fmt(state.trucksSent) })}</li><li>${t('stats.streak', { n: state.bestStreak })}</li></ul>`;
+    $('achieve').innerHTML = stats + `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '★' : '○'} ${esc(achievementName(a))}</li>`).join('')}</ul>`;
   }
   async function drawRanking(): Promise<void> {
     const box = $('ranking');

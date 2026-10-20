@@ -57,7 +57,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [ ] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
 - [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
 - [ ] Iluminación y sombras suaves en toda la escena, no solo de noche (degradados, ambient occlusion falso bajo las máquinas)
-- [ ] Estadísticas del jugador (tiempo jugado, camiones, mejor racha) en ajustes
+- [x] Estadísticas del jugador (tiempo de partida, dinero ganado, camiones, mejor racha) en ajustes
 - [ ] Accesibilidad: texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
 - [x] Textos en inglés con selector de idioma
 - [x] Equilibrio con el bot: simulación de jugador hecha (`scripts/balance.ts`), propuesta en la Parte 18; falta que Mikel elija

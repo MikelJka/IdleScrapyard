@@ -249,3 +249,16 @@ describe('hitos, logros y objetivo', () => {
     expect(s.zones.crusher.milestone).toBe(0);
   });
 });
+
+describe('estadísticas', () => {
+  it('cuenta camiones enviados y mejor racha; partidas antiguas empiezan en 0', () => {
+    const s = newGame();
+    expect(s.trucksSent).toBe(0);
+    const old = JSON.parse(serialize(s));
+    delete old.trucksSent;
+    delete old.bestStreak;
+    const loaded = load(JSON.stringify(old));
+    expect(loaded.trucksSent).toBe(0);
+    expect(loaded.bestStreak).toBe(0);
+  });
+});

@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Estadísticas del jugador
+
+- Fase 2b: en ajustes, sobre los logros, salen tiempo de partida, dinero ganado, camiones enviados (incluye dorados) y mejor racha. Partidas antiguas empiezan en 0 en lo nuevo. Con test; textos en es/en.
+- Qué probar: abrir ajustes tras jugar un rato.
+- Siguiente: logística visible (L1). Siguen sin respuesta las Partes 11, 18, 19 y 20.
+
 ## 2026-10-20 — T3, simulación de jugador, inglés y rendimiento
 
 - Mikel eligió T3. Cada línea tiene sus carretillas (extra y «tanda» de +5 piezas por viaje) y el palé de salida solo suma cuando llega la tanda entera (viaje de 10 s). Mejoras en el menú de cada línea. Partidas antiguas migradas.

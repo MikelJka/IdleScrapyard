@@ -77,6 +77,9 @@ export interface GameState {
   lastClaimDay: number;
   /** Ids de los logros conseguidos (`src/data/achievements.json`). */
   achievements: string[];
+  /** Camiones de expedición que han salido (incluye los dorados) y mejor día de racha alcanzado. */
+  trucksSent: number;
+  bestStreak: number;
 }
 
 export function newGame(): GameState {
@@ -118,6 +121,8 @@ export function newGame(): GameState {
     streakDay: 0,
     lastClaimDay: -1,
     achievements: [],
+    trucksSent: 0,
+    bestStreak: 0,
   };
 }
 
@@ -242,6 +247,7 @@ export function claimGoldenTruck(state: GameState): number {
   state.dockValue = 0;
   state.dockByZone = {};
   state.goldenVisible = 0;
+  state.trucksSent += 1;
   return value;
 }
 
@@ -268,6 +274,7 @@ export function claimDaily(state: GameState, today: number): number {
   state.dollars += value;
   state.totalEarned += value;
   state.streakDay = day;
+  state.bestStreak = Math.max(state.bestStreak, day);
   state.lastClaimDay = today;
   return value;
 }
@@ -332,6 +339,7 @@ function step(state: GameState, dt: number): void {
     const paid = value * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
     state.dollars += paid;
     state.totalEarned += paid;
+    state.trucksSent += 1;
     state.truckCooldown = ECONOMY.dock.returnSeconds;
   }
 }
