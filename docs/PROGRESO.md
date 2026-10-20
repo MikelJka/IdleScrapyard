@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Ajustes: vibración y reducir movimiento
+
+- Fase 2b: en ajustes, sección «Comodidad» con dos interruptores propios: vibración y reducir movimiento (además de respetar el ajuste del sistema). Se guardan en el aparato; textos en es/en.
+- Qué probar: ajustes → Comodidad; con «Reducir movimiento» las cifras no rebotan ni cuentan y las máquinas no se animan al recargar la escena.
+- Siguiente: logística visible (L1). Siguen sin respuesta las Partes 11, 18, 19 y 20.
+
 ## 2026-10-20 — Estadísticas del jugador
 
 - Fase 2b: en ajustes, sobre los logros, salen tiempo de partida, dinero ganado, camiones enviados (incluye dorados) y mejor racha. Partidas antiguas empiezan en 0 en lo nuevo. Con test; textos en es/en.

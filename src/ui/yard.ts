@@ -1,6 +1,7 @@
 // Chatarrería en vista isométrica (2D con bloques que parecen 3D). Solo lee el estado de la simulación.
 // Fondo: carretera con los camiones de chatarra. Centro: las líneas de cada zona. Frente: muelle y camiones de expedición.
 import { t as tr, zoneName, zoneProduct } from './texts';
+import { isCalmMotion } from './prefs';
 import { ECONOMY, ZONES, dockLoad, purchases, scrapPerSecond, zoneCapacity, zoneRate, zoneStatus, type GameState, type ZoneDef } from '../sim/game';
 import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
@@ -596,7 +597,7 @@ export function createYard(container: HTMLElement): Yard {
 
   /** Apertura de zona: el andamio se levanta y se desvanece mientras la máquina entra desde arriba. */
   function animateOpening(l: Line, scaffold: string): void {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || !l.machines.animate) return;
+    if (isCalmMotion() || !l.machines.animate) return;
     l.machines.animate(
       [
         { transform: 'translateY(-46px)', opacity: 0 },

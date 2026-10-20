@@ -1,3 +1,4 @@
+import { isVibrationOn } from './prefs';
 // Sonidos sintetizados con Web Audio: sin archivos de terceros (coste cero). Solo la interfaz los usa.
 const KEY = 'chatarrero.mute';
 
@@ -22,7 +23,7 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
 
 /** Vibración corta en el móvil (si el aparato lo permite). */
 export function buzz(ms = 12): void {
-  if (!muted) navigator.vibrate?.(ms);
+  if (!muted && isVibrationOn()) navigator.vibrate?.(ms);
 }
 
 export function isMuted(): boolean {

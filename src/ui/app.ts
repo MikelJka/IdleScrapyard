@@ -35,6 +35,7 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
+import { isCalmMotion, isVibrationOn, setCalmMotion, setVibration } from './prefs';
 import { buzz, isMuted, play, setMuted } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
@@ -113,6 +114,10 @@ export function startApp(root: HTMLElement): void {
         <div id="quality" hidden>
           <b>${t('settings.quality')}</b>
           <div><button type="button" data-q="auto">${t('settings.qualityAuto')}</button><button type="button" data-q="low">${t('settings.qualityLow')}</button></div>
+        </div>
+        <div id="toggles" hidden>
+          <b>${t('settings.comfort')}</b>
+          <div><button type="button" data-toggle="vibration" aria-pressed="${isVibrationOn()}">${t('settings.vibration')}</button><button type="button" data-toggle="calm" aria-pressed="${isCalmMotion()}">${t('settings.calm')}</button></div>
         </div>
         <div id="transfer" hidden>
           <b>${t('transfer.title')}</b>
@@ -238,6 +243,7 @@ export function startApp(root: HTMLElement): void {
     $('transfer').hidden = sel !== 'settings';
     $('lang').hidden = sel !== 'settings';
     $('quality').hidden = sel !== 'settings';
+    $('toggles').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -270,6 +276,14 @@ export function startApp(root: HTMLElement): void {
       /* vale solo para esta sesión */
     }
     location.reload();
+  });
+  $('toggles').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-toggle]');
+    if (!btn) return;
+    const on = btn.getAttribute('aria-pressed') !== 'true';
+    if (btn.dataset.toggle === 'vibration') setVibration(on);
+    else setCalmMotion(on);
+    btn.setAttribute('aria-pressed', String(on));
   });
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
   $('ranking-btn').addEventListener('click', () => openPanel(panel === 'ranking' ? null : 'ranking'));
@@ -366,7 +380,7 @@ export function startApp(root: HTMLElement): void {
       play('buy');
       buzz(15);
       const btn = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]');
-      if (btn && !calmMotion) btn.animate([{ filter: 'brightness(2.2)', scale: '1.04' }, { filter: 'none', scale: '1' }], { duration: 320, easing: 'ease-out' });
+      if (btn && !isCalmMotion()) btn.animate([{ filter: 'brightness(2.2)', scale: '1.04' }, { filter: 'none', scale: '1' }], { duration: 320, easing: 'ease-out' });
       bumpDollars();
       if (id.startsWith('unlock:')) shakeScene();
     }
@@ -416,16 +430,15 @@ export function startApp(root: HTMLElement): void {
   // Cifra de dólares que cuenta hacia arriba (o hacia abajo al comprar) en vez de saltar.
   let shownDollars = state.dollars;
   let lastRenderAt = performance.now();
-  const calmMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   /** Pequeño rebote de la cifra de dólares (al comprar o cobrar). */
   function bumpDollars(): void {
-    if (calmMotion) return;
+    if (isCalmMotion()) return;
     $('dollars').animate([{ scale: '1.18', color: '#ffe36b' }, { scale: '1' }], { duration: 300, easing: 'ease-out' });
   }
 
   /** Temblor suave del mapa al abrir una zona nueva. */
   function shakeScene(): void {
-    if (calmMotion) return;
+    if (isCalmMotion()) return;
     $('scene-wrap').animate(
       [{ translate: '0 0' }, { translate: '-5px 3px' }, { translate: '4px -3px' }, { translate: '-3px -2px' }, { translate: '2px 2px' }, { translate: '0 0' }],
       { duration: 420, easing: 'ease-out' },
@@ -434,7 +447,7 @@ export function startApp(root: HTMLElement): void {
 
   /** Monedas que salen del muelle (parte baja de la pantalla) y vuelan al contador al cobrar un camión. */
   function flyCoins(): void {
-    if (calmMotion) return;
+    if (isCalmMotion()) return;
     const to = $('dollars').getBoundingClientRect();
     const fromX = innerWidth * 0.5;
     const fromY = innerHeight * 0.45;
@@ -467,7 +480,7 @@ export function startApp(root: HTMLElement): void {
     const dtMs = Math.min(500, nowMs - lastRenderAt);
     lastRenderAt = nowMs;
     const gap = state.dollars - shownDollars;
-    shownDollars = calmMotion || Math.abs(gap) < 0.5 ? state.dollars : shownDollars + gap * (1 - Math.exp(-dtMs / 120));
+    shownDollars = isCalmMotion() || Math.abs(gap) < 0.5 ? state.dollars : shownDollars + gap * (1 - Math.exp(-dtMs / 120));
     // Los botones de extras solo se redibujan si cambian, para no perder el toque.
     const extras = renderExtras();
     if (extras !== lastExtras) {

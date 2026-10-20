@@ -54,7 +54,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Apertura de zona animada (se levanta el andamio y entra la máquina)
 - [ ] Logística visible (L1): las carretillas sueltan su producto en su huella y el camión se llena de las huellas
 - [ ] Música ambiental sintetizada (suave, con volumen propio) y sonidos por tipo de línea
-- [ ] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
+- [x] Ajustes completos (**hecho: vibración y reducir movimiento; la música llega con su tarea**): música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento
 - [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
 - [ ] Iluminación y sombras suaves en toda la escena, no solo de noche (degradados, ambient occlusion falso bajo las máquinas)
 - [x] Estadísticas del jugador (tiempo de partida, dinero ganado, camiones, mejor racha) en ajustes
