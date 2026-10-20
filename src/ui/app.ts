@@ -28,7 +28,7 @@ import {
   type GameState,
 } from '../sim/game';
 import { HELPER_LOOKS } from './look';
-import { FORKLIFT, helperFace, productIcon, truck, uiIcon } from './icons';
+import { FORKLIFT, helperFace, esc, inlineIcon, productIcon, truck, uiIcon, type UiIconName } from './icons';
 import { createYard, machineGrade } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/offline';
@@ -124,8 +124,8 @@ export function startApp(root: HTMLElement): void {
       const hours = Math.round((result.lostSeconds / 3600) * 10) / 10;
       w.innerHTML = `<div class="welcome-text">${t('welcomeBack', { dollars: fmt(result.dollarsEarned), minutes: Math.round(result.simulatedSeconds / 60) })}</div>
         <div class="welcome-actions">
-          ${doubled ? '' : `<button type="button" data-offline="double">${t('offline.double', { dollars: fmt(result.dollarsEarned) })}</button>`}
-          ${recovered ? '' : `<button type="button" data-offline="recover">${t('offline.recover', { hours, dollars: fmt(result.lostDollars) })}</button>`}
+          ${doubled ? '' : `<button type="button" data-offline="double">${inlineIcon('ad', t('offline.double', { dollars: fmt(result.dollarsEarned) }))}</button>`}
+          ${recovered ? '' : `<button type="button" data-offline="recover">${inlineIcon('ad', t('offline.recover', { hours, dollars: fmt(result.lostDollars) }))}</button>`}
           <button type="button" data-offline="close" aria-label="${t('close')}">✕</button>
         </div>`;
     };
@@ -180,14 +180,15 @@ export function startApp(root: HTMLElement): void {
   let lastTip = '';
   function renderTip(): void {
     let text = t('tip');
-    if (tut === 0) text = t('tut.tap', { n: Math.min(taps, 5) });
-    else if (tut === 1) text = state.dollars >= 10 ? t('tut.station') : t('tut.money');
-    else if (tut === 2) text = t('tut.buy');
-    else if (tut === 3) text = t('tut.close');
+    let tipIcon: UiIconName | null = null;
+    if (tut === 0) [text, tipIcon] = [t('tut.tap', { n: Math.min(taps, 5) }), 'finger'];
+    else if (tut === 1) [text, tipIcon] = state.dollars >= 10 ? [t('tut.station'), 'finger'] : [t('tut.money'), 'coin'];
+    else if (tut === 2) [text, tipIcon] = [t('tut.buy'), 'cart'];
+    else if (tut === 3) [text, tipIcon] = [t('tut.close'), 'check'];
     if (tut === 0 && taps >= 5) setTut(1);
     if (text !== lastTip) {
       lastTip = text;
-      $('tip').textContent = text;
+      $('tip').innerHTML = tipIcon ? inlineIcon(tipIcon, text) : esc(text);
       $('tip').classList.toggle('tut', tut < 4);
     }
   }
@@ -245,9 +246,8 @@ export function startApp(root: HTMLElement): void {
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
   $('ranking-btn').addEventListener('click', () => openPanel(panel === 'ranking' ? null : 'ranking'));
 
-  const esc = (x: string) => x.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
   function drawAchievements(): void {
-    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '🏅' : '🔒'} ${esc(a.name)}</li>`).join('')}</ul>`;
+    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '★' : '○'} ${esc(a.name)}</li>`).join('')}</ul>`;
   }
   async function drawRanking(): Promise<void> {
     const box = $('ranking');
@@ -288,9 +288,9 @@ export function startApp(root: HTMLElement): void {
 
   // Avisos breves (logros).
   let toastTimer = 0;
-  function toast(text: string): void {
+  function toast(text: string, icon?: UiIconName): void {
     const el = $('toast');
-    el.textContent = text;
+    el.innerHTML = icon ? inlineIcon(icon, text) : esc(text);
     el.hidden = false;
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => (el.hidden = true), 3500);
@@ -396,7 +396,7 @@ export function startApp(root: HTMLElement): void {
     renderTip();
     celebrateLevels();
     for (const a of checkAchievements(state)) {
-      toast(t('achieve.got', { name: a.name }));
+      toast(t('achieve.got', { name: a.name }), 'medal');
       play('reward');
     }
     if (panel === null || panel === 'settings') return;
@@ -440,7 +440,7 @@ export function startApp(root: HTMLElement): void {
       pallets: fmt(pallets),
       dock: fmt(state.dockUnits),
       load: dockLoad(state),
-    })}${jam === 'none' ? '' : ` · <span class="jam">${t('jam.' + jam)}</span>`}${goalTxt ? `<br><span class="goal">${goalTxt}</span>` : ''}`;
+    })}${jam === 'none' ? '' : ` · <span class="jam">${inlineIcon('warning', t('jam.' + jam))}</span>`}${goalTxt ? `<br><span class="goal">${inlineIcon('target', goalTxt)}</span>` : ''}`;
     if (html !== lastStats) {
       lastStats = html;
       $('stats').innerHTML = html;

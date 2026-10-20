@@ -537,7 +537,7 @@ export function createYard(container: HTMLElement): Yard {
   });
   addHit('dock', boxOutline(0.2, DOCK_Y, 19, 1.4, 0.3), iso(19.2, DOCK_Y + 0.7, 0.8));
   addHit('trucks', boxOutline(-6, BACK_Y - 1.4, 24, 3, 0.1), iso(17.5, BACK_Y - 0.2, 0.6));
-  for (const [text, x, y] of [['🚚 Camiones de chatarra', 5.5, BACK_Y - 0.7], ['📦 Muelle y carretillas', 16.2, DOCK_Y + 1.7]] as const) {
+  for (const [text, x, y] of [['Camiones de chatarra', 5.5, BACK_Y - 0.7], ['Muelle y carretillas', 16.2, DOCK_Y + 1.7]] as const) {
     const [tx, ty] = iso(x, y, 0.4);
     const tag = mk(labels, `<text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${text}</text>`);
     tag.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)})`);

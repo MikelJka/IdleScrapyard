@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Sin emojis en textos y avisos
+
+- Fase 2b, «Interfaz coherente»: el tutorial, el objetivo, el aviso de atasco, los avisos de logro y los botones de anuncio al volver llevan iconos SVG propios (dedo, moneda, carrito, check, diana, advertencia, medalla, anuncio) delante del texto (`inlineIcon`); los rótulos del mapa y la lista de logros pierden los emojis.
+- Qué probar: el mensaje amarillo del tutorial, la línea de objetivo, un logro y la ventana al volver.
+- Siguiente: botones con relieve, paneles con transición y cifras que cuentan hacia arriba.
+
 ## 2026-10-20 — Iconos SVG propios en la interfaz (primera parte)
 
 - Fase 2b, «Interfaz coherente»: los emojis de la barra de arriba (ranking, ajustes, sonido) y de los botones de extras (empujón, regalo diario, pase) pasan a iconos SVG propios con contorno y sombra (`uiIcon` en `src/ui/icons.ts`).

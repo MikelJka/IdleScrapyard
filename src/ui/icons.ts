@@ -86,7 +86,16 @@ export const FORKLIFT = `<g>
 
 
 /** Iconos de la interfaz (barra de arriba y botones de extras), 24×24, con relieve y contorno propios. */
-export type UiIconName = 'trophy' | 'gear' | 'sound-on' | 'sound-off' | 'timer' | 'ad' | 'hourglass' | 'gift' | 'star';
+export type UiIconName = 'trophy' | 'gear' | 'sound-on' | 'sound-off' | 'timer' | 'ad' | 'hourglass' | 'gift' | 'star' | 'target' | 'finger' | 'coin' | 'cart' | 'check' | 'warning' | 'medal';
+
+/** Icono pequeño que va delante de un texto (el texto se escapa). */
+export function inlineIcon(name: UiIconName, text: string): string {
+  return uiIcon(name).replace('class="uiicon"', 'class="uiicon inline"') + esc(text);
+}
+
+export function esc(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+}
 
 export function uiIcon(name: UiIconName): string {
   const o = 'stroke="#2a1d14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"';
@@ -119,6 +128,27 @@ export function uiIcon(name: UiIconName): string {
       break;
     case 'star':
       body = `<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8Z" fill="#f2c14e" ${o}/>`;
+      break;
+    case 'target':
+      body = `<circle cx="12" cy="12" r="8.5" fill="#fff6d8" ${o}/><circle cx="12" cy="12" r="5" fill="#e0584a" ${o}/><circle cx="12" cy="12" r="1.8" fill="#fff6d8" ${o}/>`;
+      break;
+    case 'finger':
+      body = `<path d="M9 11V5.5a1.6 1.6 0 0 1 3.2 0V11h1.3a2 2 0 0 1 2 .6 2 2 0 0 1 2.6 1.3l.4 1.4V17q0 4-4 4h-2.5q-2 0-3.2-1.6L5.5 15q.8-1.2 2.3-.4L9 15.5Z" fill="#f5cfa0" ${o}/>`;
+      break;
+    case 'coin':
+      body = `<circle cx="12" cy="12" r="8.5" fill="#f2c14e" ${o}/><circle cx="12" cy="12" r="5.6" fill="#f7d77a" ${o}/><path d="M12 8.2v7.6M14 9.6q-1.4-1-2.6-.6-1.6.6-.8 1.8c.8 1 3.6.6 3.2 2.2-.3 1.4-2.6 1.4-4 .4" fill="none" stroke="#8a6410" stroke-width="1.3" stroke-linecap="round"/>`;
+      break;
+    case 'cart':
+      body = `<path d="M3 5h3l2.4 10h9.4L20 8H7" fill="#b9c2c9" ${o}/><circle cx="9.5" cy="19" r="1.8" fill="#4d6070" ${o}/><circle cx="16.5" cy="19" r="1.8" fill="#4d6070" ${o}/>`;
+      break;
+    case 'check':
+      body = `<circle cx="12" cy="12" r="9" fill="#6fcf7f" ${o}/><path d="M7.5 12.5l3 3 6-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+      break;
+    case 'warning':
+      body = `<path d="M12 3.5l9 16H3Z" fill="#ffb347" ${o}/><path d="M12 9.5v5" stroke="#2a1d14" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.1" fill="#2a1d14"/>`;
+      break;
+    case 'medal':
+      body = `<path d="M8 3l4 7 4-7" fill="#e0584a" ${o}/><circle cx="12" cy="15" r="6" fill="#f2c14e" ${o}/><path d="M12 11.5l1.1 2.3 2.5.3-1.8 1.7.5 2.5-2.3-1.2-2.3 1.2.5-2.5-1.8-1.7 2.5-.3Z" fill="#fff3c4"/>`;
       break;
   }
   return `<svg class="uiicon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">${body}</svg>`;
