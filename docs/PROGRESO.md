@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Iconos en los estados
+
+- El estado de una línea en su panel lleva un símbolo (▶ trabajando, ✖ sin chatarra, ■ palé lleno) además del color, para no depender solo del color (`src/style.css`).
+- Qué probar: tocar una línea y ver el símbolo delante del estado.
+- Sigue: animar el barco, tests de interfaz sencillos.
+
 ## 2026-10-20 — La prueba de humo comprueba más cosas
 
 - `scripts/smoke.mjs` ahora abre el panel de una línea y comprueba que tiene contenido, abre el ranking (apagado, sin Firebase) y comprueba que muestra el aviso, y carga `?hora=22` comprobando que la capa nocturna se aplica. Nuevas capturas: `*-ranking.png` y `movil-noche.png`.
