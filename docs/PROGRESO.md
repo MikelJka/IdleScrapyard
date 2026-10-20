@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Los dólares cuentan hacia arriba
+
+- Fase 2b, «Interfaz coherente» (cerrada): la cifra de dólares de la barra de arriba sube y baja con suavidad en vez de saltar (se respeta «reducir movimiento»).
+- Qué probar: cobrar un camión y comprar algo; la cifra debe deslizarse.
+- Siguiente: «juice» (monedas que vuelan al contador, números flotantes, destello al comprar).
+
 ## 2026-10-20 — Paneles con transición y botones con relieve
 
 - Fase 2b, «Interfaz coherente»: el panel inferior sube con una transición suave, el ranking y el aviso de bienvenida aparecen con un pequeño rebote, y todos los botones (código de partida, bienvenida, ranking) tienen relieve y se hunden al pulsar. Se respeta «reducir movimiento» del sistema.

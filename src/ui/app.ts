@@ -378,14 +378,23 @@ export function startApp(root: HTMLElement): void {
   let lastCooldown = state.truckCooldown;
   let lastExtras = '';
   let lastStats = '';
+  // Cifra de dólares que cuenta hacia arriba (o hacia abajo al comprar) en vez de saltar.
+  let shownDollars = state.dollars;
+  let lastRenderAt = performance.now();
+  const calmMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   function render(): void {
+    const nowMs = performance.now();
+    const dtMs = Math.min(500, nowMs - lastRenderAt);
+    lastRenderAt = nowMs;
+    const gap = state.dollars - shownDollars;
+    shownDollars = calmMotion || Math.abs(gap) < 0.5 ? state.dollars : shownDollars + gap * (1 - Math.exp(-dtMs / 120));
     // Los botones de extras solo se redibujan si cambian, para no perder el toque.
     const extras = renderExtras();
     if (extras !== lastExtras) {
       $('extras').innerHTML = extras;
       lastExtras = extras;
     }
-    $('dollars').textContent = fmt(state.dollars);
+    $('dollars').textContent = fmt(shownDollars);
     $('rate').textContent = t('incomeRate', { n: fmt(incomePerSecond(state)) });
     scene.update(state);
     // Sonido al cobrar un camión (el dinero sube y el camión se reinicia).
