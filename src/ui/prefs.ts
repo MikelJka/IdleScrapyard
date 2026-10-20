@@ -27,3 +27,30 @@ export function reducedMotion(): boolean {
 export function setReducedMotion(value: boolean): void {
   writeFlag(CALM_KEY, value);
 }
+
+const BIGTEXT_KEY = 'chatarrero.bigtext';
+const CONTRAST_KEY = 'chatarrero.contrast';
+
+export function isBigText(): boolean {
+  return readFlag(BIGTEXT_KEY, false);
+}
+
+export function setBigText(value: boolean): void {
+  writeFlag(BIGTEXT_KEY, value);
+  applyAccessibility();
+}
+
+export function isHighContrast(): boolean {
+  return readFlag(CONTRAST_KEY, window.matchMedia?.('(prefers-contrast: more)').matches ?? false);
+}
+
+export function setHighContrast(value: boolean): void {
+  writeFlag(CONTRAST_KEY, value);
+  applyAccessibility();
+}
+
+/** Pone en <html> las clases de «texto grande» y «alto contraste» que usa style.css. */
+export function applyAccessibility(): void {
+  document.documentElement.classList.toggle('bigtext', isBigText());
+  document.documentElement.classList.toggle('contrast', isHighContrast());
+}

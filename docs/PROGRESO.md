@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Accesibilidad: texto grande y alto contraste
+
+- Dos interruptores nuevos en ajustes (es/en): «Texto grande» (paneles y mensajes al 120 %) y «Alto contraste» (por defecto sigue al sistema; texto blanco, bordes blancos). Se guardan en el aparato (`src/ui/prefs.ts`).
+- Qué probar: ⚙ → Texto grande / Alto contraste; se aplican al instante.
+- Sigue: iconos en los estados para no depender del color, iluminación y sombras.
+
 ## 2026-10-20 — Ajustes completos
 
 - Ajustes con interruptores propios de efectos de sonido, vibración y reducir movimiento (este último por defecto sigue al sistema; al cambiarlo se recarga la página). Se guardan en el aparato, no en la partida (`src/ui/prefs.ts`). Textos es/en.

@@ -37,7 +37,7 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
-import { reducedMotion, setReducedMotion } from './prefs';
+import { applyAccessibility, isBigText, isHighContrast, reducedMotion, setBigText, setHighContrast, setReducedMotion } from './prefs';
 import { buzz, isMuted, isMusicOn, isSfxOn, isVibeOn, play, setMuted, setMusicOn, setSfxOn, setVibeOn, syncMusic } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
@@ -133,6 +133,14 @@ export function startApp(root: HTMLElement): void {
         <div id="calm" class="opt" hidden>
           <b>${t('settings.calm')}</b>
           <div><button type="button" data-v="1" ${reducedMotion() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${reducedMotion() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
+        </div>
+        <div id="bigtext" class="opt" hidden>
+          <b>${t('settings.bigtext')}</b>
+          <div><button type="button" data-v="1" ${isBigText() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${isBigText() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
+        </div>
+        <div id="contrast" class="opt" hidden>
+          <b>${t('settings.contrast')}</b>
+          <div><button type="button" data-v="1" ${isHighContrast() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${isHighContrast() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
         </div>
         <div id="quality" hidden>
           <b>${t('settings.quality')}</b>
@@ -266,6 +274,8 @@ export function startApp(root: HTMLElement): void {
     $('sfx').hidden = sel !== 'settings';
     $('vibe').hidden = sel !== 'settings';
     $('calm').hidden = sel !== 'settings';
+    $('bigtext').hidden = sel !== 'settings';
+    $('contrast').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -305,6 +315,9 @@ export function startApp(root: HTMLElement): void {
   };
   bindFlag('sfx', setSfxOn);
   bindFlag('vibe', setVibeOn);
+  bindFlag('bigtext', setBigText);
+  bindFlag('contrast', setHighContrast);
+  applyAccessibility();
   bindFlag('calm', (v) => {
     setReducedMotion(v);
     writeSave(state);

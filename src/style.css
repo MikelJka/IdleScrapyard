@@ -158,3 +158,9 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #scene-wrap.lowq svg { shape-rendering: optimizeSpeed; }
 #scene-wrap.lowq svg * { animation: none !important; }
 #stats .order { color: #8be28b; font-weight: 800; }
+
+/* Accesibilidad (ajustes): texto grande y alto contraste */
+html.bigtext #sheet, html.bigtext #welcome { zoom: 1.2; }
+html.contrast { --ink: #fff; --muted: #d8cfbd; --bg: #0e0b08; }
+html.contrast #shop button, html.contrast #close-shop { border-color: #fff; background: #000; }
+html.contrast #shop button:disabled { opacity: 0.75; }
