@@ -299,7 +299,9 @@ export function createYard(container: HTMLElement): Yard {
   svg.setAttribute('class', 'yard');
   const city = cityMarkup();
   const hallBox = [-500, -170, 1140, 600] as const;
-  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient></defs>
+  svg.innerHTML = `<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset="0.5" stop-color="#f2b705"/><stop offset="1" stop-color="#b07d00"/></linearGradient>
+    <radialGradient id="ao"><stop offset="0" stop-color="#1a1008" stop-opacity="0.5"/><stop offset="0.6" stop-color="#1a1008" stop-opacity="0.22"/><stop offset="1" stop-color="#1a1008" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3d0" stop-opacity="0.18"/><stop offset="0.5" stop-color="#fff3d0" stop-opacity="0"/><stop offset="1" stop-color="#1a1530" stop-opacity="0.16"/></linearGradient></defs>
     ${skySvg()}
     <g id="clouds"></g>
     ${staticImage(city.base, -1900, HORIZON - 380, 3800, 480)}
@@ -320,6 +322,7 @@ export function createYard(container: HTMLElement): Yard {
     <g id="front"></g>
     <g id="train"></g>
     ${staticImage(portFrontSvg(), -900, 200, 1800, 760)}
+    <polygon points="${boxOutline(HALL.x0, HALL.y0, HALL.x1 - HALL.x0, HALL.y1 - HALL.y0, HALL.wall)}" fill="url(#sun)" pointer-events="none"/>
     <g id="lampglow" opacity="0" pointer-events="none">${lampGlowSvg()}</g>
     <rect id="duskR" x="-4000" y="-1700" width="8000" height="5000" fill="#ff8a3c" opacity="0" pointer-events="none"/>
     <path id="nightR" fill-rule="evenodd" fill="#0b1738" opacity="0" pointer-events="none" d="M-4000 -1700 H4000 V3300 H-4000Z ${boxOutline(HALL.x0, HALL.y0, HALL.x1 - HALL.x0, HALL.y1 - HALL.y0, HALL.wall).split(' ').map((q, i) => (i ? 'L' : 'M') + q.replace(',', ' ')).join(' ')}Z"/>
@@ -574,7 +577,10 @@ export function createYard(container: HTMLElement): Yard {
     const px = 0.9 + k * 2.3;
     const py = DOCK_Y + 0.15;
     const look = ZONE_LOOKS[def.id] ?? { wall: '#999', roof: '#555' };
-    const floor = mk(floorLayer, tile(px, py, PAD_W, 1.1, `fill="${shade(look.wall, 0.8)}" stroke="#f4c430" stroke-width="1.6" stroke-dasharray="6 4"`, 0.3), 'pad');
+    // Sombra suave bajo las máquinas (oclusión ambiental falsa).
+    const [aox, aoy] = iso(px + PAD_W / 2, py + 0.7, 0.3);
+    const aoSvg = `<ellipse cx="${aox.toFixed(1)}" cy="${(aoy + 4).toFixed(1)}" rx="${(PAD_W * 30).toFixed(1)}" ry="${(PAD_W * 15).toFixed(1)}" fill="url(#ao)" pointer-events="none"/>`;
+    const floor = mk(floorLayer, tile(px, py, PAD_W, 1.1, `fill="${shade(look.wall, 0.8)}" stroke="#f4c430" stroke-width="1.6" stroke-dasharray="6 4"`, 0.3) + aoSvg, 'pad');
     floor.setAttribute('display', 'none');
     const stack = mk(objectsG, '');
     stack.setAttribute('transform', at(px, py));

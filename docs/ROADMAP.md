@@ -56,7 +56,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Música ambiental sintetizada (**hecho: acordes suaves en bucle con interruptor propio en ajustes**; faltan sonidos por tipo de línea)
 - [x] Ajustes completos: música, efectos, vibración, idioma, calidad gráfica (baja/alta), reducir movimiento (**hecho**)
 - [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
-- [ ] Iluminación y sombras suaves en toda la escena, no solo de noche (degradados, ambient occlusion falso bajo las máquinas)
+- [x] Iluminación y sombras suaves en toda la escena, no solo de noche (**hecho: sombra suave bajo cada puesto y luz de sol en la nave**; degradados, ambient occlusion falso bajo las máquinas)
 - [x] Estadísticas del jugador (tiempo de partida, dinero ganado, camiones, mejor racha) en ajustes
 - [x] Accesibilidad (**hecho: «Texto grande» y «Alto contraste» en ajustes, reducir movimiento**; falta iconos en los estados para no depender solo del color): texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
 - [x] Textos en inglés con selector de idioma

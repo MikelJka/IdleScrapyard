@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Iluminación y sombras suaves
+
+- Sombra suave (degradado radial) bajo las máquinas de cada puesto y luz de sol en degradado sobre la nave, de día y de noche. Cambio solo de dibujo (`src/ui/yard.ts`).
+- Qué probar: abrir un puesto y ver el suelo oscurecido bajo las máquinas; la nave más clara arriba a la izquierda y más oscura abajo a la derecha.
+- Sigue: pruebas de la prueba de humo (panel por línea, ranking apagado, noche), iconos en los estados.
+
 ## 2026-10-20 — Accesibilidad: texto grande y alto contraste
 
 - Dos interruptores nuevos en ajustes (es/en): «Texto grande» (paneles y mensajes al 120 %) y «Alto contraste» (por defecto sigue al sistema; texto blanco, bordes blancos). Se guardan en el aparato (`src/ui/prefs.ts`).
