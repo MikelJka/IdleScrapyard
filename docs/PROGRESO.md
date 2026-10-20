@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — La prueba de humo comprueba más cosas
+
+- `scripts/smoke.mjs` ahora abre el panel de una línea y comprueba que tiene contenido, abre el ranking (apagado, sin Firebase) y comprueba que muestra el aviso, y carga `?hora=22` comprobando que la capa nocturna se aplica. Nuevas capturas: `*-ranking.png` y `movil-noche.png`.
+- Qué probar: nada en el juego; mira las capturas nuevas en la rama `capturas`.
+- Sigue: tests de interfaz sencillos, iconos en los estados, animar el barco.
+
 ## 2026-10-20 — Iluminación y sombras suaves
 
 - Sombra suave (degradado radial) bajo las máquinas de cada puesto y luz de sol en degradado sobre la nave, de día y de noche. Cambio solo de dibujo (`src/ui/yard.ts`).
