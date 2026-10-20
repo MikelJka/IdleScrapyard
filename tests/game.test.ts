@@ -110,7 +110,7 @@ describe('ritmo R2 (decidido por Mikel)', () => {
     const at = playBot(newGame(), 12 * 3600, { ...DEFAULT_BOT, stopWhenAllOpen: true });
     expect(at.smelter / 60).toBeGreaterThan(6);
     expect(at.smelter / 60).toBeLessThan(15);
-    // Con las carretillas por línea (T3) la zona 4 llega antes que el ~6 h de R2; ver Parte 18 de FEEDBACK.md.
+    // Con las carretillas por línea (T3) la zona 4 llegaba a ~3,6 h; con las zonas 3 y 4 un 50 % más caras (B1b) llega a ~4,3 h (Parte 18).
     expect(at.pipes / 3600).toBeGreaterThan(3);
     expect(at.pipes / 3600).toBeLessThan(8);
   });

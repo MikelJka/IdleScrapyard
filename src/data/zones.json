@@ -36,7 +36,7 @@
     "unitValue": 15,
     "scrapPerUnit": 1,
     "cycleSeconds": 4,
-    "unlockCost": 60000,
+    "unlockCost": 90000,
     "upgradeCostScale": 60,
     "helper": {
       "id": "yunque",
@@ -51,7 +51,7 @@
     "unitValue": 60,
     "scrapPerUnit": 1,
     "cycleSeconds": 8,
-    "unlockCost": 3000000,
+    "unlockCost": 4500000,
     "upgradeCostScale": 400,
     "helper": {
       "id": "codo",

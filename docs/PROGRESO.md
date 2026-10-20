@@ -2,6 +2,11 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Equilibrio B1b y B2a
+
+- Mikel eligió B1b y B2a: abrir las zonas 3 y 4 cuesta un 50 % más y el nivel de máquina crece ×2,2 por nivel (antes ×4). Zona 4 a ~4,3 h jugando sin parar.
+- B3 (pedidos especiales, zonas de tren y barco) queda en la Parte 21 de FEEDBACK.md a la espera de números y de aclarar qué producto va en cada transporte.
+
 ## 2026-10-20 — Scrap Empire y material de anuncio
 
 - Mikel eligió G2 y M1-M4. El juego pasa a llamarse «Scrap Empire: Idle Factory» (título, carga, manifest, cartel del mapa). Las etiquetas «Muelle y carretillas» y «Camiones de chatarra» del mapa estaban sin traducir: arreglado.

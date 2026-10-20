@@ -40,6 +40,9 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 - [x] **Rendimiento (N4)** (2026-10-20): medido con `scripts/perf.mjs` (CPU ×4, partida de 2 días): el coste es dibujar el SVG (el 90 %; el código del juego, un 7 %), sobre todo las 5 400 piezas de máquinas y trabajadores. Ahora: las líneas fuera de la pantalla no se animan, la escena se redibuja a 30/s en táctiles (y a 20/s si va justo), y hay «Calidad baja» (sin nubes, pájaros, autopista, tren ni animaciones CSS y bordes sin suavizar) que se activa sola tras 3 s a menos de ~22 fps y se puede fijar en ajustes. Resultado en la prueba lenta: de ~11 a ~25 fps. **Hecho**; si siguen los parpadeos en el móvil, el siguiente paso es dibujar las máquinas en `<canvas>` (aviso de Mikel).
 - [x] **Textos en inglés (N3)** (2026-10-20): selector Español/English en ajustes (por defecto el idioma del navegador); todos los textos, nombres de zonas, ayudantes y logros traducidos; una prueba exige que no falte ninguna traducción. **Hecho.**
 
+- [x] **Equilibrio B1b y B2a** (2026-10-20, Mikel): abrir las zonas 3 y 4 cuesta un 50 % más (90 000 $ y 4 500 000 $; la zona 4 llega a ~4,3 h jugando sin parar) y el nivel de máquina crece ×2,2 por nivel en vez de ×4 (el nivel 30 pasa a ser alcanzable). **Hecho.**
+- [ ] **Pedidos especiales (B3-a)** (2026-10-20, Mikel): aprobado; faltan los números, ver Parte 21.
+- [ ] **Zonas nuevas con tren y barco (B3-c)** (2026-10-20, Mikel): 2 líneas más, con carga en el tren y en el barco del fondo; faltan detalles, ver Parte 21.
 - [x] **Nombre global (G2)** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» en título, pantalla de carga, manifest, cartel del mapa y documentación; el repositorio y las claves de guardado conservan «chatarrero» para no romper partidas. **Hecho.**
 - [x] **Material de anuncio (M1-M4)** (2026-10-20, Mikel): `scripts/marketing/index.mjs` genera en `public/press/` (se publica en `/press/`): 12 capturas 1080×1920 con rótulo (6 en español, 6 en inglés), gráfico de función 1024×500, iconos (normal, adaptable, monocromo, SVG y rótulo), dos vídeos verticales de ~27 s sin sonido y la página de prensa; textos de la ficha en `docs/FICHA_TIENDA.md`. **Hecho.**
 - [x] **Carretillas de las líneas muy mejoradas** (2026-10-20, Mikel: «solo aparecen llegando al puesto de carga en bucle»; las de una línea nueva iban bien): causa en el dibujo: cada carretilla visible seguía al viaje más viejo de su línea, y con muchas carretillas ese viaje siempre estaba a punto de acabar. Ahora cada carretilla sigue a su viaje hasta el final, y libre espera junto al palé y coge solo viajes recién salidos. **Hecho.**
@@ -59,6 +62,23 @@ Todo lo aprobado está hecho salvo «pulir» y comprobar la web en el móvil. Pa
 - **N5 — Otra cosa:** dime tu idea.
 
 Responde con las letras (p. ej. «N1N4»).
+
+### Parte 21 — Pedidos especiales y las dos zonas de tren y barco (2026-10-20)
+
+Entendido: B1b, B2a, B3-a y B3-c. Para no inventar números, necesito cuatro cosas:
+
+**1. Las zonas nuevas.** Dices «coches que se cargan en el tren» y «otro material que se carga en el barco». Hoy la zona 8 ya es «Coches reconstruidos» y sale en el camión. ¿Cuál de estas lecturas es la tuya?
+- **Z1 —** Zona 9 = **Vagones** (o coches clásicos) que salen solo en el **tren** del fondo, y zona 10 = **Contenedores** (o motores navales) que salen solo en el **barco**. La zona 8 sigue en el camión.
+- **Z2 —** La zona 8 (coches reconstruidos) pasa a cargarse en el tren, y se añaden dos zonas nuevas: una para el barco y otra más (a elegir) para el camión.
+- **Z3 —** Otra cosa: dime qué producto lleva cada una.
+
+**2. Cómo se manda el tren y el barco.** El tren y el barco ya pasan de decoración. Opciones: (a) llegan cada pocos minutos, se llenan con lo de su línea y se van (como el camión de expedición, con su propio muelle y palé de salida); (b) se llenan despacio y salen cuando están llenos, y se pagan más por viaje que el camión.
+
+**3. Precio y valor (mi propuesta, ajustable).** Zona 9: abrir 4 800 000 000 $ y 4× el valor por pieza de la zona 8; zona 10: abrir 24 000 000 000 $ y 4× la zona 9; cada una con ayudante nuevo con su frase (te propongo nombres: «Vagón» y «Ancla»).
+
+**4. Pedidos especiales (B3-a).** Mi propuesta: cada ~15 min aparece un pedido de un producto de una línea abierta, con 2 min para entregarlo; la cantidad pedida equivale a 3 min de lo que produce esa línea (así sirve en toda la partida, no solo con los 50 bloques del principio); si se cumple, se cobra el doble de su valor y si no, no pasa nada. Se ve como un cartel en el mapa con cuenta atrás. ¿Te vale? Si prefieres otra cantidad (p. ej. 5 min) o que se pueda ver un anuncio para alargar el plazo, dímelo.
+
+Responde: Z1/Z2/Z3, 2a/2b, «precios ok» o tus números, y «pedidos ok» o lo que cambies.
 
 ### Parte 18 — Resultado de la simulación de jugador y qué ajustar (2026-10-20)
 
