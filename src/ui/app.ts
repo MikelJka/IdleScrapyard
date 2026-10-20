@@ -37,7 +37,7 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
-import { buzz, isMuted, play, setMuted } from './sound';
+import { buzz, isMuted, isReduceMotion, isVibration, play, setMuted, setReduceMotion, setVibration } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
 const AUTOSAVE_MS = 10_000;
@@ -116,6 +116,12 @@ export function startApp(root: HTMLElement): void {
         <div id="lang" hidden>
           <b>${t('settings.language')}</b>
           <div><button type="button" data-lang="es" ${getLang() === 'es' ? 'aria-pressed="true"' : ''}>Español</button><button type="button" data-lang="en" ${getLang() === 'en' ? 'aria-pressed="true"' : ''}>English</button></div>
+        </div>
+        <div id="options" hidden>
+          <b>${t('settings.options')}</b>
+          <div>
+            <button type="button" data-opt="sound"></button><button type="button" data-opt="vibration"></button><button type="button" data-opt="motion"></button>
+          </div>
         </div>
         <div id="quality" hidden>
           <b>${t('settings.quality')}</b>
@@ -245,6 +251,7 @@ export function startApp(root: HTMLElement): void {
     $('transfer').hidden = sel !== 'settings';
     $('lang').hidden = sel !== 'settings';
     $('quality').hidden = sel !== 'settings';
+    $('options').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -267,6 +274,29 @@ export function startApp(root: HTMLElement): void {
     setLang(next);
     writeSave(state);
     location.reload();
+  });
+  const optState = (): Record<string, boolean> => ({ sound: !isMuted(), vibration: isVibration(), motion: isReduceMotion() });
+  const showOptions = () => {
+    const on = optState();
+    $('options').querySelectorAll<HTMLElement>('button[data-opt]').forEach((b) => {
+      const k = b.dataset.opt!;
+      b.setAttribute('aria-pressed', String(on[k]));
+      b.textContent = t('settings.' + k);
+    });
+    document.body.classList.toggle('reduce-motion', isReduceMotion());
+  };
+  showOptions();
+  $('options').addEventListener('click', (e) => {
+    const k = (e.target as HTMLElement).closest<HTMLElement>('button[data-opt]')?.dataset.opt;
+    if (!k) return;
+    if (k === 'sound') {
+      setMuted(!isMuted());
+      showMute();
+    } else if (k === 'vibration') setVibration(!isVibration());
+    else setReduceMotion(!isReduceMotion());
+    showOptions();
+    play('tap');
+    if (k === 'vibration') buzz(30);
   });
   $('quality').addEventListener('click', (e) => {
     const q = (e.target as HTMLElement).closest<HTMLElement>('button[data-q]')?.dataset.q;

@@ -22,7 +22,49 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
 
 /** Vibración corta en el móvil (si el aparato lo permite). */
 export function buzz(ms = 12): void {
-  if (!muted) navigator.vibrate?.(ms);
+  if (vibration) navigator.vibrate?.(ms);
+}
+
+const VIB_KEY = 'chatarrero.vibration';
+const MOTION_KEY = 'chatarrero.reduceMotion';
+
+function readFlag(key: string, fallback: boolean): boolean {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v === '1';
+  } catch {
+    return fallback;
+  }
+}
+
+function writeFlag(key: string, value: boolean): void {
+  try {
+    localStorage.setItem(key, value ? '1' : '0');
+  } catch {
+    /* sin almacenamiento: se juega igual */
+  }
+}
+
+let vibration = readFlag(VIB_KEY, true);
+// Por defecto sigue el ajuste «reducir movimiento» del sistema.
+let reduceMotion = readFlag(MOTION_KEY, typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+export function isVibration(): boolean {
+  return vibration;
+}
+
+export function setVibration(value: boolean): void {
+  vibration = value;
+  writeFlag(VIB_KEY, value);
+}
+
+export function isReduceMotion(): boolean {
+  return reduceMotion;
+}
+
+export function setReduceMotion(value: boolean): void {
+  reduceMotion = value;
+  writeFlag(MOTION_KEY, value);
 }
 
 export function isMuted(): boolean {

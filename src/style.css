@@ -64,10 +64,10 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #shop button.unlock { background: linear-gradient(180deg, #d98b2b, #a8601a); border-color: #f2b45c; }
 #shop button.helper { background: linear-gradient(180deg, #3f8f7a, #2d6156); border-color: #6cc4ad; }
 .ad-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); color: var(--ink); font-size: 20px; z-index: 10; }
-#lang, #quality, #transfer { margin-top: 10px; padding-top: 10px; border-top: 2px solid #5f4a33; color: #f3e3c3; display: flex; flex-direction: column; gap: 4px; }
-#lang small, #quality small, #transfer small { opacity: 0.75; }
-#lang div, #quality div, #transfer div { display: flex; gap: 8px; }
-#lang button, #quality button, #transfer button { flex: 1; min-height: 44px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
+#lang, #options, #quality, #transfer { margin-top: 10px; padding-top: 10px; border-top: 2px solid #5f4a33; color: #f3e3c3; display: flex; flex-direction: column; gap: 4px; }
+#lang small, #options small, #quality small, #transfer small { opacity: 0.75; }
+#lang div, #options div, #quality div, #transfer div { display: flex; gap: 8px; }
+#lang button, #options button, #quality button, #transfer button { flex: 1; min-height: 44px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
 /* Animaciones de la escena (las de las máquinas las mueve el código, suavizadas) */
 .puff, .spark, .far-smoke { transform-box: fill-box; transform-origin: center; }
 .puff { animation: puff 2.4s ease-out infinite; }
@@ -115,7 +115,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .st-working { color: #8be28b; } .st-starved { color: #ff8a7a; } .st-full { color: #ffb347; }
 #shop .empty { color: var(--muted); text-align: center; }
 #sheet { max-height: 70%; overflow-y: auto; }
-#lang[hidden], #quality[hidden], #transfer[hidden] { display: none; }
+#lang[hidden], #options[hidden], #quality[hidden], #transfer[hidden] { display: none; }
 #sheet { max-height: 56%; }
 
 #ranking-btn { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px 0; font-size: 20px; background: none; border: 0; cursor: pointer; }
@@ -145,7 +145,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 @keyframes pop-in { from { transform: scale(0.94); opacity: 0; } to { transform: none; opacity: 1; } }
 #sheet:not([hidden]) { animation: sheet-in 0.18s ease-out; }
 #ranking:not([hidden]), #welcome:not([hidden]) { animation: pop-in 0.16s ease-out; }
-#lang button, #quality button, #transfer button, .welcome-actions button, #ranking form button { box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); transition: transform 0.06s; }
+#lang button, #options button, #quality button, #transfer button, .welcome-actions button, #ranking form button { box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); transition: transform 0.06s; }
 #lang button, #quality button, #transfer button:active, .welcome-actions button:active, #ranking form button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4); }
 @media (prefers-reduced-motion: reduce) { #sheet, #ranking, #welcome { animation: none !important; } }
 
@@ -157,3 +157,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #scene-wrap.lowq svg { shape-rendering: optimizeSpeed; }
 #scene-wrap.lowq svg * { animation: none !important; }
 #stats .order { color: #8be28b; font-weight: 800; }
+
+#options button[aria-pressed='false'] { opacity: 0.55; text-decoration: line-through; }
+body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after { animation: none !important; transition: none !important; }
+#options div { flex-wrap: wrap; }

@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Ajustes: efectos, vibración y reducir movimiento
+
+- Fase 2b (aprobada): en ajustes hay tres interruptores nuevos, «Efectos de sonido», «Vibración» y «Reducir movimiento» (este último arranca según el ajuste del sistema y quita las animaciones CSS). Se guardan en el aparato.
+- Qué probar: abrir ajustes en el móvil, apagar la vibración y tocar la pila; activar «Reducir movimiento» y ver la escena quieta.
+- Falta: música ambiental (con volumen propio), para cerrar «Ajustes completos».
+
 ## 2026-10-20 — Pedidos especiales, tren y barco
 
 - Mikel eligió Z1, 2b, precios y pedidos OK. Zonas 9 (vagones, por tren) y 10 (contenedores, por barco): el tren y el barco se llenan y salen llenos, pagan ×1,5 y ×3; mejora de carga en el menú de cada línea. Anexo nuevo en el mapa a la derecha de la nave; el tren del fondo pasa al salir cargado.
