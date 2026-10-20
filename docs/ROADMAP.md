@@ -58,7 +58,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Rendimiento (**hecho**: líneas fuera de pantalla sin animar, 30 fps en táctiles, calidad baja automática o fija; falta canvas si hace falta): ocultar lo que queda fuera de cámara, animar solo las líneas visibles, modo «calidad baja»; pasar lo animado a canvas si el contador lo pide (Parte 13)
 - [x] Iluminación y sombras suaves en toda la escena, no solo de noche (**hecho: sombra suave bajo cada puesto y luz de sol en la nave**; degradados, ambient occlusion falso bajo las máquinas)
 - [x] Estadísticas del jugador (tiempo de partida, dinero ganado, camiones, mejor racha) en ajustes
-- [x] Accesibilidad (**hecho: «Texto grande» y «Alto contraste» en ajustes, reducir movimiento**; falta iconos en los estados para no depender solo del color): texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
+- [x] Accesibilidad (**hecho: «Texto grande» y «Alto contraste» en ajustes, reducir movimiento**; **hecho también: iconos en los estados de las líneas**): texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
 - [x] Textos en inglés con selector de idioma
 - [x] Equilibrio con el bot: simulación de jugador hecha (`scripts/balance.ts`), propuesta en la Parte 18; falta que Mikel elija
 - [x] Pedidos especiales y zonas 9-10 con tren y barco (primera parte; falta animar el barco y equilibrar)

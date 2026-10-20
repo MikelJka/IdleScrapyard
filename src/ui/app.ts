@@ -660,7 +660,7 @@ export function startApp(root: HTMLElement): void {
     const ready = helperLevelsReady(zone);
     return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${helperName(def)}</b> · ${t('lvl')} ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${helperBio(def)}</small></div></div>
       <ul class="rows">
-        <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
+        <li>${t('info.state')}: <b class="st-${status}">${inlineIcon(status === 'working' ? 'check' : status === 'starved' ? 'hourglass' : 'warning', t('status.' + status))}</b></li>
         <li>${t('info.rate')}: <b>${rateTxt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (${t('lvl')} ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
         <li>${t('info.carts', { n: zone.carts, batch: cartBatch(zone), trip: ECONOMY.carts.tripSeconds })}</li>
         ${

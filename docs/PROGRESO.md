@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Iconos en los estados de las líneas
+
+- El estado de cada línea en su panel lleva icono además de color: ✔ trabajando, reloj de arena sin chatarra, aviso con el palé lleno (`src/ui/app.ts`). Así no se depende solo del color.
+- Qué probar: tocar un puesto y ver el icono delante del estado.
+- Sigue: animar el barco, tests de interfaz sencillos. Lo demás aprobado está hecho; las Partes 11 y 21 siguen sin respuesta de Mikel (Android/Capacitor no está aprobado).
+
 ## 2026-10-20 — La prueba de humo comprueba más cosas
 
 - `scripts/smoke.mjs` ahora abre el panel de una línea y comprueba que tiene contenido, abre el ranking (apagado, sin Firebase) y comprueba que muestra el aviso, y carga `?hora=22` comprobando que la capa nocturna se aplica. Nuevas capturas: `*-ranking.png` y `movil-noche.png`.
