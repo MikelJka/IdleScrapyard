@@ -49,8 +49,25 @@ try {
     await page.evaluate(() => document.querySelector('[data-sel="crusher"] polygon:last-child').dispatchEvent(new MouseEvent('click', { bubbles: true })));
     await sleep(600);
     await page.screenshot({ path: `smoke/${d.name}-puesto.png` });
+    // El panel por línea tiene que mostrar su KPI (chatarra, pila, palés...).
+    const info = (await page.textContent('#panel-info')) ?? '';
+    if (!(await page.isVisible('#sheet')) || info.trim().length < 20) problems.push(`${d.name}: el panel de la línea está vacío`);
+    // Ranking apagado (sin Firebase): el botón abre un aviso, sin errores.
+    await page.click('#ranking-btn');
+    await sleep(400);
+    if (!(await page.isVisible('#ranking .empty'))) problems.push(`${d.name}: el ranking apagado no muestra su aviso`);
     await context.close();
   }
+  // Noche: ?hora=23 oscurece la nave y enciende las luces.
+  const night = await browser.newContext({ viewport: devices[1].viewport, isMobile: true, hasTouch: true });
+  const npage = await night.newPage();
+  npage.on('pageerror', (e) => problems.push(`noche pageerror: ${e.message}`));
+  await npage.goto(`${URL}?hora=23`);
+  await sleep(2000);
+  const op = Number(await npage.getAttribute('#nightR', 'opacity'));
+  if (!(op > 0.3)) problems.push(`noche: la capa nocturna no se activa (opacidad ${op})`);
+  await npage.screenshot({ path: 'smoke/movil-noche.png' });
+  await night.close();
   await browser.close();
 } finally {
   server.kill();

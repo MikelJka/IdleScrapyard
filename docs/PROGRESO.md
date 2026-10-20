@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Prueba de humo más completa
+
+- `scripts/smoke.mjs` ahora comprueba que el panel de la línea muestra su KPI, que el ranking apagado enseña su aviso y que con `?hora=23` se activa la capa nocturna; guarda la captura `movil-noche.png`.
+- Qué probar: nada en el juego; mirar que «Probar y publicar» siga en verde y que aparezca la captura nueva.
+- Sigue: iconos en los estados (accesibilidad), animar el barco, Android (Capacitor) cuando Mikel lo ordene.
+
 ## 2026-10-20 — Iluminación y sombras suaves
 
 - Sombra suave (degradado radial) bajo las máquinas de cada puesto y luz de sol en degradado sobre la nave, de día y de noche. Cambio solo de dibujo (`src/ui/yard.ts`).
