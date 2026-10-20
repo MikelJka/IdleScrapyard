@@ -21,6 +21,7 @@ import {
   lampGlowSvg,
   nightAmount,
   portFrontSvg,
+  shipSvg,
   scaffoldSvg,
   skySvg,
   spotlightsSvg,
@@ -321,6 +322,7 @@ export function createYard(container: HTMLElement): Yard {
     ${staticImage(hallFrameSvg(), ...hallBox)}
     <g id="front"></g>
     <g id="train"></g>
+    <g id="ship"></g>
     ${staticImage(portFrontSvg(), -900, 200, 1800, 760)}
     <polygon points="${boxOutline(HALL.x0, HALL.y0, HALL.x1 - HALL.x0, HALL.y1 - HALL.y0, HALL.wall)}" fill="url(#sun)" pointer-events="none"/>
     <g id="lampglow" opacity="0" pointer-events="none">${lampGlowSvg()}</g>
@@ -388,6 +390,9 @@ export function createYard(container: HTMLElement): Yard {
     const y = PORT.quayY + 1.2 + ((k * 13) % 9);
     return `<polyline class="shimmer" points="${iso(x, y)[0]},${iso(x, y)[1]} ${iso(x + 1.4, y)[0]},${iso(x + 1.4, y)[1]}" stroke="#e6f6ff" stroke-width="1.6" fill="none" style="animation-delay:${(-k * 0.37).toFixed(2)}s"/>`;
   }).join('');
+
+  // Barco: zarpa al enviarse el cargamento y vuelve vacío.
+  const ship = mk(q('ship'), shipSvg());
 
   // Tren de mercancías que pasa de vez en cuando por la vía de delante.
   const train = mk(
@@ -683,6 +688,8 @@ export function createYard(container: HTMLElement): Yard {
 
   let lastDepthOrder = '';
   let lastRailSent = -1;
+  let lastSeaSent = -1;
+  let seaStart = -1e9;
   let railStart = -1e9;
   let lastHourCheck = -1;
   let lastBadgeCheck = -1;
@@ -756,6 +763,13 @@ export function createYard(container: HTMLElement): Yard {
         : 400
       : -48 + ((t % PORT.trainPeriod) / PORT.trainPeriod) * 130;
     train.setAttribute('transform', at(trainPos, 0));
+    // Barco: sale hacia la derecha (6 s), está fuera y vuelve por la izquierda (6 s).
+    const seaSent = state.transports.sea.sent;
+    if (lastSeaSent >= 0 && seaSent > lastSeaSent && t - seaStart >= 14) seaStart = t;
+    lastSeaSent = seaSent;
+    const sa = t - seaStart;
+    const shipX = sa < 0 || sa >= 14 ? 0 : sa < 6 ? (sa / 6) ** 2 * 60 : sa < 8 ? 400 : -60 + (1 - (1 - (sa - 8) / 6) ** 2) * 60;
+    ship.setAttribute('transform', at(shipX, 0));
     // Cielo: nubes y pájaros.
     cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
     birdEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * (16 + i * 3) + i * 520) % 2600) - 1100).toFixed(1)} ${(HORIZON - 120 - i * 34 + Math.sin(t * 1.3 + i) * 10).toFixed(1)})`));

@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — El barco zarpa
+
+- El barco del puerto ya no es decorado fijo: cuando sale el cargamento de la zona 10 se va hacia la derecha, queda fuera unos segundos y vuelve por la izquierda (`shipSvg` en `src/ui/scenery.ts`, animación en `src/ui/yard.ts`).
+- Qué probar: abrir la zona 10 y esperar a que el barco se llene y salga.
+- Sigue: estación propia para las carretillas del anexo y equilibrar tren y barco.
+
 ## 2026-10-20 — Iconos en los estados
 
 - El estado de una línea en su panel lleva un símbolo (▶ trabajando, ✖ sin chatarra, ■ palé lleno) además del color, para no depender solo del color (`src/style.css`).

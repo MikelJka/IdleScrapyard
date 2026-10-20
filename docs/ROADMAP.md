@@ -61,7 +61,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 - [x] Accesibilidad (**hecho: «Texto grande» y «Alto contraste» en ajustes, reducir movimiento**; **hecho también: símbolos ▶ ✖ ■ en los estados**): texto más grande, alto contraste, no depender solo del color (iconos en los estados), reducir movimiento
 - [x] Textos en inglés con selector de idioma
 - [x] Equilibrio con el bot: simulación de jugador hecha (`scripts/balance.ts`), propuesta en la Parte 18; falta que Mikel elija
-- [x] Pedidos especiales y zonas 9-10 con tren y barco (primera parte; falta animar el barco y equilibrar)
+- [x] Pedidos especiales y zonas 9-10 con tren y barco (barco animado; falta estación propia en el anexo y equilibrar)
 - [x] Pruebas: la prueba de humo comprueba el panel por línea, el ranking apagado y la noche (**hecho**; los tests de interfaz sencillos quedan para más adelante)
 
 ## Fase 3 — Android y monetización

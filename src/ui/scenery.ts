@@ -297,10 +297,9 @@ export function terrainSvg(): string {
   return s;
 }
 
-/** Puerto por delante: grúa pórtico sobre la vía y barco con contenedores. */
-export function portFrontSvg(): string {
+/** Barco con contenedores (se anima aparte: zarpa al enviar el cargamento). */
+export function shipSvg(): string {
   let s = '';
-  // Barco.
   const sy = PORT.quayY + 1.8;
   s += block(2, sy, -0.5, 22, 3.2, 1.5, '#394b61');
   s += block(24, sy + 0.4, -0.5, 1.6, 2.4, 1.0, '#394b61');
@@ -309,6 +308,12 @@ export function portFrontSvg(): string {
   const r = lcg(9);
   for (let i = 0; i < 6; i++) for (let j = 0; j < 2; j++) for (let k = 0; k < 1 + Math.floor(r() * 3); k++) s += block(2.6 + i * 2.2, sy + 0.3 + j * 1.45, 1.15 + k * 0.62, 2.0, 1.3, 0.6, cols[Math.floor(r() * cols.length)]);
   s += block(20.5, sy + 0.5, 1.15, 2.6, 2.2, 2.6, '#e8e0d0') + block(20.7, sy + 0.7, 3.75, 2.2, 1.8, 0.5, '#cfd8dc') + cyl(21.3, sy + 1.6, 4.2, 0.28, 0.9, '#c0392b');
+  return s;
+}
+
+/** Puerto por delante: grúa pórtico sobre la vía. */
+export function portFrontSvg(): string {
+  let s = '';
   // Grúa pórtico que cruza la vía.
   const cx = 11;
   const legs: [number, number][] = [[cx, 21.5], [cx + 3.2, 21.5], [cx, 24.2], [cx + 3.2, 24.2]];
