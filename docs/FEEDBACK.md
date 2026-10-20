@@ -41,8 +41,8 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 - [x] **Textos en inglés (N3)** (2026-10-20): selector Español/English en ajustes (por defecto el idioma del navegador); todos los textos, nombres de zonas, ayudantes y logros traducidos; una prueba exige que no falte ninguna traducción. **Hecho.**
 
 - [x] **Equilibrio B1b y B2a** (2026-10-20, Mikel): abrir las zonas 3 y 4 cuesta un 50 % más (90 000 $ y 4 500 000 $; la zona 4 llega a ~4,3 h jugando sin parar) y el nivel de máquina crece ×2,2 por nivel en vez de ×4 (el nivel 30 pasa a ser alcanzable). **Hecho.**
-- [ ] **Pedidos especiales (B3-a)** (2026-10-20, Mikel): aprobado; faltan los números, ver Parte 21.
-- [ ] **Zonas nuevas con tren y barco (B3-c)** (2026-10-20, Mikel): 2 líneas más, con carga en el tren y en el barco del fondo; faltan detalles, ver Parte 21.
+- [ ] **Pedidos especiales (B3-a)** (2026-10-20, Mikel): aprobado; faltan los números, ver Parte 22.
+- [ ] **Zonas nuevas con tren y barco (B3-c)** (2026-10-20, Mikel): 2 líneas más, con carga en el tren y en el barco del fondo; faltan detalles, ver Parte 22 (y la 21).
 - [x] **Nombre global (G2)** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» en título, pantalla de carga, manifest, cartel del mapa y documentación; el repositorio y las claves de guardado conservan «chatarrero» para no romper partidas. **Hecho.**
 - [x] **Material de anuncio (M1-M4)** (2026-10-20, Mikel): `scripts/marketing/index.mjs` genera en `public/press/` (se publica en `/press/`): 12 capturas 1080×1920 con rótulo (6 en español, 6 en inglés), gráfico de función 1024×500, iconos (normal, adaptable, monocromo, SVG y rótulo), dos vídeos verticales de ~27 s sin sonido y la página de prensa; textos de la ficha en `docs/FICHA_TIENDA.md`. **Hecho.**
 - [x] **Carretillas de las líneas muy mejoradas** (2026-10-20, Mikel: «solo aparecen llegando al puesto de carga en bucle»; las de una línea nueva iban bien): causa en el dibujo: cada carretilla visible seguía al viaje más viejo de su línea, y con muchas carretillas ese viaje siempre estaba a punto de acabar. Ahora cada carretilla sigue a su viaje hasta el final, y libre espera junto al palé y coge solo viajes recién salidos. **Hecho.**
@@ -63,9 +63,9 @@ Todo lo aprobado está hecho salvo «pulir» y comprobar la web en el móvil. Pa
 
 Responde con las letras (p. ej. «N1N4»).
 
-### Parte 21 — Pedidos especiales y las dos zonas de tren y barco (2026-10-20)
+### Parte 22 — Pedidos especiales y las dos zonas de tren y barco (2026-10-20)
 
-Entendido: B1b, B2a, B3-a y B3-c. Para no inventar números, necesito cuatro cosas:
+Se cruza con la Parte 21 (F1-F5, transporte ferroviario y marítimo): las dos cosas hablan del tren y del barco del fondo, así que conviene decidirlas juntas. Entendido: B1b, B2a, B3-a y B3-c. Para no inventar números, necesito cuatro cosas:
 
 **1. Las zonas nuevas.** Dices «coches que se cargan en el tren» y «otro material que se carga en el barco». Hoy la zona 8 ya es «Coches reconstruidos» y sale en el camión. ¿Cuál de estas lecturas es la tuya?
 - **Z1 —** Zona 9 = **Vagones** (o coches clásicos) que salen solo en el **tren** del fondo, y zona 10 = **Contenedores** (o motores navales) que salen solo en el **barco**. La zona 8 sigue en el camión.
