@@ -1,5 +1,6 @@
 // Chatarrería en vista isométrica (2D con bloques que parecen 3D). Solo lee el estado de la simulación.
 // Fondo: carretera con los camiones de chatarra. Centro: las líneas de cada zona. Frente: muelle y camiones de expedición.
+import { t as tr, zoneName, zoneProduct } from './texts';
 import { ECONOMY, ZONES, dockLoad, purchases, scrapPerSecond, zoneCapacity, zoneRate, zoneStatus, type GameState, type ZoneDef } from '../sim/game';
 import { block, iso, shade, tile, wheel } from './iso';
 import { HELPER_LOOKS, ZONE_LOOKS, type HelperLook } from './look';
@@ -399,7 +400,7 @@ export function createYard(container: HTMLElement): Yard {
   pile.setAttribute('transform', at(PILE.x, PILE.y));
   const pileBody = pile.querySelector<SVGGElement>('.pile-body')!;
   const pileLabel = mk(labels, '', 'tag');
-  const hint = mk(labels, `<rect x="-36" y="-12" width="72" height="20" rx="10" fill="#fff6e0" stroke="#2a1d14" stroke-width="1.2"/><text y="2.5" text-anchor="middle" font-size="10" font-weight="800" fill="#2a1d14">¡TÓCAME!</text>`, 'hint');
+  const hint = mk(labels, `<rect x="-36" y="-12" width="72" height="20" rx="10" fill="#fff6e0" stroke="#2a1d14" stroke-width="1.2"/><text y="2.5" text-anchor="middle" font-size="10" font-weight="800" fill="#2a1d14">${tr('map.touchMe')}</text>`, 'hint');
   hint.setAttribute('pointer-events', 'none');
   {
     const [x, y] = iso(PILE.x + 0.8, PILE.y + 0.8, 2.6);
@@ -621,7 +622,7 @@ export function createYard(container: HTMLElement): Yard {
       l.stat = l.cnt = null;
       const [x, y] = iso(st.x + SIZE / 2, st.y + SIZE / 2, 0.4);
       l.label.innerHTML = `<g transform="translate(${x} ${y})" opacity="${isNext ? 1 : 0.6}"><rect x="-10" y="-5" width="20" height="15" rx="3" fill="#c9a24a" stroke="#2a1d14"/><path d="M-6 -5 V-9 Q0 -16 6 -9 V-5" stroke="#2a1d14" stroke-width="2.2" fill="none"/>
-        ${isNext ? `<text y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.name}</text><text y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke">$${fmtShort(l.def.unlockCost)}</text>` : `<text y="24" text-anchor="middle" font-size="9" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">Próximamente</text>`}</g>`;
+        ${isNext ? `<text y="26" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${zoneName(l.def)}</text><text y="40" text-anchor="middle" font-size="11" font-weight="900" fill="#ffd76a" stroke="#2a1d14" stroke-width="3" paint-order="stroke">$${fmtShort(l.def.unlockCost)}</text>` : `<text y="24" text-anchor="middle" font-size="9" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${tr('map.soon')}</text>`}</g>`;
       return;
     }
     l.floor.innerHTML =
@@ -651,8 +652,8 @@ export function createYard(container: HTMLElement): Yard {
     l.machines.innerHTML = `<g transform="${at(st.x, st.y)}">${machines}</g>`;
     l.worker.innerHTML = `<g transform="scale(1.45)">${personIso(HELPER_LOOKS[l.def.helper.id])}</g>`;
     const [lx, ly] = iso(st.x + 0.3, st.y + SIZE + 0.2);
-    const extra = zone.machines > 1 ? ` · ${zone.machines} máq.` : '';
-    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${l.def.product}${extra}</text></g>
+    const extra = zone.machines > 1 ? ` · ${zone.machines} ${tr('map.machShort')}` : '';
+    l.label.innerHTML = `<g transform="translate(${lx} ${ly})"><text text-anchor="middle" font-size="10" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${zoneProduct(l.def)}${extra}</text></g>
       <g class="lvl" transform="translate(${iso(st.x + 1.3, st.y + 2.3, 2.75)[0]} ${iso(st.x + 1.3, st.y + 2.3, 2.75)[1]})"><rect x="-17" y="-9" width="34" height="15" rx="7.5" fill="#2a1d14" opacity="0.85"/><text y="2.5" text-anchor="middle" font-size="9" font-weight="900" fill="#ffd76a"></text></g>`;
     l.palletShown = -1;
     l.press = [...l.machines.querySelectorAll<SVGElement>('.press')];
@@ -741,7 +742,7 @@ export function createYard(container: HTMLElement): Yard {
     const s = 0.85 + Math.min(0.3, Math.log10(1 + state.scrap) / 10);
     pileBody.setAttribute('transform', `scale(${s.toFixed(3)})`);
     const [plx, ply] = iso(PILE.x + 1.8, PILE.y + 2.6, 0);
-    pileLabel.innerHTML = `<text x="${plx}" y="${ply}" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${state.scrap >= 1 ? `${fmtShort(state.scrap)} chatarra` : `+${fmtShort(scrapPerSecond(state))}/s`}</text>`;
+    pileLabel.innerHTML = `<text x="${plx}" y="${ply}" text-anchor="middle" font-size="11" font-weight="900" fill="#fff6e0" stroke="#2a1d14" stroke-width="3" paint-order="stroke">${state.scrap >= 1 ? tr('map.scrapPile', { n: fmtShort(state.scrap) }) : `+${fmtShort(scrapPerSecond(state))}/s`}</text>`;
     hint.setAttribute('visibility', state.scrapTrucks === 0 ? 'visible' : 'hidden');
 
     // Camiones de chatarra: llegan por detrás, maniobran hasta la pila, vuelcan la caja y se van vacíos.
@@ -826,7 +827,7 @@ export function createYard(container: HTMLElement): Yard {
       }
       if (l.torso) l.torso.style.translate = `0 ${(-2 * l.level * (0.5 + 0.5 * Math.sin(l.phase * 1.3))).toFixed(2)}px`;
       const lvl = l.label.querySelector('.lvl text');
-      const txt = `Nv ${zone.helperLevel}`;
+      const txt = `${tr('lvl')} ${zone.helperLevel}`;
       if (lvl && lvl.textContent !== txt) lvl.textContent = txt;
       const status = zoneStatus(state, l.def);
       const rate = zoneRate(l.def, zone);

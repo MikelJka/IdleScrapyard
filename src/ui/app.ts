@@ -33,7 +33,7 @@ import { createYard, machineGrade } from './yard';
 import { buyPass, showRewardedAd } from './ads';
 import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/offline';
 import { fromCode, toCode } from '../sim/transfer';
-import { t } from './texts';
+import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
 import { buzz, isMuted, play, setMuted } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
@@ -106,6 +106,10 @@ export function startApp(root: HTMLElement): void {
         <div id="shop"></div>
         <div id="ranking" hidden></div>
         <div id="achieve" hidden></div>
+        <div id="lang" hidden>
+          <b>${t('settings.language')}</b>
+          <div><button type="button" data-lang="es" ${getLang() === 'es' ? 'aria-pressed="true"' : ''}>Español</button><button type="button" data-lang="en" ${getLang() === 'en' ? 'aria-pressed="true"' : ''}>English</button></div>
+        </div>
         <div id="transfer" hidden>
           <b>${t('transfer.title')}</b>
           <small>${t('transfer.help')}</small>
@@ -220,13 +224,15 @@ export function startApp(root: HTMLElement): void {
     if (sel === 'ranking') return t('ranking.title');
     if (sel === 'dock') return t('panel.dock');
     if (sel === 'trucks') return t('panel.trucks');
-    return ZONES.find((z) => z.id === sel)?.name ?? '';
+    const z = ZONES.find((x) => x.id === sel);
+    return z ? zoneName(z) : '';
   };
   const openPanel = (sel: string | null) => {
     panel = sel;
     lastShop = lastInfo = '';
     $('sheet').hidden = sel === null;
     $('transfer').hidden = sel !== 'settings';
+    $('lang').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -243,11 +249,18 @@ export function startApp(root: HTMLElement): void {
     if (tut === 1 && sel === 'crusher' && panel !== sel) setTut(2);
     openPanel(panel === sel ? null : sel);
   });
+  $('lang').addEventListener('click', (e) => {
+    const next = (e.target as HTMLElement).closest<HTMLElement>('button[data-lang]')?.dataset.lang as Lang | undefined;
+    if (!next || next === getLang()) return;
+    setLang(next);
+    writeSave(state);
+    location.reload();
+  });
   $('settings').addEventListener('click', () => openPanel(panel === 'settings' ? null : 'settings'));
   $('ranking-btn').addEventListener('click', () => openPanel(panel === 'ranking' ? null : 'ranking'));
 
   function drawAchievements(): void {
-    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '★' : '○'} ${esc(a.name)}</li>`).join('')}</ul>`;
+    $('achieve').innerHTML = `<b>${t('achieve.title', { n: state.achievements.length, total: ACHIEVEMENTS.length })}</b><ul>${ACHIEVEMENTS.map((a) => `<li class="${state.achievements.includes(a.id) ? 'got' : ''}">${state.achievements.includes(a.id) ? '★' : '○'} ${esc(achievementName(a))}</li>`).join('')}</ul>`;
   }
   async function drawRanking(): Promise<void> {
     const box = $('ranking');
@@ -457,7 +470,7 @@ export function startApp(root: HTMLElement): void {
     renderTip();
     celebrateLevels();
     for (const a of checkAchievements(state)) {
-      toast(t('achieve.got', { name: a.name }), 'medal');
+      toast(t('achieve.got', { name: achievementName(a) }), 'medal');
       play('reward');
     }
     if (panel === null || panel === 'settings') return;
@@ -473,8 +486,8 @@ export function startApp(root: HTMLElement): void {
     const shop = mine
       .map((p) => {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
-        const name = p.kind === 'helper' ? t('buy.helper', { helper: def!.helper.name }) : t('buy.' + p.kind);
-        const sub = p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? def.product : def.name) : t('sub.' + p.kind);
+        const name = p.kind === 'helper' ? t('buy.helper', { helper: helperName(def!) }) : t('buy.' + p.kind);
+        const sub = p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? zoneProduct(def) : zoneName(def)) : t('sub.' + p.kind);
         const cls = p.kind === 'unlock' ? 'unlock' : p.kind === 'helper' ? 'helper' : '';
         return `<button type="button" class="${cls}" data-id="${p.id}" ${p.cost > state.dollars ? 'disabled' : ''}>${shopIcon(p.kind, p.zoneId)}<span class="what"><b>${name}</b><small>${sub}</small></span><span class="price">$${fmt(p.cost)}</span></button>`;
       })
@@ -491,9 +504,9 @@ export function startApp(root: HTMLElement): void {
     const goal = currentGoal(state);
     const goalTxt =
       goal.kind === 'unlock'
-        ? t('goal.unlock', { name: ZONES.find((z) => z.id === goal.zoneId)!.name, cost: fmt(goal.cost), left: fmt(Math.max(0, goal.cost - state.dollars)) })
+        ? t('goal.unlock', { name: zoneName(ZONES.find((z) => z.id === goal.zoneId)!), cost: fmt(goal.cost), left: fmt(Math.max(0, goal.cost - state.dollars)) })
         : goal.kind === 'machineLevel'
-          ? t('goal.level', { name: ZONES.find((z) => z.id === goal.zoneId)!.name, level: goal.level, cost: fmt(goal.cost) })
+          ? t('goal.level', { name: zoneName(ZONES.find((z) => z.id === goal.zoneId)!), level: goal.level, cost: fmt(goal.cost) })
           : '';
     const html = goalTxt ? `<span class="goal">${inlineIcon('target', goalTxt)}</span>` : '';
     if (html !== lastStats) {
@@ -535,10 +548,10 @@ export function startApp(root: HTMLElement): void {
     const status = zoneStatus(state, def);
     const jam = bottleneck(state);
     const ready = helperLevelsReady(zone);
-    return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${def.helper.name}</b> · Nv ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${def.helper.bio}</small></div></div>
+    return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${helperName(def)}</b> · ${t('lvl')} ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${helperBio(def)}</small></div></div>
       <ul class="rows">
         <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
-        <li>${t('info.rate')}: <b>${fmt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (Nv ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
+        <li>${t('info.rate')}: <b>${fmt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (${t('lvl')} ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
         <li>${t('info.carts', { n: zone.carts, batch: cartBatch(zone), trip: ECONOMY.carts.tripSeconds })}</li>
         <li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>
         <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: fmt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>

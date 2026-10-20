@@ -41,6 +41,12 @@ const es: Record<string, string> = {
   'pass.fakeConfirm': 'Versión de prueba: ¿activar el Pase de chatarrero ({price} €) sin pagar?',
   'ad.fake': 'Anuncio de prueba…',
   'settings.title': 'Ajustes',
+  'settings.language': 'Idioma',
+  lvl: 'Nv',
+  'map.touchMe': '¡TÓCAME!',
+  'map.soon': 'Próximamente',
+  'map.scrapPile': '{n} chatarra',
+  'map.machShort': 'máq.',
   'ranking.title': 'Ranking mundial',
   'ranking.off': 'El ranking se activará pronto.',
   'ranking.nick': 'Tu apodo (3-16)',
@@ -89,7 +95,203 @@ const es: Record<string, string> = {
   'status.locked': 'Cerrada',
 };
 
+/** Inglés. Lo que no esté aquí se muestra en español; los nombres del contenido (`zone.*`, `helper.*`, `ach.*`) se traducen aquí por id. */
+const en: Record<string, string> = {
+  welcomeBack: 'While you were away ({minutes} min) you earned ${dollars}.',
+  'buy.scrapTruck': 'Scrap truck',
+  'buy.carts': 'Extra forklift',
+  'buy.cartLevel': 'Forklift load',
+  'buy.dock': 'More dock capacity',
+  'buy.speed': 'Speed',
+  'buy.capacity': 'Capacity',
+  'buy.machines': 'Extra machine',
+  'buy.machineLevel': 'Machine level',
+  'buy.helper': 'Level up {helper}',
+  'buy.unlock': 'Open new zone',
+  'shop.title': 'Upgrades',
+  close: 'Close',
+  'transfer.title': 'Game on another device',
+  'transfer.help': 'Copy the code here and paste it on the other device.',
+  'transfer.copy': 'Copy code',
+  'transfer.paste': 'Paste code',
+  'transfer.copied': 'Code copied. Paste it on the other device with “Paste code”.',
+  'transfer.copyManual': 'Copy this code:',
+  'transfer.pastePrompt': 'Paste the code from your other game here:',
+  'transfer.invalid': 'That code is not valid.',
+  'transfer.confirm': 'This will replace the game on this device with the one in the code. Sure?',
+  'sound.on': 'Mute',
+  'sound.off': 'Unmute',
+  'boost.short': '×2 · 30 min',
+  'boost.activeShort': '×2 · {minutes} min',
+  'boost.waitShort': '{minutes} min',
+  'offline.double': '×2 · +${dollars}',
+  'offline.recover': 'Recover {hours} h · +${dollars}',
+  incomeRate: '{n} $/s',
+  'daily.short': 'Day {day}',
+  'daily.doneShort': 'Tomorrow',
+  'pass.short': 'Pass',
+  'pass.ownedShort': 'Pass',
+  'sub.scrapTruck': 'Brings scrap by itself',
+  'sub.carts': 'Another forklift for this line',
+  'sub.cartLevel': '+5 parts per trip',
+  'sub.dock': 'Trucks carry more',
+  'pass.fakeConfirm': 'Test version: activate the Scrapper Pass ({price} €) without paying?',
+  'ad.fake': 'Test ad…',
+  'settings.title': 'Settings',
+  'settings.language': 'Language',
+  lvl: 'Lv',
+  'ranking.title': 'World ranking',
+  'ranking.off': 'The ranking will be switched on soon.',
+  'ranking.nick': 'Your nickname (3-16)',
+  'ranking.save': 'Save',
+  'ranking.loading': 'Loading…',
+  'ranking.empty': 'Nobody yet. Be the first!',
+  'ranking.error': 'The ranking could not be loaded. Try later.',
+  'ranking.badNick': 'The nickname must be 3 to 16 letters or numbers.',
+  'achieve.title': 'Achievements {n}/{total}',
+  'achieve.got': 'Achievement: {name}',
+  'goal.unlock': 'Open {name}: ${cost} (${left} to go)',
+  'goal.level': '{name}: machine level {level} (next ${cost})',
+  tip: 'Tap a station to upgrade it',
+  'tut.tap': 'Tap the scrap pile ({n}/5)',
+  'tut.money': 'Keep tapping: get $10',
+  'tut.station': 'Tap the “Crushing” station to upgrade it',
+  'tut.buy': 'Buy an upgrade',
+  'tut.close': 'Close the panel and watch the factory work',
+  'panel.dock': 'Dock',
+  'panel.trucks': 'Scrap trucks',
+  'panel.empty': 'Nothing to buy here for now.',
+  'info.scrapFlow': 'Scrap: {in}/s coming in · pile {pile} · this line could crush {cap}/s',
+  'info.stock': 'Pallets {pallets} · dock {dock}/{load}',
+  'jam.scrap': 'out of scrap',
+  'jam.carts': 'pallets full: forklifts are short',
+  'level.helper': 'Helper',
+  'level.speed': 'Speed',
+  'level.capacity': 'Capacity',
+  'level.machines': 'Machines',
+  'level.machineLevel': 'Machine',
+  levelUp: '{what} level {n}!',
+  'info.dock': 'Each outgoing truck carries {load} units. Forklifts are upgraded on each line.',
+  'info.trucks': 'Scrap trucks: {n}. They bring scrap on their own.',
+  'info.locked': 'Zone closed. Opening it costs ${cost}.',
+  'info.state': 'Status',
+  'info.rate': 'Makes',
+  'info.machines': 'mach.',
+  'info.grade': 'grade',
+  'info.carts': 'Forklifts: {n}, {batch} parts per trip (each trip takes {trip} s)',
+  'info.pallet': 'Pallet',
+  'info.dockHas': 'On the dock',
+  'info.nextGrade': '{n} machine levels left until it transforms.',
+  'status.working': 'Working',
+  'status.starved': 'Out of scrap',
+  'status.full': 'Pallet full (forklifts are short)',
+  'status.locked': 'Closed',
+  'map.touchMe': 'TAP ME!',
+  'map.soon': 'Coming soon',
+  'map.scrapPile': '{n} scrap',
+  'map.machShort': 'mach.',
+  'zone.crusher.name': 'Scrap crushing',
+  'zone.crusher.product': 'Scrap blocks',
+  'zone.smelter.name': 'Scrap smelting',
+  'zone.smelter.product': 'Scrap ingots',
+  'zone.sheet.name': 'Sheet rolling',
+  'zone.sheet.product': 'Sheet metal',
+  'zone.pipes.name': 'Pipe shop',
+  'zone.pipes.product': 'Pipes',
+  'zone.beams.name': 'Beam shop',
+  'zone.beams.product': 'Beams',
+  'zone.engine-parts.name': 'Engine parts lathe',
+  'zone.engine-parts.product': 'Engine parts',
+  'zone.engines.name': 'Engine assembly',
+  'zone.engines.product': 'Engines',
+  'zone.cars.name': 'Rebuilt car shop',
+  'zone.cars.product': 'Rebuilt cars',
+  'helper.tuerca.name': 'Nut',
+  'helper.tuerca.bio': 'Crushes anything with a smile; says everything fits if you squeeze hard enough.',
+  'helper.chispa.name': 'Spark',
+  'helper.chispa.bio': 'Has smelted scrap since she was little and has not burnt an eyebrow… of the two she has left.',
+  'helper.yunque.name': 'Anvil',
+  'helper.yunque.bio': 'Quiet and huge; speaks in hammer blows and everyone understands.',
+  'helper.codo.name': 'Elbow',
+  'helper.codo.bio': 'A plumber all his life; fixes any problem with a pipe and duct tape.',
+  'helper.grua.name': 'Crane',
+  'helper.grua.bio': 'Lifts beams with a crane made of bed springs and is very proud of it.',
+  'helper.piston.name': 'Piston',
+  'helper.piston.bio': 'Nervous and super fast; never sits still, not even asleep.',
+  'helper.bujia.name': 'Plug',
+  'helper.bujia.bio': 'Brags about starting any engine first try (keeps the count on the wall).',
+  'helper.turbo.name': 'Turbo',
+  'helper.turbo.bio': 'Used to race scrap cars; now rebuilds them and tests them flat out.',
+  'ach.earned1k': 'First thousand',
+  'ach.earned1m': 'Scrap millionaire',
+  'ach.earned1b': 'Scrapyard tycoon',
+  'ach.zones2': 'Second line',
+  'ach.zones4': 'Half a factory',
+  'ach.zones8': 'Full factory',
+  'ach.ml5': 'Machine grade 1',
+  'ach.ml15': 'Machine grade 3',
+  'ach.ml30': 'Legendary machine',
+  'ach.carts5': 'Forklift fleet',
+  'ach.helper10': 'Veteran helper',
+  'ach.machines9': 'Hall full of machines',
+};
+
+export type Lang = 'es' | 'en';
+const LANG_KEY = 'chatarrero.lang';
+
+function detectLang(): Lang {
+  try {
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved === 'es' || saved === 'en') return saved;
+  } catch {
+    /* sin almacenamiento: se usa el idioma del navegador */
+  }
+  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('es') ? 'es' : 'en';
+}
+
+let lang: Lang = detectLang();
+if (typeof document !== 'undefined') document.documentElement.lang = lang;
+
+export function getLang(): Lang {
+  return lang;
+}
+
+/** Cambia el idioma y lo recuerda; la pantalla se recarga para dibujarla de nuevo. */
+export function setLang(next: Lang): void {
+  lang = next;
+  try {
+    localStorage.setItem(LANG_KEY, next);
+  } catch {
+    /* sin almacenamiento: vale solo para esta sesión */
+  }
+}
+
 export function t(key: string, vars: Record<string, string | number> = {}): string {
-  const text = es[key] ?? key;
+  const text = (lang === 'en' ? en[key] : undefined) ?? es[key] ?? key;
   return text.replace(/\{(\w+)\}/g, (_, k: string) => String(vars[k] ?? ''));
+}
+
+interface Named {
+  id: string;
+  name: string;
+}
+/** Nombre de contenido en el idioma actual: la traducción por id si existe y, si no, el del JSON (español). */
+function named(prefix: string, id: string, field: string, fallback: string): string {
+  return (lang === 'en' ? en[`${prefix}.${id}.${field}`] : undefined) ?? fallback;
+}
+export const zoneName = (z: Named): string => named('zone', z.id, 'name', z.name);
+export const zoneProduct = (z: Named & { product: string }): string => named('zone', z.id, 'product', z.product);
+export const helperName = (z: { helper: { id: string; name: string } }): string => named('helper', z.helper.id, 'name', z.helper.name);
+export const helperBio = (z: { helper: { id: string; bio: string } }): string => named('helper', z.helper.id, 'bio', z.helper.bio);
+export const achievementName = (a: Named): string => (lang === 'en' ? en[`ach.${a.id}`] : undefined) ?? a.name;
+
+/** Claves del español que faltan en inglés (las pruebas exigen que no falte ninguna). */
+export function missingEnglish(): string[] {
+  return Object.keys(es).filter((k) => !(k in en));
+}
+
+/** Ids de contenido (zonas, ayudantes, logros) sin traducción al inglés. */
+export function missingEnglishContent(zones: { id: string; helper: { id: string } }[], achievements: { id: string }[]): string[] {
+  const keys = [...zones.flatMap((z) => [`zone.${z.id}.name`, `zone.${z.id}.product`, `helper.${z.helper.id}.name`, `helper.${z.helper.id}.bio`]), ...achievements.map((a) => `ach.${a.id}`)];
+  return keys.filter((k) => !(k in en));
 }
