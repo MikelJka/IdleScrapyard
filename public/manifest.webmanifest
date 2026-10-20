@@ -1,7 +1,7 @@
 {
-  "name": "Chatarrero",
-  "short_name": "Chatarrero",
-  "description": "Juego incremental de desguace. Zenit Studio.",
+  "name": "Scrap Empire: Idle Factory",
+  "short_name": "Scrap Empire",
+  "description": "Idle scrapyard factory game / juego incremental de desguace. Zenit Studio.",
   "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",

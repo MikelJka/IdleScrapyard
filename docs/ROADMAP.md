@@ -72,7 +72,7 @@ Terminado: el juego está en la prueba cerrada de Google Play con anuncios de pr
 - [ ] Anuncios reales con AdMob y compra del pase con Google Play Billing
 - [ ] Consentimiento de anuncios (UE) y política de privacidad
 - [x] Textos en inglés
-- [ ] Ficha de la tienda: textos, icono y capturas
+- [ ] Ficha de la tienda (**hecho: textos, icono, capturas, gráfico y vídeo en `docs/FICHA_TIENDA.md` y `/press/`**; falta política de privacidad y clasificación)
 
 ## Fase 4 — Publicación
 

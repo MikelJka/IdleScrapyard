@@ -1,4 +1,4 @@
-# Chatarrero (Idle Scrapyard)
+# Scrap Empire (Idle Scrapyard)
 
 Juego incremental (idle) para Android de **Zenit Studio**.
 

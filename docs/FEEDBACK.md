@@ -40,6 +40,9 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 - [x] **Rendimiento (N4)** (2026-10-20): medido con `scripts/perf.mjs` (CPU ×4, partida de 2 días): el coste es dibujar el SVG (el 90 %; el código del juego, un 7 %), sobre todo las 5 400 piezas de máquinas y trabajadores. Ahora: las líneas fuera de la pantalla no se animan, la escena se redibuja a 30/s en táctiles (y a 20/s si va justo), y hay «Calidad baja» (sin nubes, pájaros, autopista, tren ni animaciones CSS y bordes sin suavizar) que se activa sola tras 3 s a menos de ~22 fps y se puede fijar en ajustes. Resultado en la prueba lenta: de ~11 a ~25 fps. **Hecho**; si siguen los parpadeos en el móvil, el siguiente paso es dibujar las máquinas en `<canvas>` (aviso de Mikel).
 - [x] **Textos en inglés (N3)** (2026-10-20): selector Español/English en ajustes (por defecto el idioma del navegador); todos los textos, nombres de zonas, ayudantes y logros traducidos; una prueba exige que no falte ninguna traducción. **Hecho.**
 
+- [x] **Nombre global (G2)** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» en título, pantalla de carga, manifest, cartel del mapa y documentación; el repositorio y las claves de guardado conservan «chatarrero» para no romper partidas. **Hecho.**
+- [x] **Material de anuncio (M1-M4)** (2026-10-20, Mikel): `scripts/marketing/index.mjs` genera en `public/press/` (se publica en `/press/`): 12 capturas 1080×1920 con rótulo (6 en español, 6 en inglés), gráfico de función 1024×500, iconos (normal, adaptable, monocromo, SVG y rótulo), dos vídeos verticales de ~27 s sin sonido y la página de prensa; textos de la ficha en `docs/FICHA_TIENDA.md`. **Hecho.**
+
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
@@ -71,7 +74,7 @@ Opciones (responde con las letras):
 - **B2 — Máquinas:** (a) crecimiento ×4 → ×2,2 (el nivel 30 cuesta ~5e12 $, alcanzable en 1-2 meses); (b) dejar ×4 y bajar el logro a nivel 15; (c) otra idea.
 - **B3 — Más estímulos (entretenimiento):** (a) **Pedidos especiales** cada ~15 min (entrega 50 bloques en 2 min → premio doble); (b) **cofre de hito por hora jugada** con premio sorpresa; (c) **zonas 9-12** más allá de los coches (reconstruidos → motos, barcos, aviones, trenes), cada una con ayudante; (d) **objetivos diarios** (3 al día) con premio; (e) **camión VIP** que aparece sin anuncio y paga mucho si se toca a tiempo. Mi recomendación: a + b + c.
 
-### Parte 19 — Nombre global (2026-10-20)
+### Parte 19 — Nombre global (2026-10-20) — decidido: G2, «Scrap Empire: Idle Factory» (hecho)
 
 «Chatarrero» solo se entiende en español. Google Play permite un título distinto por idioma, así que se puede mantener «Chatarrero» en español y poner uno global en inglés, o cambiar todo. Opciones (hay que comprobar que no estén ocupadas en Play y como marca antes de decidir):
 
@@ -83,7 +86,7 @@ Opciones (responde con las letras):
 
 Elige letra; el logo universal (sin texto, solo el icono) sirve con cualquiera.
 
-### Parte 20 — Material para anunciar el juego (2026-10-20, N5)
+### Parte 20 — Material para anunciar el juego (2026-10-20, N5) — decidido: M1, M2, M3 y M4 (hecho, ver Pendiente)
 
 Todo a coste cero y generado por código desde el propio juego (Playwright + SVG), en español e inglés:
 

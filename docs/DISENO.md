@@ -124,3 +124,5 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 - Hito cada 5 niveles de máquina: premio único de 10 minutos de producción de la línea; la máquina cambia de grado (máximo 6).
 - Objetivo a la vista y logros permanentes (sin misiones diarias).
 - Calidad profesional como línea de trabajo (Fase 2b del roadmap).
+
+- **Nombre global** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» (opción G2).

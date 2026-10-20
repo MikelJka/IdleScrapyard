@@ -1,6 +1,6 @@
-# Chatarrero (Idle Scrapyard) — instrucciones para Claude
+# Scrap Empire: Idle Factory (antes Chatarrero) — instrucciones para Claude
 
-Juego incremental (idle) para Android de **Zenit Studio** (el estudio de Mikel). Se juega a ratos con una mano, en vertical. `docs/DISENO.md` es la estructura genérica de un juego idle; el diseño concreto se decide con Mikel en «Propuestas para Mikel» de `docs/FEEDBACK.md` y lo aprobado se resume en la sección «Decidido» de DISENO.md.
+Juego incremental (idle) para Android (nombre global decidido por Mikel el 2026-10-20: «Scrap Empire: Idle Factory»; el repositorio y las claves de guardado conservan «chatarrero») de **Zenit Studio** (el estudio de Mikel). Se juega a ratos con una mano, en vertical. `docs/DISENO.md` es la estructura genérica de un juego idle; el diseño concreto se decide con Mikel en «Propuestas para Mikel» de `docs/FEEDBACK.md` y lo aprobado se resume en la sección «Decidido» de DISENO.md.
 
 Idioma: el código (nombres de variables, funciones, tipos) en inglés; comentarios, textos del juego, commits y documentación en español. Los textos del juego pasarán por un archivo de traducciones para poder sacarlo también en inglés.
 

@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Scrap Empire y material de anuncio
+
+- Mikel eligió G2 y M1-M4. El juego pasa a llamarse «Scrap Empire: Idle Factory» (título, carga, manifest, cartel del mapa). Las etiquetas «Muelle y carretillas» y «Camiones de chatarra» del mapa estaban sin traducir: arreglado.
+- `scripts/marketing/index.mjs` (necesita el build hecho, Chromium y ffmpeg) genera `public/press/`: capturas con rótulos (es/en), gráfico de función, iconos, vídeos (fotogramas del navegador unidos con ffmpeg) y página de prensa. Textos de la ficha en `docs/FICHA_TIENDA.md`.
+- Qué probar: abrir `/press/` en la web publicada y ver el vídeo en el móvil.
+- Sigue abierto: B1-B3 de la Parte 18 (equilibrio y estímulos).
+
 ## 2026-10-20 — Logística visible (L1)
 
 - Fase 2b: la caja del camión de expedición se llena con lo que hay en cada huella del muelle (en proporción) en vez de repartir los productos a partes iguales; al salir conserva su carga. Las huellas y las carretillas con carga ya estaban hechas.

@@ -238,7 +238,7 @@ function billboard(x: number, y: number): string {
     block(x + 0.3, y, 0, 0.14, 0.14, 2.3, '#4a4a4a') +
     block(x + 4.2, y, 0, 0.14, 0.14, 2.3, '#4a4a4a') +
     block(x, y, 2.0, 4.6, 0.2, 1.5, '#2f6fb3') +
-    `<g transform="matrix(28 14 0 -20 ${(-py * 28).toFixed(1)} ${(py * 14).toFixed(1)})"><text transform="translate(${x + 0.3} 2.5) scale(1 -1)" font-size="0.62" font-weight="900" fill="#fff6e0" font-family="sans-serif">CHATARRERO</text></g>`
+    `<g transform="matrix(28 14 0 -20 ${(-py * 28).toFixed(1)} ${(py * 14).toFixed(1)})"><text transform="translate(${x + 0.3} 2.5) scale(1 -1)" font-size="0.62" font-weight="900" fill="#fff6e0" font-family="sans-serif">SCRAP EMPIRE</text></g>`
   );
 }
 
