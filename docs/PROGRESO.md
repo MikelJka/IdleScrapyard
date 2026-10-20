@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Temblor al abrir una zona
+
+- Fase 2b, «Juice» (cerrado): al comprar la apertura de una zona el mapa tiembla suavemente (se respeta «reducir movimiento»).
+- Qué probar: abrir una zona nueva desde su puesto.
+- Siguiente: apertura de zona animada (se levanta el andamio y entra la máquina).
+
 ## 2026-10-20 — Monedas que vuelan y destello al comprar
 
 - Fase 2b, «Juice» (primera parte): al cobrar un camión salen monedas que vuelan al contador de dólares y la cifra rebota; al comprar, el botón da un destello y la cifra rebota. Se respeta «reducir movimiento».

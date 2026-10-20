@@ -337,6 +337,7 @@ export function startApp(root: HTMLElement): void {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]');
       if (btn && !calmMotion) btn.animate([{ filter: 'brightness(2.2)', scale: '1.04' }, { filter: 'none', scale: '1' }], { duration: 320, easing: 'ease-out' });
       bumpDollars();
+      if (id.startsWith('unlock:')) shakeScene();
     }
   });
 
@@ -389,6 +390,15 @@ export function startApp(root: HTMLElement): void {
   function bumpDollars(): void {
     if (calmMotion) return;
     $('dollars').animate([{ scale: '1.18', color: '#ffe36b' }, { scale: '1' }], { duration: 300, easing: 'ease-out' });
+  }
+
+  /** Temblor suave del mapa al abrir una zona nueva. */
+  function shakeScene(): void {
+    if (calmMotion) return;
+    $('scene-wrap').animate(
+      [{ translate: '0 0' }, { translate: '-5px 3px' }, { translate: '4px -3px' }, { translate: '-3px -2px' }, { translate: '2px 2px' }, { translate: '0 0' }],
+      { duration: 420, easing: 'ease-out' },
+    );
   }
 
   /** Monedas que salen del muelle (parte baja de la pantalla) y vuelan al contador al cobrar un camión. */
