@@ -139,3 +139,12 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .uiicon { display: block; margin: auto; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35)); }
 #mute .uiicon, #settings .uiicon, #ranking-btn .uiicon { width: 26px; height: 26px; }
 #extras .ico .uiicon { width: 26px; height: 26px; }
+
+/* Paneles con transición y botones con relieve en todo */
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pop-in { from { transform: scale(0.94); opacity: 0; } to { transform: none; opacity: 1; } }
+#sheet:not([hidden]) { animation: sheet-in 0.18s ease-out; }
+#ranking:not([hidden]), #welcome:not([hidden]) { animation: pop-in 0.16s ease-out; }
+#transfer button, .welcome-actions button, #ranking form button { box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); transition: transform 0.06s; }
+#transfer button:active, .welcome-actions button:active, #ranking form button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4); }
+@media (prefers-reduced-motion: reduce) { #sheet, #ranking, #welcome { animation: none !important; } }

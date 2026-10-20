@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Paneles con transición y botones con relieve
+
+- Fase 2b, «Interfaz coherente»: el panel inferior sube con una transición suave, el ranking y el aviso de bienvenida aparecen con un pequeño rebote, y todos los botones (código de partida, bienvenida, ranking) tienen relieve y se hunden al pulsar. Se respeta «reducir movimiento» del sistema.
+- Qué probar: abrir un puesto, el ranking y volver tras un rato fuera.
+- Siguiente: cifras que cuentan hacia arriba, y después el «juice».
+
 ## 2026-10-20 — Sin emojis en textos y avisos
 
 - Fase 2b, «Interfaz coherente»: el tutorial, el objetivo, el aviso de atasco, los avisos de logro y los botones de anuncio al volver llevan iconos SVG propios (dedo, moneda, carrito, check, diana, advertencia, medalla, anuncio) delante del texto (`inlineIcon`); los rótulos del mapa y la lista de logros pierden los emojis.
