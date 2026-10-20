@@ -37,7 +37,8 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
-import { buzz, isMuted, isMusicOn, play, setMuted, setMusicOn, syncMusic } from './sound';
+import { reducedMotion, setReducedMotion } from './prefs';
+import { buzz, isMuted, isMusicOn, isSfxOn, isVibeOn, play, setMuted, setMusicOn, setSfxOn, setVibeOn, syncMusic } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
 
 const AUTOSAVE_MS = 10_000;
@@ -117,9 +118,21 @@ export function startApp(root: HTMLElement): void {
           <b>${t('settings.language')}</b>
           <div><button type="button" data-lang="es" ${getLang() === 'es' ? 'aria-pressed="true"' : ''}>Español</button><button type="button" data-lang="en" ${getLang() === 'en' ? 'aria-pressed="true"' : ''}>English</button></div>
         </div>
-        <div id="music" hidden>
+        <div id="music" class="opt" hidden>
           <b>${t('settings.music')}</b>
           <div><button type="button" data-m="1" ${isMusicOn() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-m="0" ${isMusicOn() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
+        </div>
+        <div id="sfx" class="opt" hidden>
+          <b>${t('settings.sfx')}</b>
+          <div><button type="button" data-v="1" ${isSfxOn() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${isSfxOn() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
+        </div>
+        <div id="vibe" class="opt" hidden>
+          <b>${t('settings.vibe')}</b>
+          <div><button type="button" data-v="1" ${isVibeOn() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${isVibeOn() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
+        </div>
+        <div id="calm" class="opt" hidden>
+          <b>${t('settings.calm')}</b>
+          <div><button type="button" data-v="1" ${reducedMotion() ? 'aria-pressed="true"' : ''}>${t('settings.on')}</button><button type="button" data-v="0" ${reducedMotion() ? '' : 'aria-pressed="true"'}>${t('settings.off')}</button></div>
         </div>
         <div id="quality" hidden>
           <b>${t('settings.quality')}</b>
@@ -250,6 +263,9 @@ export function startApp(root: HTMLElement): void {
     $('lang').hidden = sel !== 'settings';
     $('quality').hidden = sel !== 'settings';
     $('music').hidden = sel !== 'settings';
+    $('sfx').hidden = sel !== 'settings';
+    $('vibe').hidden = sel !== 'settings';
+    $('calm').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
@@ -278,6 +294,21 @@ export function startApp(root: HTMLElement): void {
     if (!m) return;
     setMusicOn(m.dataset.m === '1');
     $('music').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === m)));
+  });
+  const bindFlag = (id: string, set: (v: boolean) => void): void => {
+    $(id).addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLElement>('button[data-v]');
+      if (!b) return;
+      set(b.dataset.v === '1');
+      $(id).querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    });
+  };
+  bindFlag('sfx', setSfxOn);
+  bindFlag('vibe', setVibeOn);
+  bindFlag('calm', (v) => {
+    setReducedMotion(v);
+    writeSave(state);
+    location.reload();
   });
   // La música arranca con el primer toque (los navegadores no dejan sonar antes).
   document.addEventListener('pointerdown', () => syncMusic(), { once: true });
@@ -439,7 +470,7 @@ export function startApp(root: HTMLElement): void {
   // Cifra de dólares que cuenta hacia arriba (o hacia abajo al comprar) en vez de saltar.
   let shownDollars = state.dollars;
   let lastRenderAt = performance.now();
-  const calmMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  const calmMotion = reducedMotion();
   /** Pequeño rebote de la cifra de dólares (al comprar o cobrar). */
   function bumpDollars(): void {
     if (calmMotion) return;

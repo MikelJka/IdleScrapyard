@@ -28,6 +28,7 @@ import {
   terrainSvg,
 } from './scenery';
 import { TRUCK_SLOTS, agvIso, carIso, forkliftIso, goldenTruckIso, scrapTruckIso, shipTruckIso } from './vehicles';
+import { reducedMotion } from './prefs';
 
 const NS = 'http://www.w3.org/2000/svg';
 
@@ -600,7 +601,7 @@ export function createYard(container: HTMLElement): Yard {
 
   /** Apertura de zona: el andamio se levanta y se desvanece mientras la máquina entra desde arriba. */
   function animateOpening(l: Line, scaffold: string): void {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || !l.machines.animate) return;
+    if (reducedMotion() || !l.machines.animate) return;
     l.machines.animate(
       [
         { transform: 'translateY(-46px)', opacity: 0 },

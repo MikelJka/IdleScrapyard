@@ -1,5 +1,12 @@
 // Sonidos sintetizados con Web Audio: sin archivos de terceros (coste cero). Solo la interfaz los usa.
+import { readFlag, writeFlag } from './prefs';
+
 const KEY = 'chatarrero.mute';
+const SFX_KEY = 'chatarrero.sfx';
+const VIBE_KEY = 'chatarrero.vibe';
+
+let sfxOn = readFlag(SFX_KEY, true);
+let vibeOn = readFlag(VIBE_KEY, true);
 
 let ctx: AudioContext | null = null;
 let muted = (() => {
@@ -22,7 +29,25 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
 
 /** Vibración corta en el móvil (si el aparato lo permite). */
 export function buzz(ms = 12): void {
-  if (!muted) navigator.vibrate?.(ms);
+  if (vibeOn) navigator.vibrate?.(ms);
+}
+
+export function isSfxOn(): boolean {
+  return sfxOn;
+}
+
+export function setSfxOn(value: boolean): void {
+  sfxOn = value;
+  writeFlag(SFX_KEY, value);
+}
+
+export function isVibeOn(): boolean {
+  return vibeOn;
+}
+
+export function setVibeOn(value: boolean): void {
+  vibeOn = value;
+  writeFlag(VIBE_KEY, value);
 }
 
 export function isMuted(): boolean {
@@ -40,7 +65,7 @@ export function setMuted(value: boolean): void {
 }
 
 export function play(name: Sfx): void {
-  if (muted || typeof AudioContext === 'undefined') return;
+  if (muted || !sfxOn || typeof AudioContext === 'undefined') return;
   try {
     ctx ??= new AudioContext();
     if (ctx.state === 'suspended') void ctx.resume();

@@ -64,10 +64,10 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #shop button.unlock { background: linear-gradient(180deg, #d98b2b, #a8601a); border-color: #f2b45c; }
 #shop button.helper { background: linear-gradient(180deg, #3f8f7a, #2d6156); border-color: #6cc4ad; }
 .ad-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0, 0, 0, 0.85); color: var(--ink); font-size: 20px; z-index: 10; }
-#lang, #quality, #transfer { margin-top: 10px; padding-top: 10px; border-top: 2px solid #5f4a33; color: #f3e3c3; display: flex; flex-direction: column; gap: 4px; }
-#lang small, #quality small, #transfer small { opacity: 0.75; }
-#lang div, #quality div, #transfer div { display: flex; gap: 8px; }
-#lang button, #quality button, #transfer button { flex: 1; min-height: 44px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
+#lang, #quality, #transfer, .opt { margin-top: 10px; padding-top: 10px; border-top: 2px solid #5f4a33; color: #f3e3c3; display: flex; flex-direction: column; gap: 4px; }
+#lang small, #quality small, #transfer small, .opt small { opacity: 0.75; }
+#lang div, #quality div, #transfer div, .opt div { display: flex; gap: 8px; }
+#lang button, #quality button, #transfer button, .opt button { flex: 1; min-height: 44px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #fff1a8; border-radius: 12px; cursor: pointer; }
 /* Animaciones de la escena (las de las máquinas las mueve el código, suavizadas) */
 .puff, .spark, .far-smoke { transform-box: fill-box; transform-origin: center; }
 .puff { animation: puff 2.4s ease-out infinite; }
@@ -115,7 +115,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .st-working { color: #8be28b; } .st-starved { color: #ff8a7a; } .st-full { color: #ffb347; }
 #shop .empty { color: var(--muted); text-align: center; }
 #sheet { max-height: 70%; overflow-y: auto; }
-#lang[hidden], #quality[hidden], #transfer[hidden] { display: none; }
+#lang[hidden], #quality[hidden], #transfer[hidden], .opt[hidden] { display: none; }
 #sheet { max-height: 56%; }
 
 #ranking-btn { pointer-events: auto; min-width: 44px; min-height: 44px; margin: -6px 0; font-size: 20px; background: none; border: 0; cursor: pointer; }
@@ -152,6 +152,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 /* Monedas que vuelan al contador de dólares al cobrar un camión. */
 .flycoin { position: fixed; z-index: 30; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3a0, #f2b705 60%, #b07d00); color: #6b4a00; font: 700 14px/22px system-ui, sans-serif; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,.4); pointer-events: none; }
 #dollars { display: inline-block; }
+.opt button[aria-pressed="true"] { background: #ffd76a; box-shadow: inset 0 0 0 2px #2a1d14; }
 #lang button[aria-pressed="true"] { background: #ffd76a; box-shadow: inset 0 0 0 2px #2a1d14; }
 /* Calidad baja: sin animaciones CSS ni suavizado de bordes en el mapa. */
 #scene-wrap.lowq svg { shape-rendering: optimizeSpeed; }

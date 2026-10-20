@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Ajustes completos
+
+- Ajustes con interruptores propios de efectos de sonido, vibración y reducir movimiento (este último por defecto sigue al sistema; al cambiarlo se recarga la página). Se guardan en el aparato, no en la partida (`src/ui/prefs.ts`). Textos es/en.
+- Qué probar: ⚙ → apagar «Efectos» (la música sigue), «Vibración» y «Reducir movimiento» (sin animaciones de máquinas, rebotes ni temblor).
+- Sigue: accesibilidad (texto grande, alto contraste), iluminación y sombras, animar el barco.
+
 ## 2026-10-20 — Música ambiental
 
 - Música suave sintetizada (acordes de ondas sinusoidales en bucle, sin archivos de terceros). Arranca con el primer toque; el botón de silencio la calla y en ajustes hay un interruptor «Música» propio (es/en).
