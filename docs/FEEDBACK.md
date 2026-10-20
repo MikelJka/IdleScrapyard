@@ -42,6 +42,7 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 - [x] **Nombre global (G2)** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» en título, pantalla de carga, manifest, cartel del mapa y documentación; el repositorio y las claves de guardado conservan «chatarrero» para no romper partidas. **Hecho.**
 - [x] **Material de anuncio (M1-M4)** (2026-10-20, Mikel): `scripts/marketing/index.mjs` genera en `public/press/` (se publica en `/press/`): 12 capturas 1080×1920 con rótulo (6 en español, 6 en inglés), gráfico de función 1024×500, iconos (normal, adaptable, monocromo, SVG y rótulo), dos vídeos verticales de ~27 s sin sonido y la página de prensa; textos de la ficha en `docs/FICHA_TIENDA.md`. **Hecho.**
+- [x] **Carretillas de las líneas muy mejoradas** (2026-10-20, Mikel: «solo aparecen llegando al puesto de carga en bucle»; las de una línea nueva iban bien): causa en el dibujo: cada carretilla visible seguía al viaje más viejo de su línea, y con muchas carretillas ese viaje siempre estaba a punto de acabar. Ahora cada carretilla sigue a su viaje hasta el final, y libre espera junto al palé y coge solo viajes recién salidos. **Hecho.**
 
 ## Propuestas para Mikel
 
@@ -96,6 +97,20 @@ Todo a coste cero y generado por código desde el propio juego (Playwright + SVG
 - **M4 — Página web de prensa** en GitHub Pages con las capturas, el vídeo y el texto de la ficha.
 
 Elige (p. ej. «M1M2M4» o «todo»).
+
+### Parte 21 — Transporte ferroviario y marítimo para alargar el juego (2026-10-20, idea de Mikel)
+
+Hoy todo sale por un único muelle de camiones y, cuando se abren las 8 zonas, solo queda subir números (Parte 18). Ya hay tren, vía, grúa pórtico y barco dibujados de adorno en el puerto de fondo: se pueden convertir en sistemas con los que jugar. Ideas (se pueden combinar):
+
+- **F1 — Estación de tren (carga pesada):** un segundo muelle que se abre tras la zona 5. Las vigas, piezas de motor, motores y coches reconstruidos pueden ir por tren en vez de por camión: un tren sale cuando tiene sus vagones llenos (un vagón por producto) y paga más por unidad (p. ej. ×1,5) pero tarda más en completarse. Mejoras: vagones (más carga), locomotora (más rápido) y vías (un segundo tren a la vez). Lo que más cambia el juego: da un destino nuevo donde gastar dinero y producto.
+- **F2 — Puerto y barco (pedidos grandes, viajes largos):** un barco llega cada cierto tiempo y pide un cargamento enorme (contenedores). Al cargarlo zarpa y vuelve tras un viaje de horas (por eso encaja con el juego cerrado: sale, se juega otra cosa y vuelve con una paga muy grande). Mejoras: grúa pórtico (carga más rápida), tamaño del barco (carguero → portacontenedores → buque gigante), y nº de barcos.
+- **F3 — Rutas y contratos (para elegir):** cada barco o tren puede ir a un destino distinto (ciudad vecina, país, otro continente): cuanto más lejos, más tarda y más paga, y cada destino pide un producto concreto. Da decisiones (¿ruta corta cada poco o larga sin mirar?) y metas a largo plazo (desbloquear cada destino).
+- **F4 — Almacén intermedio:** un almacén entre las líneas y los transportes que acumula producto; los trenes y barcos lo vacían en lotes. Los lotes grandes pagan bonificación, lo que premia ampliar el almacén y tener varios transportes.
+- **F5 — Con ayudante y anuncios:** un jefe de estación/capitán (como los ayudantes de zona, con nivel por horas de trabajo) y un anuncio opcional para acortar un viaje o duplicar un cargamento, igual que el camión dorado.
+
+Mi recomendación, por fases para no tocar todo a la vez: **F1 primero** (reutiliza el sistema de camión, es pequeño y ya alarga el juego unos días), después **F2 + F3** (barcos con destinos, lo que más alarga porque los viajes son largos) y **F5**. Antes de implementar nada necesito que elijas y, si quieres, números: cuándo se abre cada transporte (tras qué zona y a qué precio) y cuánto más paga que el camión. Si no tienes preferencia, propongo: estación tras la zona 5 (coste ~100× el de la zona 5), barco tras la zona 8, y que cada transporte pague ×1,5 / ×3 respecto a un camión por la misma carga.
+
+Responde con las letras (p. ej. «F1F2F3F5»).
 
 ### Parte 17 — Logística por tandas y mejoras por línea (decidida: T3, hecha)
 

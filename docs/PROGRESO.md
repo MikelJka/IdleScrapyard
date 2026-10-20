@@ -9,6 +9,12 @@ Diario de sesiones, la más reciente arriba.
 - Qué probar: abrir `/press/` en la web publicada y ver el vídeo en el móvil.
 - Sigue abierto: B1-B3 de la Parte 18 (equilibrio y estímulos).
 
+## 2026-10-20 — Carretillas que hacían bucle en el palé
+
+- Bug de Mikel: las carretillas de las líneas muy mejoradas solo aparecían girando junto al palé, en bucle; las de una línea nueva iban bien. Causa (solo en el dibujo): cada carretilla visible seguía al viaje más viejo de su línea; con muchas carretillas ese viaje siempre estaba a punto de acabar. Ahora cada carretilla sigue a su viaje hasta que termina, y libre espera en el palé y solo coge viajes recién salidos.
+- Propuesta nueva: Parte 21 (trenes y barcos para alargar el juego), pendiente de que Mikel elija.
+- Qué probar: una línea con muchas carretillas y mucho nivel de tanda; deben hacer el viaje entero al muelle.
+
 ## 2026-10-20 — Logística visible (L1)
 
 - Fase 2b: la caja del camión de expedición se llena con lo que hay en cada huella del muelle (en proporción) en vez de repartir los productos a partes iguales; al salir conserva su carga. Las huellas y las carretillas con carga ya estaban hechas.

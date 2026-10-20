@@ -589,8 +589,8 @@ export function createYard(container: HTMLElement): Yard {
     o: Obj;
     key: string;
     loadN: number;
-    trip: boolean;
-    t0: number;
+    /** Viaje de la simulación al que sigue (por identidad), o null si espera junto al palé. */
+    bound: { left: number; load: number } | null;
     home: string;
   }
   const carts: Cart[] = [];
@@ -872,8 +872,16 @@ export function createYard(container: HTMLElement): Yard {
       const g = mk(objectsG, '');
       const o: Obj = { el: g, depth: 0 };
       objs.push(o);
-      carts.push({ g, o, key: '', loadN: 0, trip: false, t0: 0, home: '' });
+      carts.push({ g, o, key: '', loadN: 0, bound: null, home: '' });
     }
+    // Cada carretilla visible sigue a un viaje concreto de la simulación hasta que termina; libre, espera junto al palé y
+    // solo coge viajes recién salidos (si no, en las líneas con muchas carretillas siempre cogería el más viejo y haría bucle en el palé).
+    const taken = new Set<object>();
+    carts.forEach((c, k) => {
+      const src = slots[k];
+      if (k < nCarts && c.home === src.z.id && c.bound && state.zones[src.z.id].trips.includes(c.bound)) taken.add(c.bound);
+      else c.bound = null;
+    });
     carts.forEach((c, k) => {
       if (k >= nCarts) {
         c.g.setAttribute('visibility', 'hidden');
@@ -881,26 +889,25 @@ export function createYard(container: HTMLElement): Yard {
         return;
       }
       const src = slots[k];
-      if (c.home !== src.z.id) {
-        c.home = src.z.id;
-        c.trip = false;
-      }
+      c.home = src.z.id;
       const zone = state.zones[src.z.id];
       const st = station(src.i);
       const p0 = { x: st.x + 3.0, y: st.y + 2.7 };
-      if (c.trip && t - c.t0 >= CYC) c.trip = false;
-      const trip = zone.trips[src.j];
-      if (!c.trip && trip) {
-        // Sale cuando la simulación la manda de viaje; empieza girando junto al palé (donde carga) y da la vuelta al muelle.
-        c.trip = true;
-        c.t0 = t - Math.max(0, ECONOMY.carts.tripSeconds - trip.left);
-        c.loadN = Math.max(1, Math.min(3, Math.ceil(trip.load / 10)));
+      if (!c.bound) {
+        const fresh = zone.trips.find((x) => !taken.has(x) && ECONOMY.carts.tripSeconds - x.left <= 0.6);
+        if (fresh) {
+          c.bound = fresh;
+          taken.add(fresh);
+          c.loadN = Math.max(1, Math.min(3, Math.ceil(fresh.load / 10)));
+        }
       }
-      const u = c.trip ? (CYC - TURN + (t - c.t0)) % CYC : 0;
-      const pose = c.trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
+      // El viaje empieza girando junto al palé (donde carga) y da la vuelta al muelle.
+      const u = c.bound ? (CYC - TURN + (ECONOMY.carts.tripSeconds - c.bound.left)) % CYC : 0;
+      const trip = c.bound !== null;
+      const pose = trip ? cartPose(u, p0, st.x + 4.0) : { x: p0.x, y: p0.y, ang: Math.PI, phase: 3 as const };
       const dockMid = MOVE + TURN / 2;
       const midTurn = CYC - TURN / 2;
-      const carrying = c.trip && (u < dockMid || u >= midTurn) ? c.loadN : 0;
+      const carrying = trip && (u < dockMid || u >= midTurn) ? c.loadN : 0;
       const key = `${src.z.id}|${Math.round((pose.ang * 18) / Math.PI)}|${carrying}`;
       if (key !== c.key) {
         c.key = key;
