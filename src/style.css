@@ -148,3 +148,7 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #transfer button, .welcome-actions button, #ranking form button { box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4); text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35); transition: transform 0.06s; }
 #transfer button:active, .welcome-actions button:active, #ranking form button:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4); }
 @media (prefers-reduced-motion: reduce) { #sheet, #ranking, #welcome { animation: none !important; } }
+
+/* Monedas que vuelan al contador de dólares al cobrar un camión. */
+.flycoin { position: fixed; z-index: 30; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3a0, #f2b705 60%, #b07d00); color: #6b4a00; font: 700 14px/22px system-ui, sans-serif; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,.4); pointer-events: none; }
+#dollars { display: inline-block; }

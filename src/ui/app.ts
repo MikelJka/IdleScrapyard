@@ -334,6 +334,9 @@ export function startApp(root: HTMLElement): void {
       if (tut === 2) setTut(3);
       play('buy');
       buzz(15);
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('button[data-id]');
+      if (btn && !calmMotion) btn.animate([{ filter: 'brightness(2.2)', scale: '1.04' }, { filter: 'none', scale: '1' }], { duration: 320, easing: 'ease-out' });
+      bumpDollars();
     }
   });
 
@@ -382,6 +385,42 @@ export function startApp(root: HTMLElement): void {
   let shownDollars = state.dollars;
   let lastRenderAt = performance.now();
   const calmMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  /** Pequeño rebote de la cifra de dólares (al comprar o cobrar). */
+  function bumpDollars(): void {
+    if (calmMotion) return;
+    $('dollars').animate([{ scale: '1.18', color: '#ffe36b' }, { scale: '1' }], { duration: 300, easing: 'ease-out' });
+  }
+
+  /** Monedas que salen del muelle (parte baja de la pantalla) y vuelan al contador al cobrar un camión. */
+  function flyCoins(): void {
+    if (calmMotion) return;
+    const to = $('dollars').getBoundingClientRect();
+    const fromX = innerWidth * 0.5;
+    const fromY = innerHeight * 0.45;
+    for (let i = 0; i < 6; i++) {
+      const c = document.createElement('span');
+      c.className = 'flycoin';
+      c.textContent = '$';
+      document.body.appendChild(c);
+      const dx = to.left + to.width / 2 - fromX;
+      const dy = to.top + to.height / 2 - fromY;
+      const spread = (i - 2.5) * 22;
+      c.animate(
+        [
+          { transform: `translate(${spread}px, 0) scale(0.6)`, opacity: 1 },
+          { transform: `translate(${spread * 1.4}px, -40px) scale(1)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${dx}px, ${dy}px) scale(0.5)`, opacity: 0.9 },
+        ],
+        { duration: 700 + i * 70, delay: i * 60, easing: 'ease-in', fill: 'backwards' },
+      ).onfinish = () => {
+        c.remove();
+        if (i === 0) bumpDollars();
+      };
+      c.style.left = fromX + 'px';
+      c.style.top = fromY + 'px';
+    }
+  }
+
   function render(): void {
     const nowMs = performance.now();
     const dtMs = Math.min(500, nowMs - lastRenderAt);
@@ -398,7 +437,10 @@ export function startApp(root: HTMLElement): void {
     $('rate').textContent = t('incomeRate', { n: fmt(incomePerSecond(state)) });
     scene.update(state);
     // Sonido al cobrar un camión (el dinero sube y el camión se reinicia).
-    if (state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > lastCooldown) play('cash');
+    if (state.totalEarned > lastEarned + 1e-9 && state.truckCooldown > lastCooldown) {
+      play('cash');
+      flyCoins();
+    }
     lastEarned = state.totalEarned;
     lastCooldown = state.truckCooldown;
     renderStats();

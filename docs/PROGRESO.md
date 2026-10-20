@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Monedas que vuelan y destello al comprar
+
+- Fase 2b, «Juice» (primera parte): al cobrar un camión salen monedas que vuelan al contador de dólares y la cifra rebota; al comprar, el botón da un destello y la cifra rebota. Se respeta «reducir movimiento».
+- Qué probar: cobrar un camión y comprar una mejora.
+- Siguiente: temblor suave al abrir una zona (junto con la apertura animada).
+
 ## 2026-10-20 — Los dólares cuentan hacia arriba
 
 - Fase 2b, «Interfaz coherente» (cerrada): la cifra de dólares de la barra de arriba sube y baja con suavidad en vez de saltar (se respeta «reducir movimiento»).
