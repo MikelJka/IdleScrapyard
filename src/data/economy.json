@@ -72,5 +72,27 @@
       90,
       120
     ]
+  },
+  "transports": {
+    "rail": {
+      "baseLoad": 100,
+      "loadPerLevel": 50,
+      "baseCost": 500000000,
+      "returnSeconds": 60,
+      "payMultiplier": 1.5
+    },
+    "sea": {
+      "baseLoad": 300,
+      "loadPerLevel": 150,
+      "baseCost": 2500000000,
+      "returnSeconds": 300,
+      "payMultiplier": 3
+    }
+  },
+  "orders": {
+    "everySeconds": 900,
+    "windowSeconds": 120,
+    "fillSeconds": 62,
+    "bonusMultiplier": 1
   }
 }

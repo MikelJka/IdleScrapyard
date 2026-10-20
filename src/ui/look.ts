@@ -14,6 +14,8 @@ export const ZONE_LOOKS: Record<string, ZoneLook> = {
   'engine-parts': { wall: '#b9584f', roof: '#7a2f29' },
   engines: { wall: '#5d7fc4', roof: '#334f8a' },
   cars: { wall: '#d4a72c', roof: '#8f6d12' },
+  wagons: { wall: '#b5523b', roof: '#6e2c1d' },
+  containers: { wall: '#2f8fa3', roof: '#1b5563' },
 };
 
 export type Accessory = 'hardhat' | 'goggles' | 'beard' | 'cap' | 'bandana' | 'spiky' | 'glasses' | 'helmet';
@@ -34,5 +36,7 @@ export const HELPER_LOOKS: Record<string, HelperLook> = {
   grua: { skin: '#8d5a3b', hair: '#f1d36b', accessory: 'bandana', gear: '#d9443a' },
   piston: { skin: '#f5d0b0', hair: '#1f1f2e', accessory: 'spiky', gear: '#1f1f2e' },
   bujia: { skin: '#d8a27a', hair: '#7a4b2a', accessory: 'glasses', gear: '#ff8c2a' },
+  vagon: { skin: '#e0b48c', hair: '#d9d9d9', accessory: 'cap', gear: '#3b4a6b' },
+  ancla: { skin: '#b97a50', hair: '#1c1c1c', accessory: 'bandana', gear: '#2f8fa3' },
   turbo: { skin: '#b97a50', hair: '#222', accessory: 'helmet', gear: '#e63946' },
 };

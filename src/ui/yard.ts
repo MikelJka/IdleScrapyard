@@ -32,7 +32,7 @@ import { TRUCK_SLOTS, agvIso, carIso, forkliftIso, goldenTruckIso, scrapTruckIso
 const NS = 'http://www.w3.org/2000/svg';
 
 // Plano del desguace (en baldosas).
-const COL_X = [1, 5.5, 10, 14.5];
+const COL_X = [1, 5.5, 10, 14.5, 21.5]; // la quinta columna es el anexo del puerto (zonas 9 y 10)
 const ROW_Y = [5, 10];
 const SIZE = 3.5;
 const BELT_Y = [4.0, 9.0];
@@ -54,8 +54,8 @@ function fmtShort(n: number): string {
 }
 
 function station(i: number): { x: number; y: number; row: number; col: number } {
-  const row = i < 4 ? 0 : 1;
-  const col = i % 4;
+  const row = i < 4 ? 0 : i < 8 ? 1 : i - 8;
+  const col = i < 8 ? i % 4 : 4;
   return { x: COL_X[col], y: ROW_Y[row], row, col };
 }
 
@@ -200,15 +200,17 @@ function staticYard(): string {
   s += `<polyline points="${[iso(-10, BACK_Y - 0.85), iso(34, BACK_Y - 0.85)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
   // Suelo del desguace con baldosas.
   s += tile(-0.6, -0.6, 20, 15.6, 'fill="#cdbba0" stroke="#2a1d14" stroke-width="1.2"');
+  // Anexo del puerto: suelo de las zonas 9 (tren) y 10 (barco), con sus cintas.
+  s += tile(19.4, -0.6, 7.4, 15.6, 'fill="#c2b092" stroke="#2a1d14" stroke-width="1.2"');
   s += floorDetailsSvg();
   for (let x = 0; x <= 19; x++) s += `<polyline points="${[iso(x - 0.6, -0.6), iso(x - 0.6, 15)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
   for (let y = 0; y <= 15; y++) s += `<polyline points="${[iso(-0.6, y - 0.6), iso(19.4, y - 0.6)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
   for (let x = -0.6; x < 19.4; x += 0.8) s += block(x, -0.9, 0, 0.12, 0.12, 0.55, '#8a7a6a');
   s += block(-0.6, -0.86, 0.38, 20, 0.04, 0.06, '#8a7a6a', { edge: false });
   // Cintas que reparten la chatarra desde la pila.
-  s += tile(4.6, BELT_Y[0], 14.4, 0.4, BELT_ATTR);
+  s += tile(4.6, BELT_Y[0], 20.9, 0.4, BELT_ATTR);
   s += tile(0.25, 4.0, 0.4, 5.4, BELT_ATTR);
-  s += tile(0.25, BELT_Y[1], 18.75, 0.4, BELT_ATTR);
+  s += tile(0.25, BELT_Y[1], 25.25, 0.4, BELT_ATTR);
   // Rutas pintadas de los AGV.
   for (const [x0, y0, x1, y1] of [[-0.25, 3.2, -0.25, 9.8], [0.9, 8.7, 18.2, 8.7], [1.0, 14.3, 18.2, 14.3]]) {
     s += `<polyline points="${iso(x0, y0)[0]},${iso(x0, y0)[1]} ${iso(x1, y1)[0]},${iso(x1, y1)[1]}" stroke="#3f8fc4" stroke-width="3" stroke-dasharray="3 7" stroke-linecap="round" opacity="0.7" fill="none"/>`;
@@ -217,6 +219,7 @@ function staticYard(): string {
   for (const c of COL_X) s += tile(c + 3.75, 4.6, 0.5, 10.2, 'fill="#f4c430" opacity="0.18"');
   // Muelle de carga.
   s += block(0.2, DOCK_Y, 0, 19, 1.4, 0.3, '#8a6a4a');
+  s += block(24.2, DOCK_Y, 0, 2.6, 1.4, 0.3, '#6f6a62'); // andén del anexo (tren y barco)
   // Carretera de delante.
   s += tile(-10, FRONT_Y - 0.6, 44, 3.4, 'fill="#5b4632"');
   s += `<polyline points="${[iso(-10, FRONT_Y + 1.1), iso(30, FRONT_Y + 1.1)].map((p) => p.join(',')).join(' ')}" stroke="#e8d3a8" stroke-width="2" stroke-dasharray="12 10" opacity="0.6"/>`;
@@ -566,7 +569,7 @@ export function createYard(container: HTMLElement): Yard {
     text: string;
   }
   const PAD_W = 2.0;
-  const pads: Pad[] = ZONES.map((def, k) => {
+  const pads: Pad[] = ZONES.filter((d) => !d.transport).map((def, k) => {
     const px = 0.9 + k * 2.3;
     const py = DOCK_Y + 0.15;
     const look = ZONE_LOOKS[def.id] ?? { wall: '#999', roof: '#555' };
@@ -672,6 +675,8 @@ export function createYard(container: HTMLElement): Yard {
   }
 
   let lastDepthOrder = '';
+  let lastRailSent = -1;
+  let railStart = -1e9;
   let lastHourCheck = -1;
   let lastBadgeCheck = -1;
   let lastEarned = -1;
@@ -734,7 +739,15 @@ export function createYard(container: HTMLElement): Yard {
       const [x, y, z] = hwayPoint(-52 + run, c.v);
       c.g.setAttribute('transform', at(x, y, z));
     });
-    const trainPos = -48 + ((t % PORT.trainPeriod) / PORT.trainPeriod) * 130;
+    // Con la zona de vagones abierta, el tren pasa solo cuando sale cargado; antes pasa de adorno cada cierto tiempo.
+    const railSent = state.transports.rail.sent;
+    if (lastRailSent >= 0 && railSent > lastRailSent && t - railStart >= PORT.trainPeriod) railStart = t;
+    lastRailSent = railSent;
+    const trainPos = state.zones.wagons?.unlocked
+      ? t - railStart < PORT.trainPeriod
+        ? -48 + ((t - railStart) / PORT.trainPeriod) * 130
+        : 400
+      : -48 + ((t % PORT.trainPeriod) / PORT.trainPeriod) * 130;
     train.setAttribute('transform', at(trainPos, 0));
     // Cielo: nubes y pájaros.
     cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
@@ -802,7 +815,7 @@ export function createYard(container: HTMLElement): Yard {
     const openIds: string[] = [];
     lines.forEach((l, i) => {
       const zone = state.zones[l.def.id];
-      if (zone.unlocked) openIds.push(l.def.id);
+      if (zone.unlocked && !l.def.transport) openIds.push(l.def.id); // en el camión solo van los productos de camión
       const key = `${zone.unlocked ? 1 : 0}-${zone.machineLevel}-${Math.min(MAX_SHOWN, zone.machines)}-${zone.machines}-${l.def.id === nextLocked ? 1 : 0}`;
       if (key !== l.key) {
         const opening = l.key.startsWith('0-') && zone.unlocked;

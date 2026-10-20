@@ -11,6 +11,8 @@ export const PROP_HEIGHT: Record<string, number> = {
   'engine-parts': 0.3,
   engines: 0.3,
   cars: 0.34,
+  wagons: 0.3,
+  containers: 0.34,
 };
 
 /** Producto de la zona `id` con su esquina en el origen (huella de unos 0,4 × 0,4). */
@@ -77,6 +79,12 @@ export function propIso(id: string): string {
         wheel(0.1, 0.3, 0.06) +
         wheel(0.38, 0.3, 0.06)
       );
+    case 'wagons':
+      // Vagón de tren con dos ruedas.
+      return block(0, 0.03, 0.1, 0.5, 0.26, 0.17, '#b5523b') + block(0, 0.03, 0.27, 0.5, 0.26, 0.05, '#6e2c1d') + wheel(0.1, 0.29, 0.07) + wheel(0.4, 0.29, 0.07);
+    case 'containers':
+      // Contenedor de carga con rayas.
+      return block(0, 0.02, 0, 0.5, 0.28, 0.28, '#2f8fa3') + block(0.1, 0.0, 0.02, 0.03, 0.02, 0.24, '#1b5563', { edge: false }) + block(0.24, 0.0, 0.02, 0.03, 0.02, 0.24, '#1b5563', { edge: false }) + block(0.38, 0.0, 0.02, 0.03, 0.02, 0.24, '#1b5563', { edge: false });
     default:
       return block(0, 0, 0, 0.34, 0.34, 0.28, '#c58a4a');
   }

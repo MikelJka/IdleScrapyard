@@ -60,6 +60,10 @@ export function productIcon(id: string): string {
       return `<rect x="-8" y="-3" width="16" height="9" rx="2" fill="#8fa8dc" stroke="#334f8a"/><rect x="-6" y="-8" width="4" height="5" fill="#8fa8dc" stroke="#334f8a"/><rect x="2" y="-8" width="4" height="5" fill="#8fa8dc" stroke="#334f8a"/>`;
     case 'cars':
       return `<path d="M-10 3 L-10 -1 L-5 -2 L-2 -6 L5 -6 L8 -2 L10 -1 L10 3Z" fill="#e8c35a" stroke="#8f6d12"/><circle cx="-5" cy="4" r="2.6" fill="#2a1d14"/><circle cx="5" cy="4" r="2.6" fill="#2a1d14"/>`;
+    case 'wagons':
+      return `<path d="M-10 2 L-10 -4 L10 -4 L10 2Z" fill="#b5523b" stroke="#6e2c1d"/><circle cx="-5" cy="4" r="2.6" fill="#2a1d14"/><circle cx="5" cy="4" r="2.6" fill="#2a1d14"/>`;
+    case 'containers':
+      return `<rect x="-9" y="-5" width="18" height="10" rx="1" fill="#2f8fa3" stroke="#1b5563"/><path d="M-4 -5 V5 M0 -5 V5 M4 -5 V5" stroke="#1b5563"/>`;
     default:
       return '';
   }

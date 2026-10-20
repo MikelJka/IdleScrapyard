@@ -156,3 +156,4 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 /* Calidad baja: sin animaciones CSS ni suavizado de bordes en el mapa. */
 #scene-wrap.lowq svg { shape-rendering: optimizeSpeed; }
 #scene-wrap.lowq svg * { animation: none !important; }
+#stats .order { color: #8be28b; font-weight: 800; }

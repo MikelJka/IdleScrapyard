@@ -6,6 +6,26 @@ import zonesData from '../data/zones.json';
 import economyData from '../data/economy.json';
 import achievementsData from '../data/achievements.json';
 
+export type TransportId = 'rail' | 'sea';
+
+/** Tren o barco del puerto: se llena despacio con lo de su línea y sale cuando está lleno. */
+export interface TransportState {
+  units: number;
+  value: number;
+  level: number;
+  /** Segundos hasta que pueda salir otro viaje. */
+  cooldown: number;
+  sent: number;
+}
+
+/** Pedido especial: entregar `qty` unidades de un producto antes de que se acabe el plazo. */
+export interface OrderState {
+  zoneId: string;
+  qty: number;
+  delivered: number;
+  left: number;
+}
+
 export interface ZoneDef {
   id: string;
   name: string;
@@ -15,12 +35,14 @@ export interface ZoneDef {
   cycleSeconds: number;
   unlockCost: number;
   upgradeCostScale: number;
+  /** Cómo sale lo producido: por el camión de expedición (por defecto), por el tren o por el barco. */
+  transport?: TransportId;
   helper: { id: string; name: string; bio: string };
 }
 
 export type Economy = typeof economyData;
 
-export const ZONES: readonly ZoneDef[] = zonesData;
+export const ZONES: readonly ZoneDef[] = zonesData as ZoneDef[];
 export const ECONOMY: Economy = economyData;
 
 export const SAVE_VERSION = 1;
@@ -79,7 +101,17 @@ export interface GameState {
   achievements: string[];
   /** Camiones de expedición que han salido (incluye los dorados) y mejor día de racha alcanzado. */
   trucksSent: number;
+  /** Tren y barco del puerto. */
+  transports: Record<TransportId, TransportState>;
+  /** Pedido especial en marcha (o null), segundos hasta el siguiente y pedidos cumplidos. */
+  order: OrderState | null;
+  orderTimer: number;
+  ordersDone: number;
   bestStreak: number;
+}
+
+function newTransport(): TransportState {
+  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0 };
 }
 
 export function newGame(): GameState {
@@ -122,6 +154,10 @@ export function newGame(): GameState {
     lastClaimDay: -1,
     achievements: [],
     trucksSent: 0,
+    transports: { rail: newTransport(), sea: newTransport() },
+    order: null,
+    orderTimer: ECONOMY.orders.everySeconds,
+    ordersDone: 0,
     bestStreak: 0,
   };
 }
@@ -202,6 +238,17 @@ export function dockLoad(state: GameState): number {
   return ECONOMY.dock.baseLoad + state.dockLevel * ECONOMY.dock.loadPerLevel;
 }
 
+export function transportLoad(id: TransportId, state: GameState): number {
+  const c = ECONOMY.transports[id];
+  return c.baseLoad + state.transports[id].level * c.loadPerLevel;
+}
+
+/** Cuántas unidades de la zona caben en un viaje, por segundo, hacia su destino: camión de expedición, tren o barco. */
+function outletCarry(state: GameState, def: ZoneDef): number {
+  if (def.transport) return transportLoad(def.transport, state) / ECONOMY.transports[def.transport].returnSeconds;
+  return dockLoad(state) / ECONOMY.dock.returnSeconds;
+}
+
 /** El jugador toca la pila de chatarra. */
 export function tap(state: GameState): void {
   state.scrap += ECONOMY.tap.scrap;
@@ -213,10 +260,11 @@ export function incomePerSecond(state: GameState, tapsPerSecond = 0): number {
   let carry = dockLoad(state) / ECONOMY.dock.returnSeconds;
   let income = 0;
   for (const def of ZONES_BY_PROFIT) {
-    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, carry, cartThroughput(state.zones[def.id]));
+    const own = def.transport ? outletCarry(state, def) : carry;
+    const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, own, cartThroughput(state.zones[def.id]));
     scrap -= units * def.scrapPerUnit;
-    carry -= units;
-    income += units * unitValue(def, state.zones[def.id]);
+    if (!def.transport) carry -= units;
+    income += units * unitValue(def, state.zones[def.id]) * (def.transport ? ECONOMY.transports[def.transport].payMultiplier : 1);
   }
   return income;
 }
@@ -314,9 +362,16 @@ function step(state: GameState, dt: number): void {
     if (!zone.unlocked) continue;
     for (const trip of zone.trips) trip.left -= dt;
     for (const trip of zone.trips.filter((x) => x.left <= 0)) {
-      state.dockUnits += trip.load;
-      state.dockValue += trip.load * unitValue(def, zone);
-      state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + trip.load;
+      if (def.transport) {
+        const out = state.transports[def.transport];
+        out.units += trip.load;
+        out.value += trip.load * unitValue(def, zone);
+      } else {
+        state.dockUnits += trip.load;
+        state.dockValue += trip.load * unitValue(def, zone);
+        state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + trip.load;
+      }
+      if (state.order?.zoneId === def.id) state.order.delivered += trip.load;
     }
     zone.trips = zone.trips.filter((x) => x.left > 0);
     const batch = cartBatch(zone);
@@ -342,6 +397,76 @@ function step(state: GameState, dt: number): void {
     state.trucksSent += 1;
     state.truckCooldown = ECONOMY.dock.returnSeconds;
   }
+
+  // Tren y barco: salen cuando están llenos y pagan más por viaje que el camión.
+  for (const id of ['rail', 'sea'] as const) {
+    const out = state.transports[id];
+    out.cooldown = Math.max(0, out.cooldown - dt);
+    const cargo = transportLoad(id, state);
+    if (out.cooldown === 0 && out.units >= cargo) {
+      const value = (out.value * cargo) / out.units;
+      out.units -= cargo;
+      out.value -= value;
+      const paid = value * ECONOMY.transports[id].payMultiplier * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+      state.dollars += paid;
+      state.totalEarned += paid;
+      out.sent += 1;
+      out.cooldown = ECONOMY.transports[id].returnSeconds;
+    }
+  }
+
+  stepOrders(state, dt);
+}
+
+/**
+ * Pedidos especiales. Cada `everySeconds` (desde que acaba el anterior) se pide una cantidad de un producto de una línea
+ * abierta y trabajando; la cantidad cabe en el plazo con margen (`fillSeconds`), siempre en tandas enteras de las carretillas
+ * porque lo entregado cuenta cuando llega la tanda. Cumplirlo paga una bonificación igual al valor de lo pedido; si no, no pasa nada.
+ */
+function stepOrders(state: GameState, dt: number): void {
+  const o = ECONOMY.orders;
+  if (state.order) {
+    if (state.order.delivered >= state.order.qty) {
+      const bonus = orderBonus(state, state.order);
+      state.dollars += bonus;
+      state.totalEarned += bonus;
+      state.ordersDone += 1;
+      state.order = null;
+      state.orderTimer = o.everySeconds;
+    } else {
+      state.order.left -= dt;
+      if (state.order.left <= 0) {
+        state.order = null;
+        state.orderTimer = o.everySeconds;
+      }
+    }
+    return;
+  }
+  state.orderTimer -= dt;
+  if (state.orderTimer > 0) return;
+  const candidates = ZONES.map((def) => ({ def, qty: orderQuantity(state, def) })).filter((c) => c.qty > 0);
+  if (candidates.length === 0) {
+    state.orderTimer = 60; // nada que pedir ahora: se vuelve a mirar en un minuto
+    return;
+  }
+  // Rota entre las líneas posibles según el tiempo de juego (determinista, sin azar).
+  const pick = candidates[Math.floor(state.time / o.everySeconds) % candidates.length];
+  state.order = { zoneId: pick.def.id, qty: pick.qty, delivered: 0, left: o.windowSeconds };
+}
+
+/** Bonificación que paga un pedido al cumplirse. */
+export function orderBonus(state: GameState, order: OrderState): number {
+  const def = ZONES.find((d) => d.id === order.zoneId)!;
+  return order.qty * unitValue(def, state.zones[def.id]) * ECONOMY.orders.bonusMultiplier;
+}
+
+/** Cantidad que se podría pedir a una línea: 0 si no está abierta, sin chatarra o con ritmo para llenar al menos una tanda a tiempo. */
+export function orderQuantity(state: GameState, def: ZoneDef): number {
+  const zone = state.zones[def.id];
+  if (!zone.unlocked || zone.carts <= 0 || ['locked', 'starved'].includes(zoneStatus(state, def))) return 0;
+  const batch = cartBatch(zone);
+  const rate = Math.min(zoneRate(def, zone), cartThroughput(zone));
+  return Math.floor((rate * ECONOMY.orders.fillSeconds) / batch) * batch;
 }
 
 /** Avanza la simulación `seconds` segundos, en pasos de un segundo como máximo. */
@@ -354,7 +479,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
+export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -388,6 +513,9 @@ export function purchases(state: GameState): Purchase[] {
     list.push(
       { id: `carts:${def.id}`, kind: 'carts', zoneId: def.id, cost: s * growthCost(ECONOMY.carts.baseCost, zone.carts - ECONOMY.carts.start) },
       { id: `cartLevel:${def.id}`, kind: 'cartLevel', zoneId: def.id, cost: s * growthCost(ECONOMY.carts.baseCost, zone.cartLevel) },
+      ...(def.transport
+        ? [{ id: `transport:${def.id}`, kind: 'transport' as const, zoneId: def.id, cost: growthCost(ECONOMY.transports[def.transport].baseCost, state.transports[def.transport].level) }]
+        : []),
       { id: `speed:${def.id}`, kind: 'speed', zoneId: def.id, cost: s * growthCost(u.speed.baseCost, zone.speed) },
       { id: `capacity:${def.id}`, kind: 'capacity', zoneId: def.id, cost: s * growthCost(u.capacity.baseCost, zone.capacity) },
       { id: `machines:${def.id}`, kind: 'machines', zoneId: def.id, cost: s * growthCost(u.machines.baseCost, zone.machines - 1) },
@@ -415,7 +543,7 @@ export function milestoneReward(def: ZoneDef, zone: ZoneState): number {
 export interface AchievementDef {
   id: string;
   name: string;
-  kind: 'earned' | 'zones' | 'machineLevel' | 'carts' | 'helperLevel' | 'machines';
+  kind: 'earned' | 'orders' | 'zones' | 'machineLevel' | 'carts' | 'helperLevel' | 'machines';
   value: number;
 }
 export const ACHIEVEMENTS: readonly AchievementDef[] = achievementsData as AchievementDef[];
@@ -425,6 +553,8 @@ function achievementProgress(state: GameState, kind: AchievementDef['kind']): nu
   switch (kind) {
     case 'earned':
       return state.totalEarned;
+    case 'orders':
+      return state.ordersDone;
     case 'zones':
       return zs.filter((z) => z.unlocked).length;
     case 'machineLevel':
@@ -471,6 +601,9 @@ export function buy(state: GameState, id: string): boolean {
       break;
     case 'dock':
       state.dockLevel++;
+      break;
+    case 'transport':
+      state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!].level++;
       break;
     case 'unlock':
       zone!.unlocked = true;
@@ -519,5 +652,12 @@ export function load(json: string): GameState {
     for (const z of open) z.carts = Math.max(1, Math.round(old / open.length));
   }
   for (const z of Object.values(zones)) z.trips = (z.trips ?? []).map((x) => ({ ...x }));
-  return { ...base, ...data, dockByZone: { ...(data.dockByZone ?? {}) }, version: SAVE_VERSION, zones };
+  const transports = {
+    rail: { ...base.transports.rail, ...(data.transports?.rail ?? {}) },
+    sea: { ...base.transports.sea, ...(data.transports?.sea ?? {}) },
+  };
+  // Un pedido guardado de una zona que ya no existe, o con datos raros, se descarta.
+  const o = data.order;
+  const order = o && ZONES.some((d) => d.id === o.zoneId) && Number.isFinite(o.qty) && o.qty > 0 ? { zoneId: o.zoneId, qty: o.qty, delivered: Number(o.delivered) || 0, left: Number(o.left) || 0 } : null;
+  return { ...base, ...data, transports, order, dockByZone: { ...(data.dockByZone ?? {}) }, version: SAVE_VERSION, zones };
 }

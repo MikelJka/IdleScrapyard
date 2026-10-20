@@ -118,5 +118,37 @@
       "name": "Turbo",
       "bio": "Pilotaba carreras de coches de chatarra; ahora los reconstruye y los prueba a todo gas."
     }
+  },
+  {
+    "id": "wagons",
+    "name": "Taller de vagones",
+    "product": "Vagones",
+    "unitValue": 60000,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 256,
+    "unlockCost": 4800000000,
+    "upgradeCostScale": 6722800,
+    "transport": "rail",
+    "helper": {
+      "id": "vagon",
+      "name": "Vagón",
+      "bio": "Maquinista jubilado que sigue silbando al pasar bajo cada puente; dice que el mejor tren es el que sale lleno."
+    }
+  },
+  {
+    "id": "containers",
+    "name": "Astillero de contenedores",
+    "product": "Contenedores",
+    "unitValue": 240000,
+    "scrapPerUnit": 1,
+    "cycleSeconds": 512,
+    "unlockCost": 24000000000,
+    "upgradeCostScale": 47059600,
+    "transport": "sea",
+    "helper": {
+      "id": "ancla",
+      "name": "Ancla",
+      "bio": "Capitana de puerto con un loro que canta las órdenes; no ha perdido ni un contenedor en alta mar."
+    }
   }
 ]

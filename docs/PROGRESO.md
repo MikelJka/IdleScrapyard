@@ -2,6 +2,14 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-20 — Pedidos especiales, tren y barco
+
+- Mikel eligió Z1, 2b, precios y pedidos OK. Zonas 9 (vagones, por tren) y 10 (contenedores, por barco): el tren y el barco se llenan y salen llenos, pagan ×1,5 y ×3; mejora de carga en el menú de cada línea. Anexo nuevo en el mapa a la derecha de la nave; el tren del fondo pasa al salir cargado.
+- Pedidos especiales cada 15 min con 2 min de plazo; cantidad ajustada a lo que la línea puede producir y llevar a tiempo (62 s) en tandas enteras, para que nunca sea imposible. Bonificación = valor de lo pedido. Barra de arriba con cuenta atrás, avisos y logro «Primer pedido»; logro «Imperio completo» (10 zonas).
+- 11 pruebas nuevas (`tests/transport.test.ts`); partidas antiguas sin tren/barco/pedido se cargan con valores por defecto.
+- Qué probar: abrir las zonas 9 y 10 (en el anexo, a la derecha, arrastrando el mapa), esperar un pedido (~15 min) y entregarlo. Las cifras de carga y retorno del tren y el barco son provisionales.
+- Falta: animar el barco al zarpar, estación propia de descarga en el anexo, equilibrio de las dos zonas con la simulación de jugador.
+
 ## 2026-10-20 — Equilibrio B1b y B2a
 
 - Mikel eligió B1b y B2a: abrir las zonas 3 y 4 cuesta un 50 % más y el nivel de máquina crece ×2,2 por nivel (antes ×4). Zona 4 a ~4,3 h jugando sin parar.
