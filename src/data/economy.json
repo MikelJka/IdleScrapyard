@@ -127,13 +127,13 @@
     {
       "id": "mid",
       "wait": 2,
-      "pay": 2.5,
+      "pay": 3,
       "unlockMult": 100
     },
     {
       "id": "far",
       "wait": 4,
-      "pay": 4.5,
+      "pay": 6,
       "unlockMult": 1000
     }
   ],

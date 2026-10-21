@@ -39,7 +39,7 @@ Diario de sesiones, la más reciente arriba.
 
 ## 2026-10-21 — Destinos del tren y el barco (F3)
 
-- Tren y barco tienen destinos (`routes` en `economy.json`): «Puerto local» (el de siempre, gratis) y tres que se compran en el panel de la línea (10, 100 y 1000 veces el valor de un cargamento): viaje ×1/×2/×4 y paga ×1,5/×2,5/×4,5 encima de la del transporte. Selector «Destino» con los ya comprados. Partidas antiguas: destino local.
+- Tren y barco tienen destinos (`routes` en `economy.json`): «Puerto local» (el de siempre, gratis) y tres que se compran en el panel de la línea (10, 100 y 1000 veces el valor de un cargamento): viaje ×1/×2/×4 y paga ×1,5/×3/×6 (ajustado el 2026-10-21) encima de la del transporte. Selector «Destino» con los ya comprados. Partidas antiguas: destino local.
 - Sin hacer: «los destinos lejanos piden además la mitad de la otra línea» (a decidir tras el almacén). Ojo: con estos números el destino cercano rinde más por minuto que los lejanos; propuesta pendiente de Mikel: paga ×1,5/×3/×6.
 - Qué probar: abrir la zona 9, comprar un destino y ver el cambio de espera y paga.
 - Sigue: F5 (capitán y anuncio) y F4 (almacén).
