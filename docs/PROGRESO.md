@@ -4,6 +4,12 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Almacén del tren y el barco (F4)
+
+- Almacén por transporte (`warehouse` en `economy.json`): capacidad 500 (+250 por nivel, hasta 10, ×1,8 de precio por nivel; siempre cabe el doble de un cargamento); si se llena, las carretillas esperan con su tanda; al salir un viaje paga +5 % por cada 25 % lleno (máx. +20 %). Se compra en el panel de la línea y su estado sale en «Más datos». Precio inicial: la mitad del precio del transporte (lo puse yo, a revisar).
+- Qué probar: zona 9 o 10: comprar el almacén y ver la bonificación al salir.
+- Sigue: visuales (menú de inicio, animaciones, material de anuncio) si sobra tiempo.
+
 ## 2026-10-21 — Capitán y anuncio del tren y el barco (F5)
 
 - Cada transporte tiene capitán (jefe de estación en el tren): gana un nivel por cada hora de trabajo y se paga como los ayudantes (`captain` en `economy.json`): +10 % de paga y −3 % de viaje por nivel, máximo 25. Dos anuncios opcionales en el panel de la línea: «Viaje ya» (sale en cuanto esté lleno) y «Cargamento ×2» (el próximo viaje paga el doble), con 2 h de espera entre usos (el Pase no espera).

@@ -24,6 +24,8 @@ export interface TransportState {
   captainXp: number;
   adCooldown: number;
   doubleNext: boolean;
+  /** Nivel del almacén intermedio (capacidad). */
+  warehouseLevel: number;
 }
 
 /** Pedido especial: entregar `qty` unidades de un producto antes de que se acabe el plazo. */
@@ -57,6 +59,12 @@ export const ECONOMY: Economy = economyData;
 
 export const SAVE_VERSION = 1;
 
+/** Viaje de una carretilla: segundos que le faltan para llegar y unidades que lleva. */
+export interface Trip {
+  left: number;
+  load: number;
+}
+
 export interface ZoneState {
   unlocked: boolean;
   machines: number;
@@ -73,7 +81,7 @@ export interface ZoneState {
   carts: number;
   cartLevel: number;
   /** Carretillas de viaje: segundos que les faltan para llegar al muelle y piezas que llevan. */
-  trips: { left: number; load: number }[];
+  trips: Trip[];
   /** Mayor múltiplo de 5 de nivel de máquina cuyo premio ya se cobró. */
   milestone: number;
 }
@@ -124,7 +132,7 @@ export interface GameState {
 }
 
 function newTransport(): TransportState {
-  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0, route: 'local', routesUnlocked: [], captainLevel: 0, captainXp: 0, adCooldown: 0, doubleNext: false };
+  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0, route: 'local', routesUnlocked: [], captainLevel: 0, captainXp: 0, adCooldown: 0, doubleNext: false, warehouseLevel: 0 };
 }
 
 export function newGame(): GameState {
@@ -292,6 +300,18 @@ export function setRoute(state: GameState, id: TransportId, routeId: string): bo
   return true;
 }
 
+/** Almacén del tren o el barco: lo que llevan las carretillas espera ahí hasta que sale el viaje. Siempre cabe al menos el doble de un cargamento. */
+export function warehouseCapacity(state: GameState, id: TransportId): number {
+  const w = ECONOMY.warehouse;
+  return Math.max(w.baseCapacity + state.transports[id].warehouseLevel * w.capacityPerLevel, 2 * transportLoad(id, state));
+}
+/** Bonificación al salir un viaje: +5 % por cada 25 % del almacén lleno (máx. +20 %). */
+export function warehouseBonus(state: GameState, id: TransportId): number {
+  const w = ECONOMY.warehouse;
+  const fill = Math.min(1, state.transports[id].units / warehouseCapacity(state, id));
+  return 1 + w.bonusPerStep * Math.min(w.maxSteps, Math.floor(fill / w.stepFill + 1e-9));
+}
+
 /** Paga ×(1 + nivel·10 %) y viaje −3 % por nivel del capitán. */
 export function captainPay(state: GameState, id: TransportId): number {
   return 1 + state.transports[id].captainLevel * ECONOMY.captain.payPerLevel;
@@ -452,10 +472,16 @@ function step(state: GameState, dt: number): void {
   for (const def of ZONES_BY_PROFIT) {
     const zone = state.zones[def.id];
     if (!zone.unlocked) continue;
-    for (const trip of zone.trips) trip.left -= dt;
+    for (const trip of zone.trips) trip.left = Math.max(0, trip.left - dt);
+    const stuck = new Set<Trip>();
     for (const trip of zone.trips.filter((x) => x.left <= 0)) {
       if (def.transport) {
         const out = state.transports[def.transport];
+        // Si el almacén está lleno, la carretilla espera con su tanda hasta que salga un viaje.
+        if (out.units + trip.load > warehouseCapacity(state, def.transport) + 1e-9) {
+          stuck.add(trip);
+          continue;
+        }
         out.units += trip.load;
         out.value += trip.load * unitValue(def, zone);
       } else {
@@ -466,7 +492,7 @@ function step(state: GameState, dt: number): void {
       if (state.order?.zoneId === def.id) state.order.delivered += trip.load;
       dailyAdd(state.daily, 'units', trip.load, def.id);
     }
-    zone.trips = zone.trips.filter((x) => x.left > 0);
+    zone.trips = zone.trips.filter((x) => x.left > 0 || stuck.has(x));
     const batch = cartBatch(zone);
     while (zone.trips.length < zone.carts && zone.buffer >= batch - 1e-9) {
       zone.buffer -= batch;
@@ -501,9 +527,10 @@ function step(state: GameState, dt: number): void {
     const cargo = transportLoad(id, state);
     if (out.cooldown === 0 && out.units >= cargo) {
       const value = (out.value * cargo) / out.units;
+      const bonus = warehouseBonus(state, id);
       out.units -= cargo;
       out.value -= value;
-      const paid = value * ECONOMY.transports[id].payMultiplier * routeOf(state, id).pay * captainPay(state, id) * (out.doubleNext ? 2 : 1) * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+      const paid = value * ECONOMY.transports[id].payMultiplier * routeOf(state, id).pay * captainPay(state, id) * bonus * (out.doubleNext ? 2 : 1) * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
       out.doubleNext = false;
       state.dollars += paid;
       state.totalEarned += paid;
@@ -577,7 +604,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper' | 'route' | 'captain';
+export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper' | 'route' | 'captain' | 'warehouse';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -633,6 +660,10 @@ export function purchases(state: GameState): Purchase[] {
       },
     );
     // El siguiente nivel del ayudante solo se ofrece cuando su experiencia lo ha desbloqueado.
+    if (def.transport && state.transports[def.transport].warehouseLevel < ECONOMY.warehouse.maxLevel) {
+      const w = ECONOMY.warehouse;
+      list.push({ id: `warehouse:${def.id}`, kind: 'warehouse', zoneId: def.id, cost: growthCost(w.baseCostFraction * ECONOMY.transports[def.transport].baseCost, state.transports[def.transport].warehouseLevel, w.costGrowth) });
+    }
     if (def.transport && captainLevelsReady(state, def.transport) > 0) {
       const c = ECONOMY.captain;
       list.push({ id: `captain:${def.id}`, kind: 'captain', zoneId: def.id, cost: s * growthCost(c.baseCost, state.transports[def.transport].captainLevel, c.costGrowth) });
@@ -715,6 +746,9 @@ export function buy(state: GameState, id: string): boolean {
       break;
     case 'transport':
       state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!].level++;
+      break;
+    case 'warehouse':
+      state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!].warehouseLevel++;
       break;
     case 'captain': {
       const out = state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!];

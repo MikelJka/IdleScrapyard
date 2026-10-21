@@ -229,3 +229,60 @@ describe('capitán y anuncio del tren y el barco (F5)', () => {
     expect(s.transports.sea).toMatchObject({ captainLevel: 0, captainXp: 0, adCooldown: 0, doubleNext: false });
   });
 });
+
+describe('almacén del tren y el barco (F4)', () => {
+  it('la capacidad crece por nivel y siempre cabe el doble de un cargamento', async () => {
+    const { warehouseCapacity } = await import('../src/sim/game');
+    const s = newGame();
+    expect(warehouseCapacity(s, 'rail')).toBe(ECONOMY.warehouse.baseCapacity);
+    s.transports.rail.warehouseLevel = 2;
+    expect(warehouseCapacity(s, 'rail')).toBe(ECONOMY.warehouse.baseCapacity + 2 * ECONOMY.warehouse.capacityPerLevel);
+    s.transports.rail.level = 100;
+    expect(warehouseCapacity(s, 'rail')).toBe(2 * transportLoad('rail', s));
+  });
+
+  it('el viaje paga +5 % por cada 25 % del almacén lleno, hasta +20 %', async () => {
+    const { warehouseBonus, warehouseCapacity } = await import('../src/sim/game');
+    const s = newGame();
+    const cap = warehouseCapacity(s, 'rail');
+    const at = (f: number) => {
+      s.transports.rail.units = cap * f;
+      return warehouseBonus(s, 'rail');
+    };
+    expect(at(0.1)).toBe(1);
+    expect(at(0.25)).toBeCloseTo(1.05, 9);
+    expect(at(0.6)).toBeCloseTo(1.1, 9);
+    expect(at(1)).toBeCloseTo(1.2, 9);
+    s.transports.rail.units = cap;
+    s.transports.rail.value = cap * 100;
+    advance(s, 1);
+    expect(s.dollars).toBeCloseTo(transportLoad('rail', s) * 100 * ECONOMY.transports.rail.payMultiplier * 1.2, 3);
+  });
+
+  it('con el almacén lleno las carretillas esperan con su tanda y no se pierde producto', () => {
+    const s = rich('wagons');
+    s.zones.wagons.machines = 500;
+    s.zones.wagons.carts = 20;
+    s.transports.rail.cooldown = 1e9;
+    const cap = ECONOMY.warehouse.baseCapacity;
+    advance(s, 600);
+    expect(s.transports.rail.units).toBeLessThanOrEqual(cap + 1e-6);
+    const inCarts = s.zones.wagons.trips.reduce((n, t) => n + t.load, 0);
+    const before = s.transports.rail.units + inCarts;
+    s.transports.rail.cooldown = 0;
+    advance(s, 1);
+    expect(s.transports.rail.sent).toBeGreaterThanOrEqual(1);
+    expect(before).toBeGreaterThan(cap);
+    expect(inCarts).toBeGreaterThan(0);
+  });
+
+  it('el almacén se compra por niveles hasta el máximo y una partida antigua carga con nivel 0', () => {
+    const s = rich('wagons');
+    s.dollars = 1e30;
+    for (let i = 0; i < ECONOMY.warehouse.maxLevel; i++) expect(buy(s, 'warehouse:wagons')).toBe(true);
+    expect(purchases(s).some((p) => p.id === 'warehouse:wagons')).toBe(false);
+    const old = JSON.parse(serialize(newGame()));
+    delete old.transports.rail.warehouseLevel;
+    expect(load(JSON.stringify(old)).transports.rail.warehouseLevel).toBe(0);
+  });
+});

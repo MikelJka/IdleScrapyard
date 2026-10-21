@@ -4,6 +4,8 @@ import {
   ROUTES,
   ZONES,
   captainPay,
+  warehouseBonus,
+  warehouseCapacity,
   captainTrip,
   useTransportAd,
   activateBoost,
@@ -690,9 +692,9 @@ export function startApp(root: HTMLElement): void {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
         const kindKey = p.kind === 'transport' ? `transport.${def!.transport}` : '';
         const route = p.kind === 'route' ? p.id.split(':')[2] : '';
-        const name = p.kind === 'captain' ? t('buy.captain.' + def!.transport) : p.kind === 'route' ? t('buy.route', { route: t('route.' + route) }) : p.kind === 'helper' ? t('buy.helper', { helper: helperName(def!) }) : t('buy.' + p.kind + (kindKey ? `.${def!.transport}` : ''));
+        const name = p.kind === 'warehouse' ? t('buy.warehouse.' + def!.transport) : p.kind === 'captain' ? t('buy.captain.' + def!.transport) : p.kind === 'route' ? t('buy.route', { route: t('route.' + route) }) : p.kind === 'helper' ? t('buy.helper', { helper: helperName(def!) }) : t('buy.' + p.kind + (kindKey ? `.${def!.transport}` : ''));
         const routeDef = ROUTES.find((r) => r.id === route);
-        const sub = p.kind === 'captain' ? t('sub.captain') : p.kind === 'route' ? t('sub.route', { wait: routeDef!.wait, pay: routeDef!.pay }) : p.kind === 'transport' ? t('sub.transport.' + def!.transport) : p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? zoneProduct(def) : zoneName(def)) : t('sub.' + p.kind);
+        const sub = p.kind === 'warehouse' ? t('sub.warehouse') : p.kind === 'captain' ? t('sub.captain') : p.kind === 'route' ? t('sub.route', { wait: routeDef!.wait, pay: routeDef!.pay }) : p.kind === 'transport' ? t('sub.transport.' + def!.transport) : p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? zoneProduct(def) : zoneName(def)) : t('sub.' + p.kind);
         const cls = p.kind === 'unlock' ? 'unlock' : p.kind === 'helper' ? 'helper' : '';
         return `<button type="button" class="${cls}" data-id="${p.id}" ${p.cost > state.dollars ? 'disabled' : ''}>${shopIcon(p.kind, p.zoneId)}<span class="what"><b>${name}</b><small>${sub}</small></span><span class="price">$${fmt(p.cost)}</span></button>`;
       })
@@ -789,7 +791,7 @@ export function startApp(root: HTMLElement): void {
         <li>${t('info.carts', { n: zone.carts, batch: cartBatch(zone), trip: ECONOMY.carts.tripSeconds })}</li>
         ${
           def.transport
-            ? `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b></li><li>${t('info.transport', { name: t('transport.' + def.transport), units: Math.floor(state.transports[def.transport].units), load: transportLoad(def.transport, state), mult: ECONOMY.transports[def.transport].payMultiplier, sent: state.transports[def.transport].sent })}</li>`
+            ? `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b></li><li>${t('info.warehouse', { units: Math.floor(state.transports[def.transport].units), cap: warehouseCapacity(state, def.transport), bonus: Math.round((warehouseBonus(state, def.transport) - 1) * 100) })}</li><li>${t('info.transport', { name: t('transport.' + def.transport), units: Math.floor(state.transports[def.transport].units), load: transportLoad(def.transport, state), mult: ECONOMY.transports[def.transport].payMultiplier, sent: state.transports[def.transport].sent })}</li>`
             : `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>`
         }
         <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: rateTxt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>

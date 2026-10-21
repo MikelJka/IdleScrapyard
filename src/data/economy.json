@@ -145,5 +145,15 @@
     "baseCost": 100,
     "costGrowth": 1.5,
     "adCooldownSeconds": 7200
+  },
+  "warehouse": {
+    "baseCapacity": 500,
+    "capacityPerLevel": 250,
+    "maxLevel": 10,
+    "costGrowth": 1.8,
+    "baseCostFraction": 0.5,
+    "bonusPerStep": 0.05,
+    "stepFill": 0.25,
+    "maxSteps": 4
   }
 }
