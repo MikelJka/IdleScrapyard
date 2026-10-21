@@ -55,6 +55,10 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
+### Parte 27 — Nuevo juego: idle de estación espacial (2026-10-21, idea de Mikel)
+
+Mikel pide diseñar, mientras tanto, un juego parecido en el espacio que se construya por módulos (primero investigación, luego agricultura…) y con mejores gráficos. Borrador en `docs/NUEVO_JUEGO_ESPACIO.md` (módulos y orden, arquitectura modular, tres caminos gráficos A/B/C con recomendación y pipeline de arte a coste cero). Preguntas en su sección 9: nombre y tono, motor gráfico (prueba de PixiJS antes de decidir), orden de módulos, repositorio nuevo y tripulación.
+
 ### Parte 26 — F3, F4 y F5: números (2026-10-21) — decidido: R1, A1, C1 (en marcha, ver Pendiente)
 
 Aprobados los tres. Propuesta de números para no inventar al implementar:

@@ -4,6 +4,10 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Borrador del nuevo juego espacial
+
+- `docs/NUEVO_JUEGO_ESPACIO.md`: diseño de un idle de estación espacial hecho por módulos (investigación → agricultura → energía → minería → tripulación → fabricación → logística → exploración → colonias), arquitectura para añadir módulos sin romper partidas y plan de gráficos (SVG mejorado, PixiJS con sprites prerrenderizados desde Blender, o 3D low-poly) con prueba de concepto antes de decidir. Sin aprobar: preguntas para Mikel en la sección 9.
+
 ## 2026-10-21 — Sonidos del tren y el barco
 
 - Bocina de dos tonos al salir el tren y sirena grave al salir el barco, sintetizadas por código (`src/ui/sound.ts`), con el interruptor de efectos de siempre.
