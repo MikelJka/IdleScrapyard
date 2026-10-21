@@ -133,3 +133,49 @@ describe('pedidos especiales', () => {
     expect(load(JSON.stringify(bad)).order).toBeNull();
   });
 });
+
+describe('destinos del tren y el barco (F3)', () => {
+  it('sin destino comprado sale como siempre: espera y paga del transporte', async () => {
+    const { routeOf } = await import('../src/sim/game');
+    const s = newGame();
+    expect(routeOf(s, 'rail').id).toBe('local');
+    s.transports.rail.units = transportLoad('rail', s);
+    s.transports.rail.value = s.transports.rail.units * 100;
+    advance(s, 1);
+    expect(s.dollars).toBeCloseTo(transportLoad('rail', s) * 100 * ECONOMY.transports.rail.payMultiplier, 3);
+    expect(s.transports.rail.cooldown).toBeGreaterThan(ECONOMY.transports.rail.returnSeconds - 2);
+  });
+
+  it('comprar un destino cuesta veces el valor de un cargamento, lo elige y alarga el viaje y la paga', async () => {
+    const { routeCost, ROUTES, cargoValue, setRoute } = await import('../src/sim/game');
+    const s = rich('wagons');
+    const mid = ROUTES.find((r) => r.id === 'mid')!;
+    expect(routeCost(s, 'rail', mid)).toBeCloseTo(100 * cargoValue(s, 'rail'), 6);
+    const p = purchases(s).find((x) => x.id === 'route:wagons:mid')!;
+    expect(p.cost).toBeCloseTo(routeCost(s, 'rail', mid), 6);
+    s.dollars = p.cost - 1;
+    expect(buy(s, p.id)).toBe(false);
+    s.dollars = p.cost;
+    expect(buy(s, p.id)).toBe(true);
+    expect(s.transports.rail.route).toBe('mid');
+    expect(purchases(s).some((x) => x.id === 'route:wagons:mid')).toBe(false);
+    s.dollars = 0;
+    s.transports.rail.units = transportLoad('rail', s);
+    s.transports.rail.value = s.transports.rail.units * 100;
+    s.zones.wagons.machines = 0;
+    advance(s, 1);
+    expect(s.dollars).toBeCloseTo(transportLoad('rail', s) * 100 * ECONOMY.transports.rail.payMultiplier * mid.pay, 3);
+    expect(s.transports.rail.cooldown).toBeGreaterThan(ECONOMY.transports.rail.returnSeconds * mid.wait - 2);
+    expect(setRoute(s, 'rail', 'far')).toBe(false);
+    expect(setRoute(s, 'rail', 'local')).toBe(true);
+  });
+
+  it('una partida antigua carga con destino local', () => {
+    const old = JSON.parse(serialize(newGame()));
+    delete old.transports.rail.route;
+    delete old.transports.rail.routesUnlocked;
+    const s = load(JSON.stringify(old));
+    expect(s.transports.rail.route).toBe('local');
+    expect(s.transports.rail.routesUnlocked).toEqual([]);
+  });
+});

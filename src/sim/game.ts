@@ -16,6 +16,9 @@ export interface TransportState {
   /** Segundos hasta que pueda salir otro viaje. */
   cooldown: number;
   sent: number;
+  /** Destino elegido y destinos comprados (`routes` de economy.json; `local` es el de siempre y no se compra). */
+  route: string;
+  routesUnlocked: string[];
 }
 
 /** Pedido especial: entregar `qty` unidades de un producto antes de que se acabe el plazo. */
@@ -116,7 +119,7 @@ export interface GameState {
 }
 
 function newTransport(): TransportState {
-  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0 };
+  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0, route: 'local', routesUnlocked: [] };
 }
 
 export function newGame(): GameState {
@@ -250,9 +253,43 @@ export function transportLoad(id: TransportId, state: GameState): number {
   return c.baseLoad + state.transports[id].level * c.loadPerLevel;
 }
 
+export interface RouteDef {
+  id: string;
+  /** Multiplicador del tiempo de viaje y de la paga respecto al transporte; `unlockMult` = veces el valor de un cargamento. */
+  wait: number;
+  pay: number;
+  unlockMult: number;
+}
+export const ROUTES: readonly RouteDef[] = ECONOMY.routes;
+
+/** Destino con el que viaja ahora el tren o el barco. */
+export function routeOf(state: GameState, id: TransportId): RouteDef {
+  return ROUTES.find((r) => r.id === state.transports[id].route) ?? ROUTES[0];
+}
+
+/** Valor de un cargamento completo (lo que paga un viaje al destino local). */
+export function cargoValue(state: GameState, id: TransportId): number {
+  const def = ZONES.find((z) => z.transport === id)!;
+  return transportLoad(id, state) * unitValue(def, state.zones[def.id]) * ECONOMY.transports[id].payMultiplier;
+}
+
+/** Precio de comprar un destino: `unlockMult` cargamentos. */
+export function routeCost(state: GameState, id: TransportId, route: RouteDef): number {
+  return route.unlockMult * cargoValue(state, id);
+}
+
+/** Elige el destino del tren o el barco (solo uno ya comprado). */
+export function setRoute(state: GameState, id: TransportId, routeId: string): boolean {
+  const out = state.transports[id];
+  if (routeId !== 'local' && !out.routesUnlocked.includes(routeId)) return false;
+  if (!ROUTES.some((r) => r.id === routeId)) return false;
+  out.route = routeId;
+  return true;
+}
+
 /** Cuántas unidades de la zona caben en un viaje, por segundo, hacia su destino: camión de expedición, tren o barco. */
 function outletCarry(state: GameState, def: ZoneDef): number {
-  if (def.transport) return transportLoad(def.transport, state) / ECONOMY.transports[def.transport].returnSeconds;
+  if (def.transport) return transportLoad(def.transport, state) / (ECONOMY.transports[def.transport].returnSeconds * routeOf(state, def.transport).wait);
   return dockLoad(state) / ECONOMY.dock.returnSeconds;
 }
 
@@ -272,7 +309,7 @@ export function incomePerSecond(state: GameState, tapsPerSecond = 0): number {
     const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, own, cartThroughput(state.zones[def.id]));
     scrap -= units * def.scrapPerUnit;
     if (!def.transport) carry -= units;
-    income += units * unitValue(def, state.zones[def.id]) * (def.transport ? ECONOMY.transports[def.transport].payMultiplier : 1);
+    income += units * unitValue(def, state.zones[def.id]) * (def.transport ? ECONOMY.transports[def.transport].payMultiplier * routeOf(state, def.transport).pay : 1);
   }
   return income;
 }
@@ -427,11 +464,11 @@ function step(state: GameState, dt: number): void {
       const value = (out.value * cargo) / out.units;
       out.units -= cargo;
       out.value -= value;
-      const paid = value * ECONOMY.transports[id].payMultiplier * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+      const paid = value * ECONOMY.transports[id].payMultiplier * routeOf(state, id).pay * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
       state.dollars += paid;
       state.totalEarned += paid;
       out.sent += 1;
-      out.cooldown = ECONOMY.transports[id].returnSeconds;
+      out.cooldown = ECONOMY.transports[id].returnSeconds * routeOf(state, id).wait;
     }
   }
 
@@ -500,7 +537,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper';
+export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper' | 'route';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -536,6 +573,14 @@ export function purchases(state: GameState): Purchase[] {
       { id: `cartLevel:${def.id}`, kind: 'cartLevel', zoneId: def.id, cost: s * growthCost(ECONOMY.carts.baseCost, zone.cartLevel) },
       ...(def.transport
         ? [{ id: `transport:${def.id}`, kind: 'transport' as const, zoneId: def.id, cost: growthCost(ECONOMY.transports[def.transport].baseCost, state.transports[def.transport].level) }]
+        : []),
+      ...(def.transport
+        ? ROUTES.filter((r) => r.id !== 'local' && !state.transports[def.transport!].routesUnlocked.includes(r.id)).map((r) => ({
+            id: `route:${def.id}:${r.id}`,
+            kind: 'route' as const,
+            zoneId: def.id,
+            cost: routeCost(state, def.transport!, r),
+          }))
         : []),
       { id: `speed:${def.id}`, kind: 'speed', zoneId: def.id, cost: s * growthCost(u.speed.baseCost, zone.speed) },
       { id: `capacity:${def.id}`, kind: 'capacity', zoneId: def.id, cost: s * growthCost(u.capacity.baseCost, zone.capacity) },
@@ -627,6 +672,13 @@ export function buy(state: GameState, id: string): boolean {
     case 'transport':
       state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!].level++;
       break;
+    case 'route': {
+      const id = ZONES.find((d) => d.id === p.zoneId)!.transport!;
+      const routeId = p.id.split(':')[2];
+      state.transports[id].routesUnlocked.push(routeId);
+      state.transports[id].route = routeId;
+      break;
+    }
     case 'unlock':
       zone!.unlocked = true;
       zone!.machines = 1;

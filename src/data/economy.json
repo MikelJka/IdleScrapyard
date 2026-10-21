@@ -110,5 +110,31 @@
     "tapBase": 50,
     "buyBase": 3,
     "workingSeconds": 600
-  }
+  },
+  "routes": [
+    {
+      "id": "local",
+      "wait": 1,
+      "pay": 1,
+      "unlockMult": 0
+    },
+    {
+      "id": "near",
+      "wait": 1,
+      "pay": 1.5,
+      "unlockMult": 10
+    },
+    {
+      "id": "mid",
+      "wait": 2,
+      "pay": 2.5,
+      "unlockMult": 100
+    },
+    {
+      "id": "far",
+      "wait": 4,
+      "pay": 4.5,
+      "unlockMult": 1000
+    }
+  ]
 }
