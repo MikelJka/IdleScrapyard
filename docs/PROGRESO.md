@@ -4,6 +4,12 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Retoques visuales y material de anuncio nuevo
+
+- Viñeta suave en los bordes del mapa, botón de objetivos con su color (verde azulado) y monedas al cobrar un objetivo; cabecera de los paneles con franja de color.
+- Material de anuncio regenerado (`scripts/marketing/index.mjs`): 8 capturas por idioma (nuevas: menú de inicio y objetivos diarios; la última habla de 10 zonas con tren y barco), gráfico de función y vídeos nuevos, y la ficha dice 10 líneas.
+- Qué probar: `/press/` en la web publicada.
+
 ## 2026-10-21 — Menú de inicio
 
 - Pantalla de inicio al abrir el juego (`src/ui/title.ts`): logo que flota, «SCRAP EMPIRE · IDLE FACTORY», resumen de la partida (dólares y zonas), botón grande «JUGAR/CONTINUAR» que brilla, idioma, sonido, brasas que suben y franja de peligro. Se salta con `?notitle` (la prueba de humo, `perf.mjs` y el material de anuncio ya lo usan); la prueba de humo comprueba que sale y que se cierra, y guarda `*-menu.png`.
