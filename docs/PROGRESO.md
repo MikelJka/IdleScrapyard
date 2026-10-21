@@ -2,6 +2,8 @@
 
 Diario de sesiones, la más reciente arriba.
 
+> **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
+
 ## 2026-10-21 — Equilibrio B4b y B6b
 
 - Abrir las zonas 8, 9 y 10 cuesta un 30 % menos y el nivel de máquina crece ×1,8 (`src/data/zones.json`, `economy.json`). Los 68 tests pasan.
