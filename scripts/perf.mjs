@@ -7,7 +7,7 @@ const PORT = 4174;
 const URL = `http://localhost:${PORT}/IdleScrapyard/?fps=1&notitle`;
 const slow = Number(process.argv[2] ?? 4);
 const save = execSync('npx vite-node scripts/makesave.ts 2', { maxBuffer: 1e8 }).toString();
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore' });
+const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort', '--outDir', process.env.OUTDIR ?? 'dist'], { stdio: 'ignore' });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 try {
   for (let i = 0; i < 60; i++) {

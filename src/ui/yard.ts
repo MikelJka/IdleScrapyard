@@ -197,6 +197,42 @@ function mainFlowSvg(): string {
   return `<g id="mainflow" class="belts">${flow(4.6, 4.2, 19, 4.2)}${flow(0.45, 4.0, 0.45, 9.4)}${flow(0.25, 9.2, 19, 9.2)}</g>`;
 }
 
+/**
+ * Desgaste y luz del suelo, horneado en la imagen estática (no cuesta nada al jugar): brillo diagonal, borde más oscuro,
+ * manchas de aceite, marcas de ruedas, motas de polvo y franja de peligro junto al muelle.
+ */
+function floorWearSvg(): string {
+  let seed = 7;
+  const rnd = (): number => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  let o = `<defs><linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6dc" stop-opacity="0.2"/><stop offset="0.45" stop-color="#fff6dc" stop-opacity="0"/><stop offset="1" stop-color="#3a1f08" stop-opacity="0.16"/></linearGradient>
+    <radialGradient id="edge"><stop offset="0.62" stop-color="#3a2410" stop-opacity="0"/><stop offset="1" stop-color="#3a2410" stop-opacity="0.26"/></radialGradient>
+    <pattern id="hz" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="14" fill="#f4c430"/><rect x="7" width="7" height="14" fill="#2a1d14"/></pattern></defs>`;
+  o += tile(-0.6, -0.6, 20, 15.6, 'fill="url(#edge)"');
+  o += tile(-0.6, -0.6, 20, 15.6, 'fill="url(#sheen)"');
+  for (let i = 0; i < 44; i++) {
+    const [x, y] = iso(rnd() * 19, rnd() * 14.5);
+    const rx = 6 + rnd() * 16;
+    o += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${(rx / 2).toFixed(1)}" fill="#2a1a0c" opacity="${(0.05 + rnd() * 0.07).toFixed(2)}"/>`;
+  }
+  for (const [x0, y0, x1, y1] of [[0.9, 8.55, 18.2, 8.55], [1.0, 14.15, 18.2, 14.15], [-0.4, 3.4, -0.4, 9.6]]) {
+    for (let k = 0; k < 2; k++) {
+      const o2 = (k - 0.5) * 0.18;
+      const [ax, ay] = iso(x0 + (x0 === x1 ? o2 : 0), y0 + (y0 === y1 ? o2 : 0));
+      const [bx, by] = iso(x1 + (x0 === x1 ? o2 : 0), y1 + (y0 === y1 ? o2 : 0));
+      o += `<polyline points="${ax.toFixed(1)},${ay.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}" stroke="#1a1008" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="${(30 + rnd() * 40).toFixed(0)} ${(10 + rnd() * 30).toFixed(0)}" opacity="0.1" fill="none"/>`;
+    }
+  }
+  for (let i = 0; i < 380; i++) {
+    const [x, y] = iso(rnd() * 19.2 - 0.4, rnd() * 15 - 0.4);
+    o += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.5 + rnd() * 0.9).toFixed(1)}" fill="${rnd() > 0.5 ? '#7a6a52' : '#f5ead0'}" opacity="${(0.18 + rnd() * 0.2).toFixed(2)}"/>`;
+  }
+  o += tile(0.2, DOCK_Y - 0.22, 19, 0.16, 'fill="url(#hz)" stroke="#2a1d14" stroke-width="0.8"');
+  return o;
+}
+
 function staticYard(): string {
   let s = '';
   // Carretera de atrás y valla.
@@ -209,6 +245,7 @@ function staticYard(): string {
   s += floorDetailsSvg();
   for (let x = 0; x <= 19; x++) s += `<polyline points="${[iso(x - 0.6, -0.6), iso(x - 0.6, 15)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
   for (let y = 0; y <= 15; y++) s += `<polyline points="${[iso(-0.6, y - 0.6), iso(19.4, y - 0.6)].map((p) => p.join(',')).join(' ')}" stroke="#b9a587" stroke-width="0.7"/>`;
+  s += floorWearSvg();
   for (let x = -0.6; x < 19.4; x += 0.8) s += block(x, -0.9, 0, 0.12, 0.12, 0.55, '#8a7a6a');
   s += block(-0.6, -0.86, 0.38, 20, 0.04, 0.06, '#8a7a6a', { edge: false });
   // Cintas que reparten la chatarra desde la pila.
