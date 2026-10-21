@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-21 — Tests de interfaz sencillos
+
+- Nuevo `tests/ui.test.ts` (11 tests): proyección isométrica y colores, escape de HTML, los 16 iconos de interfaz, que cada zona tenga aspecto, icono de producto y cara de ayudante, y las preferencias con y sin almacenamiento. Si se añade una zona sin su aspecto, falla.
+- Qué probar: nada en el juego; `npm test` (79 tests).
+- Sigue: equilibrar tren y barco (cambia números: necesita propuesta de Mikel), Android con Capacitor cuando Mikel lo apruebe.
+
 ## 2026-10-20 — Estaciones propias en el anexo
 
 - Las carretillas de las zonas 9 y 10 ya no comparten pasillo ni andén: la del Taller de vagones descarga en el andén del tren y la del Astillero en el muelle del barco, cada una por su pasillo amarillo (`ANNEX_LANE_X` en `src/ui/yard.ts`). Solo cambia el dibujo.
