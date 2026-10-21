@@ -2,8 +2,6 @@
 
 Diario de sesiones, la más reciente arriba.
 
-> **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
-
 ## 2026-10-21 — Suelo con más detalle y pruebas de rendimiento
 
 - Suelo del desguace con más calidad, horneado en la imagen estática (no cuesta nada al jugar): brillo diagonal, borde más oscuro, manchas de aceite, marcas de ruedas, motas de polvo y franja de peligro junto al muelle (`floorWearSvg` en `src/ui/yard.ts`).
