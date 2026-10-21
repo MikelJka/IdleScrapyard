@@ -23,11 +23,12 @@ try {
   const cdp = await context.newCDPSession(page);
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: slow });
   await page.goto(URL);
-  await sleep(3000);
+  if (process.env.EXTRA_CSS) await page.addStyleTag({ content: process.env.EXTRA_CSS });
+  await sleep(6000);
   await cdp.send('Profiler.enable');
   await cdp.send('Profiler.start');
   const fps = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 10; i++) {
     await sleep(1000);
     fps.push(await page.locator('#fps').textContent());
   }
@@ -42,6 +43,7 @@ try {
   });
   const total = [...self.values()].reduce((a, b) => a + b, 0);
   console.log(`CPU ×${slow}:`, fps.join(' | '));
+  console.log('media', (fps.reduce((a, f) => a + parseInt(f), 0) / fps.length).toFixed(1), 'fps');
   for (const [k, v] of [...self.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14)) console.log(`${((100 * v) / total).toFixed(1).padStart(5)} %  ${k}`);
   await browser.close();
 } finally {

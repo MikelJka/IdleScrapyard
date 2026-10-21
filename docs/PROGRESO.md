@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-21 — Rendimiento: chispas sincronizadas
+
+- Medido con `scripts/perf.mjs` (ahora 10 s tras 6 s de calentamiento y con la media; `EXTRA_CSS` prueba retoques de CSS): lo que más costaba eran las ~50 chispas de las máquinas, cada una con su animación CSS desfasada. Ahora parpadean todas a la vez con una clase que cambia `yard.ts` (se ve igual, nada eliminado): CPU ×4, de ~29 a ~37 fps de media. Sin ninguna animación CSS saldría ~39, así que el resto ya no está en las animaciones.
+- Descartado tras medir: humo, lámparas, cintas y destellos del agua no pesan; `will-change` y `contain` no ayudan.
+- Qué probar: en el móvil, la fluidez con varias zonas abiertas.
+- Sigue: si aún va justo, el siguiente coste es el movimiento de vehículos y personas (transformaciones en cada fotograma).
+
 ## 2026-10-20 — Estaciones propias en el anexo
 
 - Las carretillas de las zonas 9 y 10 ya no comparten pasillo ni andén: la del Taller de vagones descarga en el andén del tren y la del Astillero en el muelle del barco, cada una por su pasillo amarillo (`ANNEX_LANE_X` en `src/ui/yard.ts`). Solo cambia el dibujo.

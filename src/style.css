@@ -72,8 +72,10 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 .puff, .spark, .far-smoke { transform-box: fill-box; transform-origin: center; }
 .puff { animation: puff 2.4s ease-out infinite; }
 @keyframes puff { 0% { opacity: 0.8; translate: 0 0; scale: 0.5; } 100% { opacity: 0; translate: 7px -36px; scale: 1.7; } }
-.spark { animation: spark 0.28s steps(2) infinite; opacity: 0; }
-@keyframes spark { 50% { opacity: 1; } }
+/* Las chispas parpadean todas a la vez: yard.ts pone y quita `spk` en el svg (un solo repintado en vez de 50 desfasados). */
+.spark { opacity: 0; }
+svg.spk .spark { opacity: 1; }
+#scene-wrap.lowq svg.spk .spark { opacity: 0; }
 .fx { opacity: 0; }
 .far-smoke { animation: puff 5s ease-out infinite; }
 .flow { opacity: 0; animation: flow 0.9s linear infinite; }

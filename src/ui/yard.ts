@@ -778,6 +778,7 @@ export function createYard(container: HTMLElement): Yard {
     const shipX = sa < 0 || sa >= 14 ? 0 : sa < 6 ? (sa / 6) ** 2 * 60 : sa < 8 ? 400 : -60 + (1 - (1 - (sa - 8) / 6) ** 2) * 60;
     ship.setAttribute('transform', at(shipX, 0));
     // Cielo: nubes y pájaros.
+    svg.classList.toggle('spk', Math.floor(t / 0.14) % 2 === 1);
     cloudEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * 2.5 + i * 700) % 2800) - 1200).toFixed(1)} ${HORIZON - 190 - i * 38})`));
     birdEls.forEach((g, i) => g.setAttribute('transform', `translate(${(((t * (16 + i * 3) + i * 520) % 2600) - 1100).toFixed(1)} ${(HORIZON - 120 - i * 34 + Math.sin(t * 1.3 + i) * 10).toFixed(1)})`));
     mainLevel += ((working ? 1 : 0) - mainLevel) * Math.min(1, dtv * (working ? 6 : 1.4));
