@@ -2,6 +2,12 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-21 — Tope en las huellas de salida
+
+- Cada producto del muelle admite como máximo 500 piezas (`dock.productCap`, valor provisional; el «x» no lo dio Mikel). Con la huella llena las carretillas de esa línea esperan con su tanda, el palé se llena y la línea para; al salir un camión vuelve a producir. En el panel de la línea se ve «piezas/tope».
+- Los pedidos especiales limitan su cantidad a la parte de lo que se llevan los camiones (con el muelle saturado no se podrían cumplir si no). La simulación de equilibrio no cambia (el muelle ya era el cuello de botella).
+- Qué probar: dejar una línea muy mejorada y ver cómo para al llegar al tope.
+
 ## 2026-10-21 — Suelo con más detalle y pruebas de rendimiento
 
 - Suelo del desguace con más calidad, horneado en la imagen estática (no cuesta nada al jugar): brillo diagonal, borde más oscuro, manchas de aceite, marcas de ruedas, motas de polvo y franja de peligro junto al muelle (`floorWearSvg` en `src/ui/yard.ts`).

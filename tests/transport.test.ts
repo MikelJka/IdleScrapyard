@@ -286,3 +286,36 @@ describe('almacén del tren y el barco (F4)', () => {
     expect(load(JSON.stringify(old)).transports.rail.warehouseLevel).toBe(0);
   });
 });
+
+describe('tope de la huella de salida en el muelle', () => {
+  it('con la huella llena la línea deja de producir hasta que el camión se lleva producto', async () => {
+    const { dockProductCap, zoneStatus } = await import('../src/sim/game');
+    const s = newGame();
+    s.scrapTrucks = 50;
+    s.zones.crusher.machines = 300;
+    s.zones.crusher.carts = 12;
+    s.truckCooldown = 1e9; // el camión no llega: nada sale del muelle
+    advance(s, 600);
+    const def = ZONES[0];
+    const cap = dockProductCap(s, def);
+    expect(s.dockByZone.crusher).toBeLessThanOrEqual(cap + 1e-6);
+    expect(s.dockByZone.crusher).toBeGreaterThan(cap - cartBatch(s.zones.crusher) * 2);
+    expect(zoneStatus(s, def)).toBe('full');
+    const before = s.zones.crusher.buffer;
+    advance(s, 60);
+    expect(s.dockByZone.crusher).toBeLessThanOrEqual(cap + 1e-6);
+    expect(s.zones.crusher.buffer).toBeCloseTo(before, 6); // no produce más
+    s.truckCooldown = 0;
+    const sent = s.trucksSent;
+    advance(s, 30);
+    expect(s.trucksSent).toBeGreaterThan(sent); // salen camiones y la huella se vuelve a llenar sin pasar del tope
+    expect(s.dockByZone.crusher).toBeLessThanOrEqual(cap + 1e-6);
+  });
+
+  it('el tope nunca baja del doble de una tanda', async () => {
+    const { dockProductCap } = await import('../src/sim/game');
+    const s = newGame();
+    s.zones.crusher.cartLevel = 500;
+    expect(dockProductCap(s, ZONES[0])).toBe(2 * cartBatch(s.zones.crusher));
+  });
+});

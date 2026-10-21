@@ -312,6 +312,14 @@ export function warehouseBonus(state: GameState, id: TransportId): number {
   return 1 + w.bonusPerStep * Math.min(w.maxSteps, Math.floor(fill / w.stepFill + 1e-9));
 }
 
+/**
+ * Tope de piezas de un producto esperando en su huella del muelle: al llegar, las carretillas de esa línea no pueden descargar,
+ * el palé se llena y la línea para hasta que el camión se lleve producto. Siempre cabe al menos el doble de una tanda.
+ */
+export function dockProductCap(state: GameState, def: ZoneDef): number {
+  return Math.max(ECONOMY.dock.productCap, 2 * cartBatch(state.zones[def.id]));
+}
+
 /** Paga ×(1 + nivel·10 %) y viaje −3 % por nivel del capitán. */
 export function captainPay(state: GameState, id: TransportId): number {
   return 1 + state.transports[id].captainLevel * ECONOMY.captain.payPerLevel;
@@ -485,6 +493,11 @@ function step(state: GameState, dt: number): void {
         out.units += trip.load;
         out.value += trip.load * unitValue(def, zone);
       } else {
+        // Si la huella del producto está llena, la carretilla espera con su tanda y la línea acaba parando.
+        if ((state.dockByZone[def.id] ?? 0) + trip.load > dockProductCap(state, def) + 1e-9) {
+          stuck.add(trip);
+          continue;
+        }
         state.dockUnits += trip.load;
         state.dockValue += trip.load * unitValue(def, zone);
         state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + trip.load;
@@ -590,7 +603,12 @@ export function orderQuantity(state: GameState, def: ZoneDef): number {
   const zone = state.zones[def.id];
   if (!zone.unlocked || zone.carts <= 0 || ['locked', 'starved'].includes(zoneStatus(state, def))) return 0;
   const batch = cartBatch(zone);
-  const rate = Math.min(zoneRate(def, zone), cartThroughput(zone));
+  let rate = Math.min(zoneRate(def, zone), cartThroughput(zone));
+  if (!def.transport) {
+    // Con la huella del muelle llena, lo que sale de cada producto es su parte de lo que se llevan los camiones.
+    const lines = ZONES.filter((d) => !d.transport && state.zones[d.id].unlocked && state.zones[d.id].carts > 0).length;
+    rate = Math.min(rate, dockLoad(state) / ECONOMY.dock.returnSeconds / Math.max(1, lines));
+  }
   return Math.floor((rate * ECONOMY.orders.fillSeconds) / batch) * batch;
 }
 

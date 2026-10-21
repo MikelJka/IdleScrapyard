@@ -25,6 +25,7 @@ import {
   claimGoldenTruck,
   dailyReward,
   dockLoad,
+  dockProductCap,
   helperLevelsReady,
   incomePerSecond,
   purchases,
@@ -809,7 +810,7 @@ export function startApp(root: HTMLElement): void {
         ${
           def.transport
             ? `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b></li><li>${t('info.warehouse', { units: Math.floor(state.transports[def.transport].units), cap: warehouseCapacity(state, def.transport), bonus: Math.round((warehouseBonus(state, def.transport) - 1) * 100) })}</li><li>${t('info.transport', { name: t('transport.' + def.transport), units: Math.floor(state.transports[def.transport].units), load: transportLoad(def.transport, state), mult: ECONOMY.transports[def.transport].payMultiplier, sent: state.transports[def.transport].sent })}</li>`
-            : `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}</b></li>`
+            : `<li>${t('info.pallet')}: <b>${Math.floor(zone.buffer)}/${Math.floor(zoneCapacity(zone))}</b> · ${t('info.dockHas')}: <b>${Math.floor(state.dockByZone[def.id] ?? 0)}/${dockProductCap(state, def)}</b></li>`
         }
         <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: rateTxt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>
         <li>${t('info.stock', { pallets: fmt(ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0)), dock: fmt(state.dockUnits), load: dockLoad(state) })}</li>

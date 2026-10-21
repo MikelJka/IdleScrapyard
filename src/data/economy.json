@@ -19,7 +19,8 @@
     "baseLoad": 10,
     "loadPerLevel": 5,
     "baseCost": 25,
-    "returnSeconds": 5
+    "returnSeconds": 5,
+    "productCap": 500
   },
   "zoneUpgrades": {
     "speed": {
