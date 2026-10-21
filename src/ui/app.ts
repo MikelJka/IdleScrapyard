@@ -563,7 +563,7 @@ export function startApp(root: HTMLElement): void {
       day > 0
         ? btn('daily', uiIcon('gift'), t('daily.short', { day }), dailyReward(state, today) > 0, 'daily ready')
         : btn('daily', uiIcon('gift'), t('daily.doneShort', { day: nextDay }), false, 'daily'),
-      btn('goals', uiIcon('target'), t('goals.short', { n: (state.daily?.goals ?? []).filter((g) => g.claimed).length }), true, goalsReady() ? 'daily ready' : 'goals'),
+      btn('goals', uiIcon('target'), t('goals.short', { n: (state.daily?.goals ?? []).filter((g) => g.claimed).length }), true, goalsReady() ? 'goals ready' : 'goals'),
       state.hasPass ? btn('pass', uiIcon('star'), t('pass.ownedShort'), false, 'pass') : btn('pass', uiIcon('star'), t('pass.short'), true, 'pass'),
     ];
     return buttons.join('');

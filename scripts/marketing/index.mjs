@@ -27,7 +27,7 @@ async function ready() {
   throw new Error('El servidor no arrancó');
 }
 
-async function open(browser, { save, lang, query = '', size = { width: 360, height: 640 }, scale = 3, }) {
+async function open(browser, { save, lang, query = '', title = false, size = { width: 360, height: 640 }, scale = 3, }) {
   const context = await browser.newContext({ viewport: size, deviceScaleFactor: scale, isMobile: true, hasTouch: true, });
   const page = await context.newPage();
   await page.addInitScript(([s, l]) => {
@@ -35,7 +35,7 @@ async function open(browser, { save, lang, query = '', size = { width: 360, heig
     localStorage.setItem('chatarrero.tut', '4');
     localStorage.setItem('chatarrero.lang', l);
   }, [save, lang]);
-  await page.goto(BASE + query + (query.includes('?') ? '&' : '?') + 'notitle');
+  await page.goto(BASE + query + (title ? '' : (query.includes('?') ? '&' : '?') + 'notitle'));
   return { context, page };
 }
 
@@ -72,10 +72,14 @@ try {
   // M1: capturas con rótulos.
   for (const lang of ['es', 'en']) {
     for (const [n, shot] of SHOTS.entries()) {
-      const { context, page } = await open(browser, { save: saves[shot.save], lang, query: shot.query ?? '' });
+      const { context, page } = await open(browser, { save: saves[shot.save], lang, query: shot.query ?? '', title: shot.title });
       await sleep(shot.wait ?? 2500);
       if (shot.line) {
         await selectLine(page, shot.line);
+        await sleep(900);
+      }
+      if (shot.goals) {
+        await page.click('button[data-action=goals]');
         await sleep(900);
       }
       await page.addStyleTag({ content: '#stats,#tip,#toast,#extras{display:none !important}' });

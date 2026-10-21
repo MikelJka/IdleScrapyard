@@ -42,6 +42,8 @@ h1 { font-size: 40px; color: var(--rust); margin: 8px 0 16px; }
 #extras .daily { background: linear-gradient(180deg, #e0699a, #b8456f); }
 #extras .daily.ready:not(:disabled) { animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(1.07); } }
+#extras .goals { background: linear-gradient(180deg, #3fb5a6, #26857b); }
+#extras .goals.ready:not(:disabled) { animation: pulse 1.2s ease-in-out infinite; }
 #extras .pass { background: linear-gradient(180deg, #8d6bd1, #6447a8); }
 #extras button:disabled { opacity: 0.6; cursor: default; }
 #extras button:active { transform: translateY(2px); }
@@ -218,3 +220,8 @@ html.contrast #shop button:disabled { opacity: 0.75; }
 .title-foot { position: absolute; bottom: 30px; margin: 0; font-size: 11px; letter-spacing: 0.3em; color: #9a8e78; font-weight: 700; }
 .title-hazard { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: repeating-linear-gradient(135deg, #f2b705 0 14px, #2a1d14 14px 28px); }
 @media (prefers-reduced-motion: reduce) { .title-bg i, .title-logo, #play { animation: none !important; } }
+
+/* Retoques visuales: viñeta suave en los bordes del mapa y cabecera de los paneles con franja de color */
+#scene-wrap::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 42%, transparent 58%, rgba(26, 14, 6, 0.32) 100%); }
+.sheet-head { border-bottom: 2px solid transparent; border-image: linear-gradient(90deg, #f2b705, rgba(242, 183, 5, 0)) 1; margin-bottom: 6px; }
+#shop button:not(:disabled) .price { box-shadow: 0 2px 0 #1f4228; }
