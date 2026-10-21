@@ -68,7 +68,7 @@ Terminado: el juego se ve, suena y se siente como un título de estudio grande, 
 
 Terminado: el juego está en la prueba cerrada de Google Play con anuncios de prueba funcionando.
 
-- [ ] Empaquetar con Capacitor y generar el archivo para Google Play en GitHub Actions
+- [ ] Empaquetar con Capacitor y generar el archivo para Google Play en GitHub Actions (**hecho: Capacitor y workflow que genera un APK de prueba**, `docs/ANDROID.md`; falta la clave de firma y el AAB)
 - [x] Anuncios y compras decididos (empujón, camión dorado, pase a 2,99 €)
 - [ ] Anuncios reales con AdMob y compra del pase con Google Play Billing
 - [ ] Consentimiento de anuncios (UE) y política de privacidad

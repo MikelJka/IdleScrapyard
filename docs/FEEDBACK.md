@@ -6,7 +6,7 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 - [ ] **Estilo visual: 2D muy bonito y atractivo** (2026-10-19, Mikel cambia el 3D por 2D: «no aporta nada ver esto desde diferentes ángulos»): escena del desguace en SVG dibujada por código, estilo dibujo animado. **Hecha la vista isométrica** (2026-10-19, como la captura de serrería que enseñó Mikel): mapa a pantalla completa (arrastrar y pellizcar), puestos con líneas amarillas, máquinas por nivel (1-2 por puesto), ayudantes de bloques, palés, carretillas, camiones de chatarra detrás y de expedición delante, dinero que salta al cobrar; botones flotantes y tienda en panel inferior. **Hechos los sonidos** (2026-10-19, sintetizados por código, con botón de silencio) **y las animaciones** (2026-10-19): productos distintos por línea, carretillas que giran, máquinas que trabajan, volquete, coches de fondo, ciudad industrial, nave en rayos X, nubes, pájaros y paseantes. Falta: pulir.
 
-- [ ] **Base del proyecto** (2026-10-19, aprobado por Mikel al crear Zenit Studio): esqueleto con Vite + TypeScript + Vitest, publicación de la versión web en GitHub Pages y capturas automáticas para STONKS. **Hecho el esqueleto**; falta comprobar que la web publicada se ve en el móvil.
+- [ ] **Base del proyecto** (2026-10-19, aprobado por Mikel al crear Zenit Studio): esqueleto con Vite + TypeScript + Vitest, publicación de la versión web en GitHub Pages y capturas automáticas para STONKS. **Hecho el esqueleto**; falta comprobar que la web publicada se ve en el móvil. **Android, primera parte (N2, Mikel lo pide el 2026-10-21):** Capacitor configurado y workflow «Android (APK de prueba)» (`docs/ANDROID.md`); falta la clave de firma de Mikel para el AAB.
 
 - [ ] **Fase 1 — bucle básico** (2026-10-19, diseño de las Partes 1-3 aprobado por Mikel): simulación de la chatarra (toque y camiones), la zona de aplastado con su máquina, carretillas, muelle y camiones de expedición, mejoras y dólares; después la pantalla principal y el guardado. **Hecha la simulación, la pantalla principal (sin 3D), el guardado automático y las ganancias con el juego cerrado** (2026-10-19); hecha la escena 2D. Los ayudantes (experiencia y niveles) van después.
 
@@ -50,6 +50,40 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 ## Propuestas para Mikel
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
+
+### Parte 23 — Equilibrio con las 10 zonas (2026-10-21, N1)
+
+Simulación actual (`npx vite-node scripts/balance.ts`, 60 días). Tiempo hasta abrir cada zona:
+
+| Zona (según la simulación) | Casual (4×5 min/día) | Atento (4 min cada 40 min, 16 h/día) |
+|---|---|---|
+| Aplastado de chatarra | 12 h | 8,7 h |
+| Fundido de chatarra | 16 h | 9,3 h |
+| Laminado de chapa | 20 h | 10 h |
+| Taller de tubos | 44 h | 14 h |
+| Taller de vigas | 2,8 d | 18 h |
+| Torno de piezas de motor | 4,5 d | 24 h |
+| Montaje de motores | 6 d | 38 h |
+| Taller de coches reconstruidos | 8,7 d | 2,4 d |
+| Taller de vagones | 12 d | 2,9 d |
+| Astillero de contenedores | 21,7 d | 5,4 d |
+
+Otros datos: máquina de nivel 5 en una línea a los 31 días (casual) y 8 días (atento); la espera más larga sin comprar nada: **8 días (casual)** y **2,3 días (atento)**, justo antes de abrir las últimas zonas; en 60 días el atento gana 1,6e14 $ y el casual 2,9e12 $.
+
+Opciones (responde con las letras):
+- **B4 — Ritmo del final:** (a) dejarlo; (b) bajar un 30 % el precio de abrir las zonas 8-10 para que el casual las vea en ~2 semanas; (c) dejar el precio y añadir algo que hacer mientras (B5).
+- **B5 — Espera de 8 días del casual:** (a) dejarlo; (b) cofre de hito por hora jugada (B3-b) que da dinero sorpresa; (c) objetivos diarios (B3-d); (d) mejoras intermedias del tren y del barco (más vagones/contenedores, F1/F2 de la Parte 21).
+- **B6 — Máquinas:** (a) dejarlo (nivel 5 a los 31 días casual); (b) bajar el crecimiento de ×2,2 a ×1,8.
+
+### Parte 24 — Tren y barco: lo que falta de la Parte 21 (2026-10-21)
+
+Z1 + 2b ya están hechos (zonas 9 y 10 con tren y barco que salen llenos). Para decidir F3, F4 y F5:
+
+- **F3 — Rutas y contratos:** el tren y el barco eligen destino (ciudad vecina, país, otro continente): más lejos tarda más y paga más (p. ej. ×1,5 / ×2,5 / ×4 con 1×, 2× y 3× el tiempo de espera) y cada destino pide un producto concreto. Da decisiones y metas largas (desbloquear destinos). Cambia reglas y números: tabla propuesta al aprobarlo.
+- **F4 — Almacén intermedio:** un almacén entre las líneas y el transporte que acumula producto; tren y barco lo vacían en lotes y los lotes grandes pagan bonificación (p. ej. +10 % con almacén lleno). Mejoras: capacidad y nº de transportes.
+- **F5 — Capitán y anuncio:** un jefe de estación / capitán como los ayudantes de zona (nivel por horas de trabajo) y un anuncio opcional que acorta un viaje o duplica un cargamento, como el camión dorado.
+
+Mi recomendación: **F3 primero** (alarga más el juego), luego **F5** (monetiza con lo ya hecho); **F4** al final o nunca, porque añade otra pantalla. Responde con letras (p. ej. «F3F5»).
 
 ### Parte 11 — Qué hacemos ahora (2026-10-19)
 

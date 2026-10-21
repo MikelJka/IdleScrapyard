@@ -2,6 +2,15 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-21 — Panel de línea, temblor, Android y equilibrio
+
+- **Panel de línea** (pedido de Mikel): arriba solo el ayudante, su estado y lo que produce; las mejoras van justo debajo y el resto de datos (máquinas, carretillas, palés, flujo de chatarra) quedan plegados en «Más datos» al final (se recuerda si estaba abierto).
+- **Temblor con «palés llenos»**: la línea del aviso aparecía y desaparecía y cambiaba el alto del panel; ahora tiene un hueco fijo (`.jam-slot`) y la altura no cambia (medida: 437 px constantes).
+- **Android (N2, primera parte)**: Capacitor 7 (`capacitor.config.json`, `CAPACITOR=1` pone rutas relativas), workflow manual «Android (APK de prueba)» y `docs/ANDROID.md`. No he podido compilar el APK aquí (sin SDK de Android): se comprueba lanzando el workflow.
+- **Equilibrio (N1)**: simulación con las 10 zonas; tabla y opciones B4-B6 en la Parte 23. **F3, F4 y F5** quedan como propuesta en la Parte 24.
+- Qué probar: abrir una línea en el móvil; lanzar el workflow «Android» y bajar el APK.
+- Sigue: lo que Mikel elija en las Partes 23 y 24; clave de firma para el AAB.
+
 ## 2026-10-21 — Rendimiento: chispas sincronizadas
 
 - Medido con `scripts/perf.mjs` (ahora 10 s tras 6 s de calentamiento y con la media; `EXTRA_CSS` prueba retoques de CSS): lo que más costaba eran las ~50 chispas de las máquinas, cada una con su animación CSS desfasada. Ahora parpadean todas a la vez con una clase que cambia `yard.ts` (se ve igual, nada eliminado): CPU ×4, de ~29 a ~37 fps de media. Sin ninguna animación CSS saldría ~39, así que el resto ya no está en las animaciones.
