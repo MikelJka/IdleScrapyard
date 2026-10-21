@@ -1,6 +1,6 @@
-# Nuevo juego: idle de estación espacial (borrador de diseño)
+# Space Harvest: idle de estación espacial (borrador de diseño)
 
-Estado: **borrador para que Mikel lo revise** (2026-10-21). Nada de esto está aprobado todavía: los números son propuestas y las decisiones abiertas están al final, en «Preguntas para Mikel». Parte de lo aprendido en Scrap Empire: Idle Factory (este repositorio) y reutiliza su forma de trabajar: simulación pura en `src/sim/`, contenido en JSON, dibujado aparte, textos es/en, coste cero.
+Estado: borrador (2026-10-21). **Decidido por Mikel el 2026-10-21:** el nombre es **Space Harvest**; el motor gráfico es la **Opción B (PixiJS)**; los módulos se centran en **agricultura, minería de planetas y recogida de energía solar** (investigación primero). El resto son propuestas: los números no están aprobados y las decisiones abiertas están al final, en «Preguntas para Mikel». Parte de lo aprendido en Scrap Empire: Idle Factory (este repositorio) y reutiliza su forma de trabajar: simulación pura en `src/sim/`, contenido en JSON, dibujado aparte, textos es/en, coste cero.
 
 ## 1. Idea en una frase
 
@@ -32,16 +32,16 @@ Pedido de Mikel: ir construyendo módulos nuevos, **primero investigación, lueg
 
 | # | Módulo | Qué aporta | Depende de |
 |---|---|---|---|
-| 0 | **Núcleo** | Estación con módulo de mando, generador solar, reloj, guardado, ganancias con el juego cerrado, menú de inicio | — |
+| 0 | **Núcleo** | Estación con módulo de mando, reloj, guardado, ganancias con el juego cerrado, menú de inicio | — |
 | 1 | **Investigación** | Laboratorio: produce **datos**; árbol tecnológico que desbloquea módulos y mejoras; investigaciones largas que se terminan con el juego cerrado | Núcleo |
-| 2 | **Agricultura** | Invernaderos hidropónicos: producen **comida**; ciclos de cultivo; la comida mantiene a la tripulación | Investigación (primeros cultivos) |
-| 3 | **Energía** | Paneles, baterías, reactor; la energía pasa a ser un recurso limitado que hay que repartir | Núcleo |
-| 4 | **Minería** | Drones a asteroides: traen hierro, hielo y silicio en viajes de duración variable | Energía, Investigación |
-| 5 | **Tripulación** | Personajes con personalidad (como los ayudantes de zona): suben de nivel trabajando en un módulo y dan bonificaciones | Agricultura |
-| 6 | **Fabricación** | Fundiciones e impresoras: convierten materiales en piezas y en naves | Minería |
-| 7 | **Logística y comercio** | Naves de carga que llevan pedidos a destinos con rutas, almacén y capitán (las ideas de F3/F4/F5 del desguace) | Fabricación |
-| 8 | **Exploración** | Sondas y expediciones: sucesos, hallazgos y mapa de sectores | Investigación, Logística |
-| 9 | **Colonias** | Estaciones satélite que repiten el bucle en pequeño y dan prestigio | Todo lo anterior |
+| 2 | **Agricultura** (eje del juego) | Invernaderos hidropónicos con bandejas: plantas que crecen en tiempo real, luz de cultivo, cosechas que se venden o alimentan a la tripulación; cultivos nuevos por investigación | Investigación |
+| 3 | **Energía solar** (eje del juego) | Campos de paneles frente a la estrella: más paneles, orientación, baterías; la energía alimenta invernaderos y minas, y hay que repartirla | Núcleo, Investigación |
+| 4 | **Minería de planetas** (eje del juego) | Torres de perforación y drones sobre la superficie de planetas distintos: minerales, hielo y gases; cada planeta se abre con investigación | Energía solar, Investigación |
+| 5 | Tripulación (opcional) | Personajes que suben de nivel trabajando en un módulo | Agricultura |
+| 6 | Logística y comercio (opcional) | Naves que llevan cosechas y minerales a destinos con rutas, almacén y capitán (ideas de F3/F4/F5 del desguace) | Agricultura, Minería |
+| 7 | Exploración y colonias (opcional) | Sondas, sucesos y estaciones satélite para el prestigio | Todo lo anterior |
+
+Los módulos 5-7 son opcionales y solo se hacen si Mikel los aprueba; el juego se centra en los tres ejes: **cosechar, minar y captar energía**, de ahí el nombre.
 
 **Regla de módulos:** un módulo nuevo solo puede (a) añadir recursos y reglas propias, (b) leer y escribir los recursos comunes. No toca el código de otros módulos. Si lo necesita, lo hace a través de un «gancho» publicado (p. ej. «bonificación de investigación»).
 
@@ -108,7 +108,7 @@ Scrap Empire dibuja el mapa con SVG isométrico hecho por código. Es bonito y l
 - Estación en 3D real (cámara con inclinación fija, no rotable: Mikel ya decidió que «ver desde diferentes ángulos no aporta» en Scrap Empire), con luz y sombras reales.
 - **Ventaja:** el mejor aspecto posible. **Riesgo:** pesa más en móviles flojos, más trabajo de modelado y de optimización. Scrap Empire pasó de 3D a 2D por esto.
 
-**Recomendación:** empezar con la **Opción B**, con una **prueba de concepto de una semana** (un módulo de estación con luces, glow y estrellas con paralaje, medido en un móvil flojo con el mismo script de rendimiento de Scrap Empire) antes de decidir. Si la prueba convence, se construye el juego sobre PixiJS; si no, se vuelve a SVG.
+**Decidido (2026-10-21): Opción B.** Recomendación original: empezar con la **Opción B**, con una **prueba de concepto de una semana** (un módulo de estación con luces, glow y estrellas con paralaje, medido en un móvil flojo con el mismo script de rendimiento de Scrap Empire) antes de decidir. Si la prueba convence, se construye el juego sobre PixiJS; si no, se vuelve a SVG.
 
 ### Pipeline de arte a coste cero
 1. **Modelos 3D:** paquetes CC0 como los de Kenney (Space Kit) y Quaternius; los que falten, se modelan con **Blender** (gratuito) o se generan por código.
@@ -143,3 +143,11 @@ Cada hito acaba jugable y publicado en una versión web de prueba, igual que aho
 3. **Orden de módulos:** ¿bien el orden de la tabla (investigación → agricultura → energía → minería…) o quieres otro?
 4. **Repositorio:** este documento vive ahora en `docs/` de Scrap Empire. Cuando lo apruebes, ¿creamos un repositorio nuevo para el juego (necesitará acceso para las sesiones automáticas)?
 5. **Tripulación:** ¿personajes con personalidad como los ayudantes (más trabajo de arte, más cariño) o trabajadores anónimos?
+
+## 10. Prueba de gráficos hecha (2026-10-21)
+
+Prototipo en `prototipos/espacio-pixi/` (PixiJS 8, MIT; todo dibujado por código, sin archivos de terceros), publicado en `/prototipos/espacio/` con el contador de fps. Cuatro escenas con `?escena=`: `estacion`, `granja` (invernadero con bandejas, plantas que crecen y luz de cultivo), `solar` (paneles frente a la estrella con destello y rayos de energía) y `mineria` (torre de perforación con láser, drones y escombros sobre un planeta). Capturas en `prototipos/espacio-pixi/capturas/`.
+
+- **Lo que ya se ve:** brillo (bloom barato), luces que parpadean, paralaje de estrellas, nebulosas y partículas.
+- **Lo que falta para llegar a «calidad de estudio»:** arte renderizado en 3D con Blender (sprites con iluminación real y sombras), animaciones de personajes y módulos y pulido de composición. El prototipo usa formas con degradados.
+- **Rendimiento:** en el servidor no hay tarjeta gráfica y no se puede medir; la cifra que vale es la del móvil de Mikel con el contador de fps de la página.

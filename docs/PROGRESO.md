@@ -4,6 +4,13 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Space Harvest: nombre, escenas de prueba y capturas
+
+- Mikel decide: nombre **Space Harvest**, motor PixiJS (Opción B), módulos centrados en agricultura, minería de planetas y energía solar. Documento actualizado (`docs/NUEVO_JUEGO_ESPACIO.md`, secciones 4 y 10).
+- Prototipo con cuatro escenas (estación, invernadero, energía solar, minería) y capturas en `prototipos/espacio-pixi/capturas/`.
+- Quitado «la mitad de la otra línea» de los destinos del tren y el barco (decidido por Mikel).
+- Qué probar: `/prototipos/espacio/?escena=granja` (y `solar`, `mineria`) en el móvil y mirar los fps.
+
 ## 2026-10-21 — Borrador del nuevo juego espacial
 
 - `docs/NUEVO_JUEGO_ESPACIO.md`: diseño de un idle de estación espacial hecho por módulos (investigación → agricultura → energía → minería → tripulación → fabricación → logística → exploración → colonias), arquitectura para añadir módulos sin romper partidas y plan de gráficos (SVG mejorado, PixiJS con sprites prerrenderizados desde Blender, o 3D low-poly) con prueba de concepto antes de decidir. Sin aprobar: preguntas para Mikel en la sección 9.
@@ -40,7 +47,7 @@ Diario de sesiones, la más reciente arriba.
 ## 2026-10-21 — Destinos del tren y el barco (F3)
 
 - Tren y barco tienen destinos (`routes` en `economy.json`): «Puerto local» (el de siempre, gratis) y tres que se compran en el panel de la línea (10, 100 y 1000 veces el valor de un cargamento): viaje ×1/×2/×4 y paga ×1,5/×3/×6 (ajustado el 2026-10-21) encima de la del transporte. Selector «Destino» con los ya comprados. Partidas antiguas: destino local.
-- Sin hacer: «los destinos lejanos piden además la mitad de la otra línea» (a decidir tras el almacén). Ojo: con estos números el destino cercano rinde más por minuto que los lejanos; propuesta pendiente de Mikel: paga ×1,5/×3/×6.
+- Descartado por Mikel (2026-10-21): «los destinos lejanos piden además la mitad de la otra línea». Paga ajustada a ×1,5/×3/×6 para que rindan igual por minuto.
 - Qué probar: abrir la zona 9, comprar un destino y ver el cambio de espera y paga.
 - Sigue: F5 (capitán y anuncio) y F4 (almacén).
 
