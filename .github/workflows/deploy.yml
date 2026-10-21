@@ -40,6 +40,14 @@ jobs:
           git add .
           git -c user.name=ci -c user.email=ci@localhost commit -qm "Capturas de main (${GITHUB_SHA::7})"
           git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" capturas
+      # Prueba de gráficos del juego espacial (PixiJS), para abrirla en el móvil: /prototipos/espacio/
+      - name: Prototipo de gráficos del juego espacial
+        run: |
+          cd prototipos/espacio-pixi
+          npm install
+          npm run build
+          mkdir -p ../../dist/prototipos/espacio
+          cp -r dist/. ../../dist/prototipos/espacio/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
