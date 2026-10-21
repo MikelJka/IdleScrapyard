@@ -4,6 +4,11 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Pulido visual v2
+
+- Interfaz con más relieve y profundidad (solo CSS, sin coste en el mapa): barra de dinero con degradado y brillo, moneda con volumen, producción por segundo en píldora, botones laterales con reflejo y brillo al estar listos, hoja de paneles con asa y degradado, botones de compra con más relieve, icono con volumen y precio con brillo, barras de progreso con degradado, aviso amarillo con brillo, foco visible al navegar con teclado y barra de desplazamiento fina. Respeta «reducir movimiento» y el alto contraste.
+- Qué probar: abrir una línea y el panel de objetivos en el móvil.
+
 ## 2026-10-21 — Space Harvest se separa de este proyecto
 
 - Todo lo de Space Harvest (diseño, decisiones, diario, prototipos de PixiJS y Blender) se ha movido a la carpeta `space-harvest/`, lista para llevársela a su propio repositorio. Este diario y `FEEDBACK.md` ya solo hablan de Scrap Empire. La web sigue publicando el prototipo en `/prototipos/espacio/` desde su nueva ubicación.
