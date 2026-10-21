@@ -4,6 +4,11 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Render 3D de prueba para Space Harvest
+
+- Mikel: las capturas del prototipo no parecen de juego moderno. Respuesta: son arte provisional; prueba con Blender (`bpy`) en `prototipos/blender/modulo_granja.py` → `granja-render-3d.png` (metal y cristal, luz, brillo, profundidad de campo). Plan de calidad en la sección 11 de `docs/NUEVO_JUEGO_ESPACIO.md`.
+- Sigue: decidir con Mikel si el arte se hace por script o con paquetes CC0; render del resto de módulos.
+
 ## 2026-10-21 — Space Harvest: nombre, escenas de prueba y capturas
 
 - Mikel decide: nombre **Space Harvest**, motor PixiJS (Opción B), módulos centrados en agricultura, minería de planetas y energía solar. Documento actualizado (`docs/NUEVO_JUEGO_ESPACIO.md`, secciones 4 y 10).

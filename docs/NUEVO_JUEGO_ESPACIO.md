@@ -151,3 +151,17 @@ Prototipo en `prototipos/espacio-pixi/` (PixiJS 8, MIT; todo dibujado por códig
 - **Lo que ya se ve:** brillo (bloom barato), luces que parpadean, paralaje de estrellas, nebulosas y partículas.
 - **Lo que falta para llegar a «calidad de estudio»:** arte renderizado en 3D con Blender (sprites con iluminación real y sombras), animaciones de personajes y módulos y pulido de composición. El prototipo usa formas con degradados.
 - **Rendimiento:** en el servidor no hay tarjeta gráfica y no se puede medir; la cifra que vale es la del móvil de Mikel con el contador de fps de la página.
+
+## 11. Cómo llegar a un aspecto moderno (2026-10-21, a petición de Mikel: «no se ve como un juego moderno»)
+
+Las capturas de la sección 10 son arte provisional (formas planas con degradados). **El aspecto final no será ese.** Prueba hecha el mismo día: `prototipos/blender/modulo_granja.py` genera con **Blender** (módulo `bpy`, gratuito, se ejecuta sin pantalla en el servidor) un render 3D del invernadero con metal y cristal físicos, bordes biselados, plantas con translucidez, luz de cultivo, planeta con atmósfera, profundidad de campo y brillo; resultado en `prototipos/blender/granja-render-3d.png`. Tiempo de render: ~40 s a 720×960 en CPU, así que el pipeline es viable en el servidor o en GitHub Actions.
+
+Qué hace que un juego se vea moderno y cómo se consigue sin pagar:
+1. **Modelos 3D con materiales reales** (metal, cristal, plantas) renderizados antes en Blender y metidos en el juego como imágenes: es lo que se ve en la prueba.
+2. **Más detalle de modelado** (paneles, tuberías, remaches, texturas CC0 de ambientCG/Poly Haven) y varias vistas y estados de cada módulo (apagado, encendido, dañado, en obras).
+3. **Iluminación en el juego:** sprites con mapas de normales y luces dinámicas en PixiJS (la luz de cultivo ilumina las plantas de verdad).
+4. **Posproceso:** brillo, viñeta, corrección de color y desenfoque de profundidad.
+5. **Animación:** plantas que crecen, paneles que giran y drones, como secuencias de imágenes o animación por huesos con herramienta gratuita.
+6. **Interfaz con diseño propio** (paneles de cristal, transiciones, iconos coherentes) y sonido.
+
+Límite honesto: modelar y pulir cada módulo lleva tiempo (el invernadero de la prueba son ~150 líneas de script y se ve «de prototipo»). Para un resultado de estudio grande harían falta modelos más detallados y retoque a mano; los paquetes CC0 de Kenney y Quaternius pueden acelerar naves y props. Decisión pendiente: ¿seguimos con arte hecho por script (rápido, coherente) o buscamos más paquetes CC0 para mezclar?
