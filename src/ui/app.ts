@@ -3,6 +3,9 @@ import {
   ECONOMY,
   ROUTES,
   ZONES,
+  captainPay,
+  captainTrip,
+  useTransportAd,
   activateBoost,
   setRoute,
   advance,
@@ -406,6 +409,23 @@ export function startApp(root: HTMLElement): void {
   // El estado abierto/cerrado de «Más datos» se recuerda entre redibujados.
   $('panel-more').addEventListener('toggle', (e) => (moreOpen = (e.target as HTMLDetailsElement).open), true);
   $('panel-info').addEventListener('click', (e) => {
+    const ad = (e.target as HTMLElement).closest<HTMLElement>('button[data-tad]');
+    if (ad && !busy) {
+      busy = true;
+      void (async () => {
+        try {
+          if (state.transports[ad.dataset.transport as 'rail' | 'sea'].adCooldown <= 0 && (await rewarded())) {
+            if (useTransportAd(state, ad.dataset.transport as 'rail' | 'sea', ad.dataset.tad as 'now' | 'double')) {
+              play('reward');
+              writeSave(state);
+            }
+          }
+        } finally {
+          busy = false;
+        }
+      })();
+      return;
+    }
     const b = (e.target as HTMLElement).closest<HTMLElement>('button[data-route]');
     if (b && setRoute(state, b.dataset.transport as 'rail' | 'sea', b.dataset.route!)) {
       play('tap');
@@ -670,9 +690,9 @@ export function startApp(root: HTMLElement): void {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
         const kindKey = p.kind === 'transport' ? `transport.${def!.transport}` : '';
         const route = p.kind === 'route' ? p.id.split(':')[2] : '';
-        const name = p.kind === 'route' ? t('buy.route', { route: t('route.' + route) }) : p.kind === 'helper' ? t('buy.helper', { helper: helperName(def!) }) : t('buy.' + p.kind + (kindKey ? `.${def!.transport}` : ''));
+        const name = p.kind === 'captain' ? t('buy.captain.' + def!.transport) : p.kind === 'route' ? t('buy.route', { route: t('route.' + route) }) : p.kind === 'helper' ? t('buy.helper', { helper: helperName(def!) }) : t('buy.' + p.kind + (kindKey ? `.${def!.transport}` : ''));
         const routeDef = ROUTES.find((r) => r.id === route);
-        const sub = p.kind === 'route' ? t('sub.route', { wait: routeDef!.wait, pay: routeDef!.pay }) : p.kind === 'transport' ? t('sub.transport.' + def!.transport) : p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? zoneProduct(def) : zoneName(def)) : t('sub.' + p.kind);
+        const sub = p.kind === 'captain' ? t('sub.captain') : p.kind === 'route' ? t('sub.route', { wait: routeDef!.wait, pay: routeDef!.pay }) : p.kind === 'transport' ? t('sub.transport.' + def!.transport) : p.kind === 'carts' || p.kind === 'cartLevel' ? t('sub.' + p.kind) : def ? (p.kind === 'unlock' ? zoneProduct(def) : zoneName(def)) : t('sub.' + p.kind);
         const cls = p.kind === 'unlock' ? 'unlock' : p.kind === 'helper' ? 'helper' : '';
         return `<button type="button" class="${cls}" data-id="${p.id}" ${p.cost > state.dollars ? 'disabled' : ''}>${shopIcon(p.kind, p.zoneId)}<span class="what"><b>${name}</b><small>${sub}</small></span><span class="price">$${fmt(p.cost)}</span></button>`;
       })
@@ -737,7 +757,13 @@ export function startApp(root: HTMLElement): void {
     const pills = ROUTES.filter((r) => r.id === 'local' || out.routesUnlocked.includes(r.id))
       .map((r) => `<button type="button" data-route="${r.id}" data-transport="${id}" aria-pressed="${r.id === out.route}">${t('route.' + r.id)}${r.id === 'local' ? '' : ` ×${r.pay}`}</button>`)
       .join('');
-    return `<div class="routes"><span>${t('route.title')}</span>${pills}</div>`;
+    const ready = out.adCooldown <= 0;
+    const wait = Math.ceil(out.adCooldown / 60);
+    const ad = (kind: 'now' | 'double', on: boolean) =>
+      `<button type="button" data-tad="${kind}" data-transport="${id}" ${ready && on ? '' : 'disabled'}>${inlineIcon(ready ? 'ad' : 'hourglass', t('transportAd.' + kind))}</button>`;
+    return `<div class="routes"><span>${t('route.title')}</span>${pills}</div>
+      <div class="routes"><span>${t('captain.line.' + id, { lvl: out.captainLevel, max: ECONOMY.captain.maxLevel, pay: Math.round((captainPay(state, id) - 1) * 100), trip: Math.round((1 - captainTrip(state, id)) * 100) })}</span></div>
+      <div class="routes">${ad('now', out.cooldown > 0)}${ad('double', !out.doubleNext)}${ready ? '' : `<span>${t('transportAd.wait', { min: wait })}</span>`}${out.doubleNext ? `<span>${t('transportAd.armed')}</span>` : ''}</div>`;
   }
 
   function renderInfo(sel: string): string {

@@ -179,3 +179,53 @@ describe('destinos del tren y el barco (F3)', () => {
     expect(s.transports.rail.routesUnlocked).toEqual([]);
   });
 });
+
+describe('capitán y anuncio del tren y el barco (F5)', () => {
+  it('el capitán gana nivel con el trabajo, se paga y sube la paga y acorta el viaje', async () => {
+    const { captainLevelsReady, captainPay, captainTrip } = await import('../src/sim/game');
+    const s = rich('wagons');
+    s.transports.rail.units = 1;
+    advance(s, ECONOMY.captain.secondsPerLevel * 2);
+    expect(captainLevelsReady(s, 'rail')).toBe(2);
+    const p = purchases(s).find((x) => x.id === 'captain:wagons')!;
+    s.dollars = p.cost;
+    expect(buy(s, p.id)).toBe(true);
+    expect(s.transports.rail.captainLevel).toBe(1);
+    expect(captainPay(s, 'rail')).toBeCloseTo(1 + ECONOMY.captain.payPerLevel, 9);
+    expect(captainTrip(s, 'rail')).toBeCloseTo(1 - ECONOMY.captain.tripPerLevel, 9);
+  });
+
+  it('«viaje ya» deja salir sin esperar y tiene espera larga; con Pase no hay espera', async () => {
+    const { useTransportAd } = await import('../src/sim/game');
+    const s = newGame();
+    s.transports.rail.cooldown = 50;
+    expect(useTransportAd(s, 'rail', 'now')).toBe(true);
+    expect(s.transports.rail.cooldown).toBe(0);
+    expect(s.transports.rail.adCooldown).toBe(ECONOMY.captain.adCooldownSeconds);
+    s.transports.rail.cooldown = 50;
+    expect(useTransportAd(s, 'rail', 'now')).toBe(false);
+    s.hasPass = true;
+    s.transports.rail.adCooldown = 0;
+    expect(useTransportAd(s, 'rail', 'now')).toBe(true);
+    expect(s.transports.rail.adCooldown).toBe(0);
+  });
+
+  it('«cargamento ×2» paga el doble solo el próximo viaje', async () => {
+    const { useTransportAd } = await import('../src/sim/game');
+    const s = newGame();
+    expect(useTransportAd(s, 'rail', 'double')).toBe(true);
+    s.transports.rail.units = transportLoad('rail', s);
+    s.transports.rail.value = s.transports.rail.units * 100;
+    advance(s, 1);
+    const first = s.dollars;
+    expect(first).toBeCloseTo(transportLoad('rail', s) * 100 * ECONOMY.transports.rail.payMultiplier * 2, 3);
+    expect(s.transports.rail.doubleNext).toBe(false);
+  });
+
+  it('una partida antigua carga sin capitán ni anuncio en espera', () => {
+    const old = JSON.parse(serialize(newGame()));
+    for (const k of ['captainLevel', 'captainXp', 'adCooldown', 'doubleNext']) delete old.transports.sea[k];
+    const s = load(JSON.stringify(old));
+    expect(s.transports.sea).toMatchObject({ captainLevel: 0, captainXp: 0, adCooldown: 0, doubleNext: false });
+  });
+});

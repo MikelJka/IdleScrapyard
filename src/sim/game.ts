@@ -19,6 +19,11 @@ export interface TransportState {
   /** Destino elegido y destinos comprados (`routes` de economy.json; `local` es el de siempre y no se compra). */
   route: string;
   routesUnlocked: string[];
+  /** Capitán (o jefe de estación): nivel, segundos de trabajo acumulados, espera del anuncio y si el próximo viaje paga ×2. */
+  captainLevel: number;
+  captainXp: number;
+  adCooldown: number;
+  doubleNext: boolean;
 }
 
 /** Pedido especial: entregar `qty` unidades de un producto antes de que se acabe el plazo. */
@@ -119,7 +124,7 @@ export interface GameState {
 }
 
 function newTransport(): TransportState {
-  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0, route: 'local', routesUnlocked: [] };
+  return { units: 0, value: 0, level: 0, cooldown: 0, sent: 0, route: 'local', routesUnlocked: [], captainLevel: 0, captainXp: 0, adCooldown: 0, doubleNext: false };
 }
 
 export function newGame(): GameState {
@@ -287,9 +292,41 @@ export function setRoute(state: GameState, id: TransportId, routeId: string): bo
   return true;
 }
 
+/** Paga ×(1 + nivel·10 %) y viaje −3 % por nivel del capitán. */
+export function captainPay(state: GameState, id: TransportId): number {
+  return 1 + state.transports[id].captainLevel * ECONOMY.captain.payPerLevel;
+}
+export function captainTrip(state: GameState, id: TransportId): number {
+  return Math.max(0.25, 1 - state.transports[id].captainLevel * ECONOMY.captain.tripPerLevel);
+}
+export function captainLevelsReady(state: GameState, id: TransportId): number {
+  const c = ECONOMY.captain;
+  const out = state.transports[id];
+  return Math.min(Math.floor(out.captainXp / c.secondsPerLevel), c.maxLevel - out.captainLevel);
+}
+/** Segundos que dura un viaje completo del tren o el barco (destino y capitán incluidos). */
+export function tripSeconds(state: GameState, id: TransportId): number {
+  return ECONOMY.transports[id].returnSeconds * routeOf(state, id).wait * captainTrip(state, id);
+}
+
+/** Anuncio del tren o el barco: «viaje ya» (sale en cuanto esté lleno) o «×2 cargamento» (el próximo viaje paga el doble). Espera larga entre usos; con el Pase no hay espera. */
+export function useTransportAd(state: GameState, id: TransportId, kind: 'now' | 'double'): boolean {
+  const out = state.transports[id];
+  if (out.adCooldown > 0) return false;
+  if (kind === 'now') {
+    if (out.cooldown <= 0) return false;
+    out.cooldown = 0;
+  } else {
+    if (out.doubleNext) return false;
+    out.doubleNext = true;
+  }
+  out.adCooldown = state.hasPass ? 0 : ECONOMY.captain.adCooldownSeconds;
+  return true;
+}
+
 /** Cuántas unidades de la zona caben en un viaje, por segundo, hacia su destino: camión de expedición, tren o barco. */
 function outletCarry(state: GameState, def: ZoneDef): number {
-  if (def.transport) return transportLoad(def.transport, state) / (ECONOMY.transports[def.transport].returnSeconds * routeOf(state, def.transport).wait);
+  if (def.transport) return transportLoad(def.transport, state) / tripSeconds(state, def.transport);
   return dockLoad(state) / ECONOMY.dock.returnSeconds;
 }
 
@@ -309,7 +346,7 @@ export function incomePerSecond(state: GameState, tapsPerSecond = 0): number {
     const units = Math.min(zoneRate(def, state.zones[def.id]), scrap / def.scrapPerUnit, own, cartThroughput(state.zones[def.id]));
     scrap -= units * def.scrapPerUnit;
     if (!def.transport) carry -= units;
-    income += units * unitValue(def, state.zones[def.id]) * (def.transport ? ECONOMY.transports[def.transport].payMultiplier * routeOf(state, def.transport).pay : 1);
+    income += units * unitValue(def, state.zones[def.id]) * (def.transport ? ECONOMY.transports[def.transport].payMultiplier * routeOf(state, def.transport).pay * captainPay(state, def.transport) : 1);
   }
   return income;
 }
@@ -459,16 +496,19 @@ function step(state: GameState, dt: number): void {
   for (const id of ['rail', 'sea'] as const) {
     const out = state.transports[id];
     out.cooldown = Math.max(0, out.cooldown - dt);
+    out.adCooldown = Math.max(0, out.adCooldown - dt);
+    if (out.units > 0 || out.cooldown > 0) out.captainXp = Math.min(out.captainXp + dt, (ECONOMY.captain.maxLevel - out.captainLevel) * ECONOMY.captain.secondsPerLevel);
     const cargo = transportLoad(id, state);
     if (out.cooldown === 0 && out.units >= cargo) {
       const value = (out.value * cargo) / out.units;
       out.units -= cargo;
       out.value -= value;
-      const paid = value * ECONOMY.transports[id].payMultiplier * routeOf(state, id).pay * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+      const paid = value * ECONOMY.transports[id].payMultiplier * routeOf(state, id).pay * captainPay(state, id) * (out.doubleNext ? 2 : 1) * (state.boostSeconds > 0 ? ECONOMY.boost.multiplier : 1);
+      out.doubleNext = false;
       state.dollars += paid;
       state.totalEarned += paid;
       out.sent += 1;
-      out.cooldown = ECONOMY.transports[id].returnSeconds * routeOf(state, id).wait;
+      out.cooldown = tripSeconds(state, id);
     }
   }
 
@@ -537,7 +577,7 @@ export function advance(state: GameState, seconds: number): void {
   }
 }
 
-export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper' | 'route';
+export type PurchaseKind = 'scrapTruck' | 'carts' | 'cartLevel' | 'dock' | 'transport' | 'unlock' | 'speed' | 'capacity' | 'machines' | 'machineLevel' | 'helper' | 'route' | 'captain';
 
 export interface Purchase {
   /** Identificador estable, p. ej. «cart» o «speed:crusher». */
@@ -593,6 +633,10 @@ export function purchases(state: GameState): Purchase[] {
       },
     );
     // El siguiente nivel del ayudante solo se ofrece cuando su experiencia lo ha desbloqueado.
+    if (def.transport && captainLevelsReady(state, def.transport) > 0) {
+      const c = ECONOMY.captain;
+      list.push({ id: `captain:${def.id}`, kind: 'captain', zoneId: def.id, cost: s * growthCost(c.baseCost, state.transports[def.transport].captainLevel, c.costGrowth) });
+    }
     if (helperLevelsReady(zone) > 0) {
       const h = ECONOMY.helpers;
       list.push({ id: `helper:${def.id}`, kind: 'helper', zoneId: def.id, cost: s * growthCost(h.baseCost, zone.helperLevel, h.costGrowth) });
@@ -672,6 +716,12 @@ export function buy(state: GameState, id: string): boolean {
     case 'transport':
       state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!].level++;
       break;
+    case 'captain': {
+      const out = state.transports[ZONES.find((d) => d.id === p.zoneId)!.transport!];
+      out.captainLevel++;
+      out.captainXp -= ECONOMY.captain.secondsPerLevel;
+      break;
+    }
     case 'route': {
       const id = ZONES.find((d) => d.id === p.zoneId)!.transport!;
       const routeId = p.id.split(':')[2];

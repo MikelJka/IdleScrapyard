@@ -4,6 +4,12 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Capitán y anuncio del tren y el barco (F5)
+
+- Cada transporte tiene capitán (jefe de estación en el tren): gana un nivel por cada hora de trabajo y se paga como los ayudantes (`captain` en `economy.json`): +10 % de paga y −3 % de viaje por nivel, máximo 25. Dos anuncios opcionales en el panel de la línea: «Viaje ya» (sale en cuanto esté lleno) y «Cargamento ×2» (el próximo viaje paga el doble), con 2 h de espera entre usos (el Pase no espera).
+- Qué probar: panel del Taller de vagones o del Astillero: línea del capitán y botones de anuncio.
+- Sigue: F4 (almacén intermedio).
+
 ## 2026-10-21 — Destinos del tren y el barco (F3)
 
 - Tren y barco tienen destinos (`routes` en `economy.json`): «Puerto local» (el de siempre, gratis) y tres que se compran en el panel de la línea (10, 100 y 1000 veces el valor de un cargamento): viaje ×1/×2/×4 y paga ×1,5/×2,5/×4,5 encima de la del transporte. Selector «Destino» con los ya comprados. Partidas antiguas: destino local.

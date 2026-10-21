@@ -136,5 +136,14 @@
       "pay": 4.5,
       "unlockMult": 1000
     }
-  ]
+  ],
+  "captain": {
+    "secondsPerLevel": 3600,
+    "maxLevel": 25,
+    "payPerLevel": 0.1,
+    "tripPerLevel": 0.03,
+    "baseCost": 100,
+    "costGrowth": 1.5,
+    "adCooldownSeconds": 7200
+  }
 }
