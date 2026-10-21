@@ -111,7 +111,7 @@
     "unitValue": 15000,
     "scrapPerUnit": 1,
     "cycleSeconds": 128,
-    "unlockCost": 1440000000,
+    "unlockCost": 1008000000,
     "upgradeCostScale": 960400,
     "helper": {
       "id": "turbo",
@@ -126,7 +126,7 @@
     "unitValue": 60000,
     "scrapPerUnit": 1,
     "cycleSeconds": 256,
-    "unlockCost": 4800000000,
+    "unlockCost": 3360000000,
     "upgradeCostScale": 6722800,
     "transport": "rail",
     "helper": {
@@ -142,7 +142,7 @@
     "unitValue": 240000,
     "scrapPerUnit": 1,
     "cycleSeconds": 512,
-    "unlockCost": 24000000000,
+    "unlockCost": 16800000000,
     "upgradeCostScale": 47059600,
     "transport": "sea",
     "helper": {

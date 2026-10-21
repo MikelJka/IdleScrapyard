@@ -4,6 +4,10 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 ## Pendiente
 
+- [x] **Equilibrio B4b y B6b** (2026-10-21, Mikel): abrir las zonas 8, 9 y 10 cuesta un 30 % menos (1 008 000 000 $, 3 360 000 000 $ y 16 800 000 000 $) y el nivel de máquina crece ×1,8 por nivel en vez de ×2,2. **Hecho.** Simulación: el casual abre todo en ~21 días (antes ~22) y el atento en ~5 (zona 10 a ~4,9 días); el bot apenas lo nota porque gasta en otras mejoras, así que se verá jugando.
+- [ ] **Objetivos diarios (B5-d)** (2026-10-21, Mikel elige «objetivos diarios» para la espera larga del casual): 3 objetivos al día con premio. **Falta decidir** qué objetivos, qué premios y cómo se renuevan: propuesta en la Parte 25.
+- [ ] **Tren y barco: F3 rutas y contratos, F4 almacén intermedio y F5 capitán y anuncio** (2026-10-21, Mikel: «F3 bien, F4 bien, F5 bien»): aprobados los tres tal como están descritos en la Parte 21. **Falta concretar números** (destinos, tiempos, pagas, capacidad del almacén, bonificación): propuesta en la Parte 26 antes de implementar; después se hace F3, luego F5 y luego F4.
+
 - [ ] **Estilo visual: 2D muy bonito y atractivo** (2026-10-19, Mikel cambia el 3D por 2D: «no aporta nada ver esto desde diferentes ángulos»): escena del desguace en SVG dibujada por código, estilo dibujo animado. **Hecha la vista isométrica** (2026-10-19, como la captura de serrería que enseñó Mikel): mapa a pantalla completa (arrastrar y pellizcar), puestos con líneas amarillas, máquinas por nivel (1-2 por puesto), ayudantes de bloques, palés, carretillas, camiones de chatarra detrás y de expedición delante, dinero que salta al cobrar; botones flotantes y tienda en panel inferior. **Hechos los sonidos** (2026-10-19, sintetizados por código, con botón de silencio) **y las animaciones** (2026-10-19): productos distintos por línea, carretillas que giran, máquinas que trabajan, volquete, coches de fondo, ciudad industrial, nave en rayos X, nubes, pájaros y paseantes. Falta: pulir.
 
 - [ ] **Base del proyecto** (2026-10-19, aprobado por Mikel al crear Zenit Studio): esqueleto con Vite + TypeScript + Vitest, publicación de la versión web en GitHub Pages y capturas automáticas para STONKS. **Hecho el esqueleto**; falta comprobar que la web publicada se ve en el móvil. **Android, primera parte (N2, Mikel lo pide el 2026-10-21):** Capacitor configurado y workflow «Android (APK de prueba)» (`docs/ANDROID.md`); falta la clave de firma de Mikel para el AAB.
@@ -51,39 +55,28 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-### Parte 23 — Equilibrio con las 10 zonas (2026-10-21, N1)
+### Parte 25 — Objetivos diarios: números (2026-10-21)
 
-Simulación actual (`npx vite-node scripts/balance.ts`, 60 días). Tiempo hasta abrir cada zona:
+Mikel aprobó 3 objetivos al día con premio. Propongo, para elegir:
+- **Cuáles:** el juego sortea 3 al día (a las 00:00 hora local) de esta lista: «cobrar N camiones», «entregar N unidades de un producto», «comprar N mejoras», «completar un pedido especial», «tocar la pila N veces», «mantener una línea sin atascos 10 min». N escala con lo que produces (equivale a ~10 min de juego).
+  - **D1 —** como arriba, los 3 siempre de distinto tipo.
+  - **D2 —** uno fácil, uno medio y uno difícil (N ×1, ×2, ×4).
+- **Premio:** **P1 —** 15 min de producción total cada uno y +1 h si se hacen los 3. **P2 —** 10 min cada uno y un «camión dorado» gratis (sin anuncio) al hacer los 3. **P3 —** 20 min cada uno, sin extra.
+- **Si no se hacen:** se pierden al cambiar el día (sin castigo); con anuncio se puede cambiar un objetivo por otro (opcional): **A —** sí; **B —** no.
 
-| Zona (según la simulación) | Casual (4×5 min/día) | Atento (4 min cada 40 min, 16 h/día) |
-|---|---|---|
-| Aplastado de chatarra | 12 h | 8,7 h |
-| Fundido de chatarra | 16 h | 9,3 h |
-| Laminado de chapa | 20 h | 10 h |
-| Taller de tubos | 44 h | 14 h |
-| Taller de vigas | 2,8 d | 18 h |
-| Torno de piezas de motor | 4,5 d | 24 h |
-| Montaje de motores | 6 d | 38 h |
-| Taller de coches reconstruidos | 8,7 d | 2,4 d |
-| Taller de vagones | 12 d | 2,9 d |
-| Astillero de contenedores | 21,7 d | 5,4 d |
+Responde con letras (p. ej. «D2 P1 A»).
 
-Otros datos: máquina de nivel 5 en una línea a los 31 días (casual) y 8 días (atento); la espera más larga sin comprar nada: **8 días (casual)** y **2,3 días (atento)**, justo antes de abrir las últimas zonas; en 60 días el atento gana 1,6e14 $ y el casual 2,9e12 $.
+### Parte 26 — F3, F4 y F5: números (2026-10-21)
 
-Opciones (responde con las letras):
-- **B4 — Ritmo del final:** (a) dejarlo; (b) bajar un 30 % el precio de abrir las zonas 8-10 para que el casual las vea en ~2 semanas; (c) dejar el precio y añadir algo que hacer mientras (B5).
-- **B5 — Espera de 8 días del casual:** (a) dejarlo; (b) cofre de hito por hora jugada (B3-b) que da dinero sorpresa; (c) objetivos diarios (B3-d); (d) mejoras intermedias del tren y del barco (más vagones/contenedores, F1/F2 de la Parte 21).
-- **B6 — Máquinas:** (a) dejarlo (nivel 5 a los 31 días casual); (b) bajar el crecimiento de ×2,2 a ×1,8.
+Aprobados los tres. Propuesta de números para no inventar al implementar:
+- **F3 destinos (tren y barco, 3 cada uno):** cerca (espera ×1, paga ×1,5), medio (×2, paga ×2,5), lejos (×4, paga ×4,5). «Espera» es el tiempo del viaje respecto al actual; se desbloquean pagando 10 / 100 / 1000 veces el valor de un cargamento. Cada destino pide un producto de la línea del transporte (vagones o contenedores; los destinos lejanos piden además la mitad de la otra línea).
+  - **R1 —** como se propone. **R2 —** solo 2 destinos por transporte (cerca y lejos). **R3 —** otros números tuyos.
+- **F4 almacén:** capacidad 500 unidades por producto (+250 por nivel, hasta nivel 10, cada nivel cuesta ×1,8); bonificación +5 % por cada 25 % del almacén que se llena al salir el transporte (máx. +20 %).
+  - **A1 —** como se propone. **A2 —** sin bonificación, solo amortigua los picos.
+- **F5 capitán:** un capitán por transporte, sube de nivel por horas de trabajo (como los ayudantes: máximo 25, +10 % de paga y −3 % de viaje por nivel); anuncio opcional: «viaje ya» o «×2 cargamento», con espera de 2 h entre usos (Pase: sin espera).
+  - **C1 —** como se propone. **C2 —** solo anuncio, sin capitán.
 
-### Parte 24 — Tren y barco: lo que falta de la Parte 21 (2026-10-21)
-
-Z1 + 2b ya están hechos (zonas 9 y 10 con tren y barco que salen llenos). Para decidir F3, F4 y F5:
-
-- **F3 — Rutas y contratos:** el tren y el barco eligen destino (ciudad vecina, país, otro continente): más lejos tarda más y paga más (p. ej. ×1,5 / ×2,5 / ×4 con 1×, 2× y 3× el tiempo de espera) y cada destino pide un producto concreto. Da decisiones y metas largas (desbloquear destinos). Cambia reglas y números: tabla propuesta al aprobarlo.
-- **F4 — Almacén intermedio:** un almacén entre las líneas y el transporte que acumula producto; tren y barco lo vacían en lotes y los lotes grandes pagan bonificación (p. ej. +10 % con almacén lleno). Mejoras: capacidad y nº de transportes.
-- **F5 — Capitán y anuncio:** un jefe de estación / capitán como los ayudantes de zona (nivel por horas de trabajo) y un anuncio opcional que acorta un viaje o duplica un cargamento, como el camión dorado.
-
-Mi recomendación: **F3 primero** (alarga más el juego), luego **F5** (monetiza con lo ya hecho); **F4** al final o nunca, porque añade otra pantalla. Responde con letras (p. ej. «F3F5»).
+Responde con letras (p. ej. «R1 A1 C1»).
 
 ### Parte 11 — Qué hacemos ahora (2026-10-19)
 

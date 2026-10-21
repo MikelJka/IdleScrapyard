@@ -36,7 +36,7 @@
     },
     "machineLevel": {
       "baseCost": 300,
-      "growth": 2.2,
+      "growth": 1.8,
       "outputMultiplierPerLevel": 2
     }
   },

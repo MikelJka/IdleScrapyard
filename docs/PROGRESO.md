@@ -2,6 +2,13 @@
 
 Diario de sesiones, la más reciente arriba.
 
+## 2026-10-21 — Equilibrio B4b y B6b
+
+- Abrir las zonas 8, 9 y 10 cuesta un 30 % menos y el nivel de máquina crece ×1,8 (`src/data/zones.json`, `economy.json`). Los 68 tests pasan.
+- Mikel aprobó los objetivos diarios y F3, F4 y F5; los números están como propuesta en las Partes 25 y 26 de `FEEDBACK.md`.
+- Qué probar: ritmo de las zonas 8-10 y de las máquinas jugando.
+- Sigue: lo que Mikel elija en las Partes 25 y 26.
+
 ## 2026-10-21 — Panel de línea, temblor, Android y equilibrio
 
 - **Panel de línea** (pedido de Mikel): arriba solo el ayudante, su estado y lo que produce; las mejoras van justo debajo y el resto de datos (máquinas, carretillas, palés, flujo de chatarra) quedan plegados en «Más datos» al final (se recuerda si estaba abierto).
