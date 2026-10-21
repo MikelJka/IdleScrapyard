@@ -26,7 +26,8 @@ function makeGoal(state: GameState, kind: DailyKind, level: 1 | 2 | 4, rng: Rng)
   const goal: DailyGoal = { kind, target: 1, progress: 0, level, claimed: false, rerolled: false };
   switch (kind) {
     case 'trucks':
-      goal.target = Math.max(c.minTrucks, Math.round((c.safety * c.windowSeconds * dockUnitsPerSecond(state)) / dockLoad(state))) * level;
+      // Un camión sale como mucho cada `returnSeconds`: el objetivo nunca pide más de lo que el muelle puede despachar en la ventana.
+      goal.target = Math.max(c.minTrucks, Math.round(Math.min((c.safety * c.windowSeconds * dockUnitsPerSecond(state)) / dockLoad(state), (c.safety * c.windowSeconds) / ECONOMY.dock.returnSeconds))) * level;
       break;
     case 'units': {
       const zones = openZones(state);

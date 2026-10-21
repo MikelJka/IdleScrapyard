@@ -175,3 +175,17 @@ html.bigtext #sheet, html.bigtext #welcome { zoom: 1.2; }
 html.contrast { --ink: #fff; --muted: #d8cfbd; --bg: #0e0b08; }
 html.contrast #shop button, html.contrast #close-shop { border-color: #fff; background: #000; }
 html.contrast #shop button:disabled { opacity: 0.75; }
+
+/* Objetivos diarios */
+#goals[hidden] { display: none; }
+#goals { color: var(--ink); font-size: 14px; margin: 0 4px 8px; }
+#goals ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+#goals .goal { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #3a2d20; border: 2px solid #5f4a33; border-radius: 14px; min-height: 64px; }
+#goals .goal-text { flex: 1; display: flex; flex-direction: column; gap: 3px; line-height: 1.2; }
+#goals small { color: var(--muted); font-size: 12px; }
+#goals .bar { height: 8px; background: #1f1812; border-radius: 4px; overflow: hidden; }
+#goals .bar i { display: block; height: 100%; background: #8be28b; }
+#goals button { min-width: 64px; min-height: 44px; padding: 0 12px; font: inherit; font-weight: 800; color: #2a1d14; background: #e6c98a; border: 2px solid #2a1d14; border-radius: 12px; cursor: pointer; }
+#goals .goal-claim { background: #8be28b; }
+#goals .goal-ok { color: #8be28b; font-weight: 800; }
+#goals .goal-note { color: var(--muted); font-size: 12px; margin: 8px 0 0; }

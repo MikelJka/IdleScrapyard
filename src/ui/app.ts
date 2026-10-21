@@ -29,6 +29,8 @@ import {
   zoneStatus,
   type GameState,
 } from '../sim/game';
+import { claimGoal, goalDone, refreshDaily, rerollGoal } from '../sim/daily';
+import type { DailyGoal } from '../sim/dailyCore';
 import { HELPER_LOOKS } from './look';
 import { FORKLIFT, helperFace, esc, inlineIcon, productIcon, truck, uiIcon, type UiIconName } from './icons';
 import { createYard, machineGrade } from './yard';
@@ -114,6 +116,7 @@ export function startApp(root: HTMLElement): void {
         <div id="shop"></div>
         <div id="panel-more"></div>
         <div id="ranking" hidden></div>
+        <div id="goals" hidden></div>
         <div id="achieve" hidden></div>
         <div id="lang" hidden>
           <b>${t('settings.language')}</b>
@@ -255,12 +258,14 @@ export function startApp(root: HTMLElement): void {
   // Panel de mejoras del puesto tocado (zona, «dock» o «trucks») o ajustes.
   let panel: string | null = null;
   let lastShop = '';
+  let lastGoals = '';
   let lastInfo = '';
   let lastMore = '';
   let moreOpen = false;
   const panelTitle = (sel: string): string => {
     if (sel === 'settings') return t('settings.title');
     if (sel === 'ranking') return t('ranking.title');
+    if (sel === 'goals') return t('goals.title');
     if (sel === 'dock') return t('panel.dock');
     if (sel === 'trucks') return t('panel.trucks');
     const z = ZONES.find((x) => x.id === sel);
@@ -281,10 +286,12 @@ export function startApp(root: HTMLElement): void {
     $('contrast').hidden = sel !== 'settings';
     $('achieve').hidden = sel !== 'settings';
     $('ranking').hidden = sel !== 'ranking';
-    $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
-    $('shop').hidden = sel === 'settings' || sel === 'ranking';
-    $('panel-more').hidden = sel === 'settings' || sel === 'ranking';
-    const global = sel === 'settings' || sel === 'ranking';
+    $('goals').hidden = sel !== 'goals';
+    lastGoals = '';
+    const global = sel === 'settings' || sel === 'ranking' || sel === 'goals';
+    $('panel-info').hidden = global;
+    $('shop').hidden = global;
+    $('panel-more').hidden = global;
     scene.setSelected(global ? null : sel);
     if (sel) $('sheet-title').textContent = panelTitle(sel);
     if (sel && !global) scene.focus(sel);
@@ -404,7 +411,7 @@ export function startApp(root: HTMLElement): void {
     if (busy || state.goldenVisible <= 0) return;
     busy = true;
     try {
-      if (await rewarded()) {
+      if (state.freeGolden || (await rewarded())) {
         claimGoldenTruck(state);
         play('reward');
       }
@@ -447,12 +454,54 @@ export function startApp(root: HTMLElement): void {
     if (!action || busy) return;
     busy = true;
     try {
+      if (action === 'goals') openPanel(panel === 'goals' ? null : 'goals');
       if (action === 'daily' && claimDaily(state, localDay()) > 0) play('reward');
       if (action === 'boost' && canBoost(state) && (await rewarded())) {
         activateBoost(state);
         play('reward');
       }
       if (action === 'pass' && !state.hasPass && (await buyPass(ECONOMY.pass.priceEur))) state.hasPass = true;
+      writeSave(state);
+    } finally {
+      busy = false;
+    }
+  });
+
+  const goalsReady = (): boolean => (state.daily?.goals ?? []).some((g) => goalDone(g) && !g.claimed);
+
+  function goalText(g: DailyGoal): string {
+    const zone = g.zoneId ? ZONES.find((z) => z.id === g.zoneId) : undefined;
+    return t('goal.' + g.kind, { n: g.kind === 'working' ? Math.round(g.target / 60) : fmt(g.target), zone: zone ? zoneName(zone) : '', product: zone ? zoneProduct(zone) : '' });
+  }
+  function renderGoals(): string {
+    const d = state.daily;
+    if (!d) return '';
+    const rows = d.goals
+      .map((g, i) => {
+        const done = goalDone(g);
+        const pct = Math.floor((100 * g.progress) / g.target);
+        const action = g.claimed
+          ? `<span class="goal-ok">${inlineIcon('check', t('goals.claimed'))}</span>`
+          : done
+            ? `<button type="button" data-claim="${i}" class="goal-claim">${t('goals.claim')}</button>`
+            : g.rerolled
+              ? ''
+              : `<button type="button" data-change="${i}" class="goal-change">${inlineIcon('ad', t('goals.change'))}</button>`;
+        return `<li class="goal lv${g.level}"><div class="goal-text"><b>${goalText(g)}</b><small>${t('goals.level.' + g.level)} · ${fmt(Math.floor(g.progress))}/${fmt(g.target)}</small><div class="bar"><i style="width:${pct}%"></i></div></div>${action}</li>`;
+      })
+      .join('');
+    return `<ul>${rows}</ul><p class="goal-note">${t(d.bonusPaid ? 'goals.bonusGot' : 'goals.bonus', { min: ECONOMY.dailyGoals.rewardMinutes })}</p>`;
+  }
+  $('goals').addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('button');
+    if (!b || busy) return;
+    busy = true;
+    try {
+      if (b.dataset.claim !== undefined && claimGoal(state, Number(b.dataset.claim)) > 0) {
+        play('reward');
+        bumpDollars();
+      }
+      if (b.dataset.change !== undefined && (await rewarded())) rerollGoal(state, Number(b.dataset.change));
       writeSave(state);
     } finally {
       busy = false;
@@ -474,6 +523,7 @@ export function startApp(root: HTMLElement): void {
       day > 0
         ? btn('daily', uiIcon('gift'), t('daily.short', { day }), dailyReward(state, today) > 0, 'daily ready')
         : btn('daily', uiIcon('gift'), t('daily.doneShort', { day: nextDay }), false, 'daily'),
+      btn('goals', uiIcon('target'), t('goals.short', { n: (state.daily?.goals ?? []).filter((g) => g.claimed).length }), true, goalsReady() ? 'daily ready' : 'goals'),
       state.hasPass ? btn('pass', uiIcon('star'), t('pass.ownedShort'), false, 'pass') : btn('pass', uiIcon('star'), t('pass.short'), true, 'pass'),
     ];
     return buttons.join('');
@@ -541,6 +591,7 @@ export function startApp(root: HTMLElement): void {
     lastRenderAt = nowMs;
     const gap = state.dollars - shownDollars;
     shownDollars = calmMotion || Math.abs(gap) < 0.5 ? state.dollars : shownDollars + gap * (1 - Math.exp(-dtMs / 120));
+    refreshDaily(state, localDay());
     // Los botones de extras solo se redibujan si cambian, para no perder el toque.
     const extras = renderExtras();
     if (extras !== lastExtras) {
@@ -581,6 +632,14 @@ export function startApp(root: HTMLElement): void {
     for (const a of checkAchievements(state)) {
       toast(t('achieve.got', { name: achievementName(a) }), 'medal');
       play('reward');
+    }
+    if (panel === 'goals') {
+      const g = renderGoals();
+      if (g !== lastGoals) {
+        $('goals').innerHTML = g;
+        lastGoals = g;
+      }
+      return;
     }
     if (panel === null || panel === 'settings') return;
     const sel = panel;

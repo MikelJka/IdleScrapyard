@@ -94,5 +94,21 @@
     "windowSeconds": 120,
     "fillSeconds": 62,
     "bonusMultiplier": 1
+  },
+  "dailyGoals": {
+    "count": 3,
+    "levels": [
+      1,
+      2,
+      4
+    ],
+    "rewardMinutes": 10,
+    "freeGoldenSeconds": 30,
+    "windowSeconds": 600,
+    "safety": 0.5,
+    "minTrucks": 3,
+    "tapBase": 50,
+    "buyBase": 3,
+    "workingSeconds": 600
   }
 }

@@ -4,6 +4,13 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Objetivos diarios
+
+- Nuevos objetivos del día (`src/sim/daily.ts`, `dailyCore.ts`, números en `economy.json` → `dailyGoals`): 3 al día sorteados con el número del día (sin azar), fáciles/medios/difíciles, 10 min de producción cada uno y camión dorado gratis al cobrar los tres; con anuncio se cambia uno (una vez). Panel «Objetivos del día» con barras de progreso, botón «Hoy n/3» en los extras; guardado con valor por defecto para partidas antiguas. 10 tests nuevos (78 en total).
+- El camión dorado gratis se cobra sin anuncio (`freeGolden`).
+- Qué probar: tocar «Hoy 0/3», jugar un rato y cobrar; cobrar los tres y tocar el camión dorado.
+- Sigue: F3 (rutas y contratos), F5 (capitán y anuncio) y F4 (almacén), con los números de la Parte 26.
+
 ## 2026-10-21 — Equilibrio B4b y B6b
 
 - Abrir las zonas 8, 9 y 10 cuesta un 30 % menos y el nivel de máquina crece ×1,8 (`src/data/zones.json`, `economy.json`). Los 68 tests pasan.

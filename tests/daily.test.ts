@@ -116,3 +116,17 @@ describe('objetivos diarios', () => {
     expect(s.freeGolden).toBe(false);
   });
 });
+
+describe('objetivos diarios: tope de camiones', () => {
+  it('no piden más camiones de los que el muelle puede despachar', () => {
+    const s = newGame();
+    s.zones.crusher.machines = 1000;
+    s.zones.crusher.carts = 200;
+    s.scrapTrucks = 1000;
+    for (let d = 0; d < 40; d++) {
+      s.daily = null;
+      refreshDaily(s, d);
+      for (const g of s.daily!.goals) if (g.kind === 'trucks') expect(g.target).toBeLessThanOrEqual(((0.5 * ECONOMY.dailyGoals.windowSeconds) / ECONOMY.dock.returnSeconds) * g.level);
+    }
+  });
+});

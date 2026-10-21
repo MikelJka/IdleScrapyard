@@ -19,6 +19,8 @@ export interface TransportState {
 }
 
 /** Pedido especial: entregar `qty` unidades de un producto antes de que se acabe el plazo. */
+import { dailyAdd, type DailyState } from './dailyCore';
+
 export interface OrderState {
   zoneId: string;
   qty: number;
@@ -108,6 +110,9 @@ export interface GameState {
   orderTimer: number;
   ordersDone: number;
   bestStreak: number;
+  /** Objetivos diarios (null hasta el primer sorteo) y camión dorado gratis pendiente de tocar. */
+  daily: DailyState | null;
+  freeGolden: boolean;
 }
 
 function newTransport(): TransportState {
@@ -159,6 +164,8 @@ export function newGame(): GameState {
     orderTimer: ECONOMY.orders.everySeconds,
     ordersDone: 0,
     bestStreak: 0,
+    daily: null,
+    freeGolden: false,
   };
 }
 
@@ -252,6 +259,7 @@ function outletCarry(state: GameState, def: ZoneDef): number {
 /** El jugador toca la pila de chatarra. */
 export function tap(state: GameState): void {
   state.scrap += ECONOMY.tap.scrap;
+  dailyAdd(state.daily, 'taps', 1);
 }
 
 /** Dólares por segundo a ritmo estable: la chatarra va a la zona que más paga, limitada por carretillas y muelle. Sin empujón. */
@@ -295,8 +303,16 @@ export function claimGoldenTruck(state: GameState): number {
   state.dockValue = 0;
   state.dockByZone = {};
   state.goldenVisible = 0;
+  state.freeGolden = false;
   state.trucksSent += 1;
+  dailyAdd(state.daily, 'trucks', 1);
   return value;
+}
+
+/** Hace aparecer un camión dorado que se cobra sin anuncio (premio de los objetivos diarios). */
+export function claimGoldenTruckFree(state: GameState): void {
+  state.goldenVisible = ECONOMY.dailyGoals.freeGoldenSeconds;
+  state.freeGolden = true;
 }
 
 /** Día de la racha que se cobraría hoy (`today` = número de día local), o 0 si ya se cobró hoy. Si se falta un día, vuelve al 1. */
@@ -336,6 +352,7 @@ function step(state: GameState, dt: number): void {
     state.boostCooldown = Math.max(0, state.boostCooldown - dt);
   }
   state.goldenVisible = Math.max(0, state.goldenVisible - dt);
+  if (state.goldenVisible === 0) state.freeGolden = false;
   state.goldenTimer -= dt;
   if (state.goldenTimer <= 0) {
     state.goldenTimer += ECONOMY.goldenTruck.everySeconds;
@@ -346,6 +363,7 @@ function step(state: GameState, dt: number): void {
   for (const def of ZONES_BY_PROFIT) {
     const zone = state.zones[def.id];
     if (!zone.unlocked) continue;
+    if (state.daily && zoneStatus(state, def) === 'working') dailyAdd(state.daily, 'working', dt, def.id);
     const space = Math.max(0, zoneCapacity(zone) - zone.buffer);
     const units = Math.min(zoneRate(def, zone) * dt, space, state.scrap / def.scrapPerUnit);
     if (units <= 0) continue;
@@ -372,6 +390,7 @@ function step(state: GameState, dt: number): void {
         state.dockByZone[def.id] = (state.dockByZone[def.id] ?? 0) + trip.load;
       }
       if (state.order?.zoneId === def.id) state.order.delivered += trip.load;
+      dailyAdd(state.daily, 'units', trip.load, def.id);
     }
     zone.trips = zone.trips.filter((x) => x.left > 0);
     const batch = cartBatch(zone);
@@ -395,6 +414,7 @@ function step(state: GameState, dt: number): void {
     state.dollars += paid;
     state.totalEarned += paid;
     state.trucksSent += 1;
+    dailyAdd(state.daily, 'trucks', 1);
     state.truckCooldown = ECONOMY.dock.returnSeconds;
   }
 
@@ -431,6 +451,7 @@ function stepOrders(state: GameState, dt: number): void {
       state.dollars += bonus;
       state.totalEarned += bonus;
       state.ordersDone += 1;
+      dailyAdd(state.daily, 'orders', 1);
       state.order = null;
       state.orderTimer = o.everySeconds;
     } else {
@@ -594,6 +615,7 @@ export function buy(state: GameState, id: string): boolean {
   const p = purchases(state).find((x) => x.id === id);
   if (!p || p.cost > state.dollars) return false;
   state.dollars -= p.cost;
+  dailyAdd(state.daily, 'buys', 1);
   const zone = p.zoneId ? state.zones[p.zoneId] : undefined;
   switch (p.kind) {
     case 'scrapTruck':

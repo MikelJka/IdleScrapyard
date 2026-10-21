@@ -5,8 +5,8 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 ## Pendiente
 
 - [x] **Equilibrio B4b y B6b** (2026-10-21, Mikel): abrir las zonas 8, 9 y 10 cuesta un 30 % menos (1 008 000 000 $, 3 360 000 000 $ y 16 800 000 000 $) y el nivel de máquina crece ×1,8 por nivel en vez de ×2,2. **Hecho.** Simulación: el casual abre todo en ~21 días (antes ~22) y el atento en ~5 (zona 10 a ~4,9 días); el bot apenas lo nota porque gasta en otras mejoras, así que se verá jugando.
-- [ ] **Objetivos diarios (B5-d)** (2026-10-21, Mikel elige «objetivos diarios» para la espera larga del casual): 3 objetivos al día con premio. **Falta decidir** qué objetivos, qué premios y cómo se renuevan: propuesta en la Parte 25.
-- [ ] **Tren y barco: F3 rutas y contratos, F4 almacén intermedio y F5 capitán y anuncio** (2026-10-21, Mikel: «F3 bien, F4 bien, F5 bien»): aprobados los tres tal como están descritos en la Parte 21. **Falta concretar números** (destinos, tiempos, pagas, capacidad del almacén, bonificación): propuesta en la Parte 26 antes de implementar; después se hace F3, luego F5 y luego F4.
+- [x] **Objetivos diarios (B5-d, D2 P2 A)** (2026-10-21, Mikel): 3 al día (fácil, medio y difícil: N ×1, ×2, ×4) de tipos distintos entre cobrar camiones, entregar un producto, comprar mejoras, cumplir un pedido (solo el fácil), tocar la pila y mantener una línea trabajando; cada uno da 10 min de producción y los tres dan un camión dorado gratis (sin anuncio, 30 s a la vista); con anuncio se cambia un objetivo sin cumplir, una vez por objetivo. Botón «Hoy n/3» en la columna de la derecha. **Hecho.**
+- [ ] **Tren y barco: F3 rutas y contratos, F4 almacén intermedio y F5 capitán y anuncio** (2026-10-21, Mikel: «F3 bien, F4 bien, F5 bien»): aprobados los tres tal como están descritos en la Parte 21. **Números decididos el 2026-10-21 (Parte 26: R1, A1, C1)**; se hace F3, luego F5 y luego F4. Sin hacer todavía.
 
 - [ ] **Estilo visual: 2D muy bonito y atractivo** (2026-10-19, Mikel cambia el 3D por 2D: «no aporta nada ver esto desde diferentes ángulos»): escena del desguace en SVG dibujada por código, estilo dibujo animado. **Hecha la vista isométrica** (2026-10-19, como la captura de serrería que enseñó Mikel): mapa a pantalla completa (arrastrar y pellizcar), puestos con líneas amarillas, máquinas por nivel (1-2 por puesto), ayudantes de bloques, palés, carretillas, camiones de chatarra detrás y de expedición delante, dinero que salta al cobrar; botones flotantes y tienda en panel inferior. **Hechos los sonidos** (2026-10-19, sintetizados por código, con botón de silencio) **y las animaciones** (2026-10-19): productos distintos por línea, carretillas que giran, máquinas que trabajan, volquete, coches de fondo, ciudad industrial, nave en rayos X, nubes, pájaros y paseantes. Falta: pulir.
 
@@ -55,18 +55,7 @@ Escribe aquí lo que quieras, o abre una incidencia en GitHub con la etiqueta `f
 
 Aquí se concreta el diseño de Chatarrero entre Mikel y Claude, por partes. La estructura genérica está en `docs/DISENO.md`. Responde con las letras (p. ej. «O2S») o con tu idea, por el chat, editando este archivo o con una incidencia `feedback`.
 
-### Parte 25 — Objetivos diarios: números (2026-10-21)
-
-Mikel aprobó 3 objetivos al día con premio. Propongo, para elegir:
-- **Cuáles:** el juego sortea 3 al día (a las 00:00 hora local) de esta lista: «cobrar N camiones», «entregar N unidades de un producto», «comprar N mejoras», «completar un pedido especial», «tocar la pila N veces», «mantener una línea sin atascos 10 min». N escala con lo que produces (equivale a ~10 min de juego).
-  - **D1 —** como arriba, los 3 siempre de distinto tipo.
-  - **D2 —** uno fácil, uno medio y uno difícil (N ×1, ×2, ×4).
-- **Premio:** **P1 —** 15 min de producción total cada uno y +1 h si se hacen los 3. **P2 —** 10 min cada uno y un «camión dorado» gratis (sin anuncio) al hacer los 3. **P3 —** 20 min cada uno, sin extra.
-- **Si no se hacen:** se pierden al cambiar el día (sin castigo); con anuncio se puede cambiar un objetivo por otro (opcional): **A —** sí; **B —** no.
-
-Responde con letras (p. ej. «D2 P1 A»).
-
-### Parte 26 — F3, F4 y F5: números (2026-10-21)
+### Parte 26 — F3, F4 y F5: números (2026-10-21) — decidido: R1, A1, C1 (en marcha, ver Pendiente)
 
 Aprobados los tres. Propuesta de números para no inventar al implementar:
 - **F3 destinos (tren y barco, 3 cada uno):** cerca (espera ×1, paga ×1,5), medio (×2, paga ×2,5), lejos (×4, paga ×4,5). «Espera» es el tiempo del viaje respecto al actual; se desbloquean pagando 10 / 100 / 1000 veces el valor de un cargamento. Cada destino pide un producto de la línea del transporte (vagones o contenedores; los destinos lejanos piden además la mitad de la otra línea).
