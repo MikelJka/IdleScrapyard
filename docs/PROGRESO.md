@@ -4,6 +4,12 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Render completo de Space Harvest
+
+- `prototipos/blender/estacion_completa.py` genera (Blender, 1080×1440, ~2 min en CPU) la estación con invernadero, núcleo, campo solar, nave de suministro y nave minera con láser sobre un planeta rocoso: `estacion-completa-render-3d.png`. Materiales con placas y células solares procedurales, brillo y viñeta.
+- Mikel pide mezclar paquetes CC0: desde el servidor no se pueden descargar (kenney.nl, opengameart.org y quaternius.com bloqueados por la política de red). Hace falta que Mikel suba los `.glb` a `prototipos/blender/cc0/` (el script ya los carga con `cargar_cc0()`) y se apuntan en `docs/CREDITOS.md`.
+- Límite: el planeta se ve plano y los módulos sencillos; con modelos CC0 y más detalle subirá.
+
 ## 2026-10-21 — Render 3D de prueba para Space Harvest
 
 - Mikel: las capturas del prototipo no parecen de juego moderno. Respuesta: son arte provisional; prueba con Blender (`bpy`) en `prototipos/blender/modulo_granja.py` → `granja-render-3d.png` (metal y cristal, luz, brillo, profundidad de campo). Plan de calidad en la sección 11 de `docs/NUEVO_JUEGO_ESPACIO.md`.
