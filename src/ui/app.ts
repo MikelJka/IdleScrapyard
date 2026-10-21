@@ -570,6 +570,8 @@ export function startApp(root: HTMLElement): void {
     return buttons.join('');
   }
 
+  let lastRailSent = state.transports.rail.sent;
+  let lastSeaSent = state.transports.sea.sent;
   let lastEarned = state.totalEarned;
   let lastCooldown = state.truckCooldown;
   let lastExtras = '';
@@ -633,6 +635,11 @@ export function startApp(root: HTMLElement): void {
     const gap = state.dollars - shownDollars;
     shownDollars = calmMotion || Math.abs(gap) < 0.5 ? state.dollars : shownDollars + gap * (1 - Math.exp(-dtMs / 120));
     refreshDaily(state, localDay());
+    // Bocina del tren y sirena del barco al salir cada viaje.
+    if (state.transports.rail.sent > lastRailSent) play('train');
+    if (state.transports.sea.sent > lastSeaSent) play('ship');
+    lastRailSent = state.transports.rail.sent;
+    lastSeaSent = state.transports.sea.sent;
     // Los botones de extras solo se redibujan si cambian, para no perder el toque.
     const extras = renderExtras();
     if (extras !== lastExtras) {

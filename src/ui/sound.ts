@@ -17,7 +17,7 @@ let muted = (() => {
   }
 })();
 
-export type Sfx = 'tap' | 'buy' | 'cash' | 'reward';
+export type Sfx = 'tap' | 'buy' | 'cash' | 'reward' | 'train' | 'ship';
 
 // Notas (Hz) y duración de cada sonido; el tipo de onda da el carácter.
 const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; gain: number }> = {
@@ -25,6 +25,9 @@ const SFX: Record<Sfx, { notes: number[]; step: number; wave: OscillatorType; ga
   buy: { notes: [523, 659], step: 0.07, wave: 'triangle', gain: 0.14 },
   cash: { notes: [880, 1175, 1568], step: 0.06, wave: 'sine', gain: 0.14 },
   reward: { notes: [523, 659, 784, 1047], step: 0.08, wave: 'triangle', gain: 0.16 },
+  // Bocina del tren (dos tonos) y sirena grave del barco.
+  train: { notes: [311, 247], step: 0.3, wave: 'sawtooth', gain: 0.06 },
+  ship: { notes: [73, 73.6], step: 0.7, wave: 'sawtooth', gain: 0.09 },
 };
 
 /** Vibración corta en el móvil (si el aparato lo permite). */

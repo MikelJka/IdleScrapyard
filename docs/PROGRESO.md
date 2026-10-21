@@ -4,6 +4,11 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Sonidos del tren y el barco
+
+- Bocina de dos tonos al salir el tren y sirena grave al salir el barco, sintetizadas por código (`src/ui/sound.ts`), con el interruptor de efectos de siempre.
+- Qué probar: abrir las zonas 9 y 10 y esperar a que salga un viaje.
+
 ## 2026-10-21 — Retoques visuales y material de anuncio nuevo
 
 - Viñeta suave en los bordes del mapa, botón de objetivos con su color (verde azulado) y monedas al cobrar un objetivo; cabecera de los paneles con franja de color.
