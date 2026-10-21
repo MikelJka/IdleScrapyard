@@ -112,7 +112,15 @@ svg.spk .spark { opacity: 1; }
 #panel-info p { margin: 4px 0; }
 #panel-info .who { display: flex; gap: 10px; align-items: center; }
 #panel-info .icon { flex: 0 0 48px; height: 48px; background: #fff3dc; border-radius: 12px; border: 2px solid #2a1d14; }
-#panel-info small { color: var(--muted); }
+#panel-info small, #panel-more small { color: var(--muted); }
+#panel-info { margin-bottom: 4px; }
+/* Hueco fijo para el aviso de atasco: así la hoja no cambia de alto (y no tiembla) cuando aparece o desaparece. */
+.jam-slot { min-height: 22px; margin-top: 4px; font-size: 12px; line-height: 22px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jam-slot .jam { color: #ffb347; font-weight: 900; }
+#panel-more { color: var(--ink); font-size: 12px; margin: 8px 4px 0; }
+#panel-more[hidden] { display: none; }
+#panel-more summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--muted); font-weight: 800; }
+#panel-more .rows { margin: 4px 0 0; padding-left: 16px; line-height: 1.5; }
 #panel-info .rows { margin: 8px 0 0; padding-left: 16px; line-height: 1.5; }
 .st-working { color: #8be28b; } .st-starved { color: #ff8a7a; } .st-full { color: #ffb347; }
 .st-working::before { content: '▶ '; } .st-starved::before { content: '✖ '; } .st-full::before { content: '■ '; }

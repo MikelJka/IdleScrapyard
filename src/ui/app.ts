@@ -112,6 +112,7 @@ export function startApp(root: HTMLElement): void {
         <div class="sheet-head"><h2 id="sheet-title"></h2><button id="close-shop" type="button" aria-label="${t('close')}">✕</button></div>
         <div id="panel-info"></div>
         <div id="shop"></div>
+        <div id="panel-more"></div>
         <div id="ranking" hidden></div>
         <div id="achieve" hidden></div>
         <div id="lang" hidden>
@@ -255,6 +256,8 @@ export function startApp(root: HTMLElement): void {
   let panel: string | null = null;
   let lastShop = '';
   let lastInfo = '';
+  let lastMore = '';
+  let moreOpen = false;
   const panelTitle = (sel: string): string => {
     if (sel === 'settings') return t('settings.title');
     if (sel === 'ranking') return t('ranking.title');
@@ -265,7 +268,7 @@ export function startApp(root: HTMLElement): void {
   };
   const openPanel = (sel: string | null) => {
     panel = sel;
-    lastShop = lastInfo = '';
+    lastShop = lastInfo = lastMore = '';
     $('sheet').hidden = sel === null;
     $('transfer').hidden = sel !== 'settings';
     $('lang').hidden = sel !== 'settings';
@@ -280,6 +283,7 @@ export function startApp(root: HTMLElement): void {
     $('ranking').hidden = sel !== 'ranking';
     $('panel-info').hidden = sel === 'settings' || sel === 'ranking';
     $('shop').hidden = sel === 'settings' || sel === 'ranking';
+    $('panel-more').hidden = sel === 'settings' || sel === 'ranking';
     const global = sel === 'settings' || sel === 'ranking';
     scene.setSelected(global ? null : sel);
     if (sel) $('sheet-title').textContent = panelTitle(sel);
@@ -390,6 +394,8 @@ export function startApp(root: HTMLElement): void {
     clearTimeout(toastTimer);
     toastTimer = window.setTimeout(() => (el.hidden = true), 3500);
   }
+  // El estado abierto/cerrado de «Más datos» se recuerda entre redibujados.
+  $('panel-more').addEventListener('toggle', (e) => (moreOpen = (e.target as HTMLDetailsElement).open), true);
   $('close-shop').addEventListener('click', () => {
     if (tut === 3) setTut(4);
     openPanel(null);
@@ -586,6 +592,11 @@ export function startApp(root: HTMLElement): void {
       $('panel-info').innerHTML = info;
       lastInfo = info;
     }
+    const more = renderMore(sel);
+    if (more !== lastMore) {
+      $('panel-more').innerHTML = more;
+      lastMore = more;
+    }
     const shop = mine
       .map((p) => {
         const def = p.zoneId ? ZONES.find((z) => z.id === p.zoneId) : undefined;
@@ -658,10 +669,18 @@ export function startApp(root: HTMLElement): void {
     const status = zoneStatus(state, def);
     const jam = bottleneck(state);
     const ready = helperLevelsReady(zone);
-    return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${helperName(def)}</b> · ${t('lvl')} ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><small>${helperBio(def)}</small></div></div>
+    return `<div class="who">${`<svg class="icon" viewBox="-16 -16 32 32">${helperFace(HELPER_LOOKS[def.helper.id])}</svg>`}<div><b>${helperName(def)}</b> · ${t('lvl')} ${zone.helperLevel}/${ECONOMY.helpers.maxLevel}${ready > 0 ? ' ⬆' : ''}<br><span class="st-${status}">${t('status.' + status)}</span> · <b>${rateTxt(zoneRate(def, zone))}/s</b></div></div>
+      <div class="jam-slot">${jam === 'none' ? '' : `<span class="jam">${inlineIcon('warning', t('jam.' + jam))}</span>`}</div>`;
+  }
+
+  /** Datos extra de una línea, plegados al final del panel para que las mejoras sean lo primero. */
+  function renderMore(sel: string): string {
+    const def = ZONES.find((z) => z.id === sel);
+    if (!def || !state.zones[def.id].unlocked) return '';
+    const zone = state.zones[def.id];
+    return `<details id="more-info"${moreOpen ? ' open' : ''}><summary>${t('info.more')}</summary><p><small>${helperBio(def)}</small></p>
       <ul class="rows">
-        <li>${t('info.state')}: <b class="st-${status}">${t('status.' + status)}</b></li>
-        <li>${t('info.rate')}: <b>${rateTxt(zoneRate(def, zone))}/s</b> · ${zone.machines} ${t('info.machines')} (${t('lvl')} ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
+        <li>${zone.machines} ${t('info.machines')} (${t('lvl')} ${zone.machineLevel}, ${t('info.grade')} ${machineGrade(zone.machineLevel)})</li>
         <li>${t('info.carts', { n: zone.carts, batch: cartBatch(zone), trip: ECONOMY.carts.tripSeconds })}</li>
         ${
           def.transport
@@ -670,9 +689,8 @@ export function startApp(root: HTMLElement): void {
         }
         <li>${t('info.scrapFlow', { in: fmt(scrapPerSecond(state)), cap: rateTxt(zoneRate(def, zone) * def.scrapPerUnit), pile: fmt(state.scrap) })}</li>
         <li>${t('info.stock', { pallets: fmt(ZONES.reduce((n, z) => n + state.zones[z.id].buffer, 0)), dock: fmt(state.dockUnits), load: dockLoad(state) })}</li>
-        ${jam === 'none' ? '' : `<li class="jam">${inlineIcon('warning', t('jam.' + jam))}</li>`}
         <li>${t('info.nextGrade', { n: 5 - (zone.machineLevel % 5) })}</li>
-      </ul>`;
+      </ul></details>`;
   }
 
   let last = performance.now();
