@@ -127,3 +127,4 @@ Lo que Mikel aprueba en `FEEDBACK.md` se resume aquí.
 
 - **Nombre global** (2026-10-20, Mikel): «Scrap Empire: Idle Factory» (opción G2).
 - **Equilibrio (2026-10-21):** zonas 8-10 un 30 % más baratas de abrir; nivel de máquina ×1,8. Objetivos diarios y F3/F4/F5 (rutas, almacén, capitán del tren y el barco) aprobados; los números se deciden en las Partes 25 y 26 de `FEEDBACK.md`.
+- **Almacén y menú (2026-10-21):** el almacén del tren y el barco cuesta la mitad que el transporte (×1,8 por nivel); el menú de inicio sale siempre al abrir el juego.
