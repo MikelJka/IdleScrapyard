@@ -4,7 +4,7 @@ import { spawn, execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
 const PORT = 4174;
-const URL = `http://localhost:${PORT}/IdleScrapyard/?fps=1`;
+const URL = `http://localhost:${PORT}/IdleScrapyard/?fps=1&notitle`;
 const slow = Number(process.argv[2] ?? 4);
 const save = execSync('npx vite-node scripts/makesave.ts 2', { maxBuffer: 1e8 }).toString();
 const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'ignore' });

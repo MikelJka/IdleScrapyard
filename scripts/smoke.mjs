@@ -41,6 +41,12 @@ try {
     });
     await page.goto(URL);
     await sleep(1500);
+    // El menú de inicio se ve y se cierra con «Jugar».
+    if (!(await page.locator('#title #play').count())) problems.push(`${d.name}: no sale el menú de inicio`);
+    await page.screenshot({ path: `smoke/${d.name}-menu.png` });
+    await page.click('#title #play');
+    await sleep(600);
+    if (await page.locator('#title').count()) problems.push(`${d.name}: el menú de inicio no se cierra`);
     await page.screenshot({ path: `smoke/${d.name}-inicio.png` });
     for (let i = 0; i < 30; i++) await page.click('#pile');
     await sleep(3000);
@@ -67,7 +73,7 @@ try {
   night.on('console', (m) => {
     if (m.type() === 'error') problems.push(`noche console: ${m.text()}`);
   });
-  await night.goto(`${URL}?hora=22`);
+  await night.goto(`${URL}?hora=22&notitle`);
   await sleep(2500);
   const nightOpacity = await night.evaluate(() => Number(document.querySelector('#nightR')?.getAttribute('opacity') ?? 0));
   if (!(nightOpacity > 0.3)) problems.push(`noche: la capa nocturna no se aplica (opacidad ${nightOpacity})`);

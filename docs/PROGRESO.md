@@ -4,6 +4,12 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
+## 2026-10-21 — Menú de inicio
+
+- Pantalla de inicio al abrir el juego (`src/ui/title.ts`): logo que flota, «SCRAP EMPIRE · IDLE FACTORY», resumen de la partida (dólares y zonas), botón grande «JUGAR/CONTINUAR» que brilla, idioma, sonido, brasas que suben y franja de peligro. Se salta con `?notitle` (la prueba de humo, `perf.mjs` y el material de anuncio ya lo usan); la prueba de humo comprueba que sale y que se cierra, y guarda `*-menu.png`.
+- Pedido de Mikel: visuales, animaciones y material de anuncio más bonitos.
+- Sigue: regenerar el material de anuncio con el menú y más pulido visual.
+
 ## 2026-10-21 — Almacén del tren y el barco (F4)
 
 - Almacén por transporte (`warehouse` en `economy.json`): capacidad 500 (+250 por nivel, hasta 10, ×1,8 de precio por nivel; siempre cabe el doble de un cargamento); si se llena, las carretillas esperan con su tanda; al salir un viaje paga +5 % por cada 25 % lleno (máx. +20 %). Se compra en el panel de la línea y su estado sale en «Más datos». Precio inicial: la mitad del precio del transporte (lo puse yo, a revisar).

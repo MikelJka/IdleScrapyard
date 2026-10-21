@@ -46,6 +46,7 @@ import { doubleOfflineEarnings, pack, recoverLostTime, unpack } from '../sim/off
 import { fromCode, toCode } from '../sim/transfer';
 import { achievementName, getLang, helperBio, helperName, setLang, t, zoneName, zoneProduct, type Lang } from './texts';
 import { store } from './storage';
+import { showTitle } from './title';
 import { applyAccessibility, isBigText, isHighContrast, reducedMotion, setBigText, setHighContrast, setReducedMotion } from './prefs';
 import { buzz, isMuted, isMusicOn, isSfxOn, isVibeOn, play, setMuted, setMusicOn, setSfxOn, setVibeOn, syncMusic } from './sound';
 import { cleanNick, getNick, rankingEnabled, setNick, submitScore, topScores } from './ranking';
@@ -433,6 +434,14 @@ export function startApp(root: HTMLElement): void {
       play('tap');
       writeSave(state);
     }
+  });
+  showTitle(root, {
+    dollars: fmt(state.dollars),
+    zonesOpen: ZONES.filter((z) => state.zones[z.id].unlocked).length,
+    zonesTotal: ZONES.length,
+    hasProgress: state.time > 0,
+    save: () => writeSave(state),
+    onPlay: () => undefined,
   });
   $('close-shop').addEventListener('click', () => {
     if (tut === 3) setTut(4);

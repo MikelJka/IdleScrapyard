@@ -35,7 +35,7 @@ async function open(browser, { save, lang, query = '', size = { width: 360, heig
     localStorage.setItem('chatarrero.tut', '4');
     localStorage.setItem('chatarrero.lang', l);
   }, [save, lang]);
-  await page.goto(BASE + query);
+  await page.goto(BASE + query + (query.includes('?') ? '&' : '?') + 'notitle');
   return { context, page };
 }
 
