@@ -4,27 +4,9 @@ Diario de sesiones, la más reciente arriba.
 
 > **BLOQUEO (2026-10-21): Mikel trabaja en esta sesión a mano hasta las 13:00 (hora local).** Las sesiones automáticas no deben tocar nada hasta esa hora: si lo lees antes, termina sin commits ni notificación.
 
-## 2026-10-21 — Render completo de Space Harvest
+## 2026-10-21 — Space Harvest se separa de este proyecto
 
-- `prototipos/blender/estacion_completa.py` genera (Blender, 1080×1440, ~2 min en CPU) la estación con invernadero, núcleo, campo solar, nave de suministro y nave minera con láser sobre un planeta rocoso: `estacion-completa-render-3d.png`. Materiales con placas y células solares procedurales, brillo y viñeta.
-- Mikel pide mezclar paquetes CC0: desde el servidor no se pueden descargar (kenney.nl, opengameart.org y quaternius.com bloqueados por la política de red). Hace falta que Mikel suba los `.glb` a `prototipos/blender/cc0/` (el script ya los carga con `cargar_cc0()`) y se apuntan en `docs/CREDITOS.md`.
-- Límite: el planeta se ve plano y los módulos sencillos; con modelos CC0 y más detalle subirá.
-
-## 2026-10-21 — Render 3D de prueba para Space Harvest
-
-- Mikel: las capturas del prototipo no parecen de juego moderno. Respuesta: son arte provisional; prueba con Blender (`bpy`) en `prototipos/blender/modulo_granja.py` → `granja-render-3d.png` (metal y cristal, luz, brillo, profundidad de campo). Plan de calidad en la sección 11 de `docs/NUEVO_JUEGO_ESPACIO.md`.
-- Sigue: decidir con Mikel si el arte se hace por script o con paquetes CC0; render del resto de módulos.
-
-## 2026-10-21 — Space Harvest: nombre, escenas de prueba y capturas
-
-- Mikel decide: nombre **Space Harvest**, motor PixiJS (Opción B), módulos centrados en agricultura, minería de planetas y energía solar. Documento actualizado (`docs/NUEVO_JUEGO_ESPACIO.md`, secciones 4 y 10).
-- Prototipo con cuatro escenas (estación, invernadero, energía solar, minería) y capturas en `prototipos/espacio-pixi/capturas/`.
-- Quitado «la mitad de la otra línea» de los destinos del tren y el barco (decidido por Mikel).
-- Qué probar: `/prototipos/espacio/?escena=granja` (y `solar`, `mineria`) en el móvil y mirar los fps.
-
-## 2026-10-21 — Borrador del nuevo juego espacial
-
-- `docs/NUEVO_JUEGO_ESPACIO.md`: diseño de un idle de estación espacial hecho por módulos (investigación → agricultura → energía → minería → tripulación → fabricación → logística → exploración → colonias), arquitectura para añadir módulos sin romper partidas y plan de gráficos (SVG mejorado, PixiJS con sprites prerrenderizados desde Blender, o 3D low-poly) con prueba de concepto antes de decidir. Sin aprobar: preguntas para Mikel en la sección 9.
+- Todo lo de Space Harvest (diseño, decisiones, diario, prototipos de PixiJS y Blender) se ha movido a la carpeta `space-harvest/`, lista para llevársela a su propio repositorio. Este diario y `FEEDBACK.md` ya solo hablan de Scrap Empire. La web sigue publicando el prototipo en `/prototipos/espacio/` desde su nueva ubicación.
 
 ## 2026-10-21 — Sonidos del tren y el barco
 

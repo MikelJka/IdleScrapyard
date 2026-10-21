@@ -141,7 +141,7 @@ Cada hito acaba jugable y publicado en una versión web de prueba, igual que aho
 1. **Nombre y tono:** ¿ciencia ficción realista (estación orbital, hidroponía, asteroides) o más fantasía espacial (alienígenas, naves raras)? Nombres para elegir: *Orbit Works*, *Stellar Forge*, *Station Zero*, *Void Harvest* (a comprobar que no estén ocupados en Play).
 2. **Motor gráfico:** ¿hacemos la prueba de gráficos (Opción B) antes de decidir, o prefieres seguir con SVG (Opción A) o ir directo a 3D (Opción C)?
 3. **Orden de módulos:** ¿bien el orden de la tabla (investigación → agricultura → energía → minería…) o quieres otro?
-4. **Repositorio:** este documento vive ahora en `docs/` de Scrap Empire. Cuando lo apruebes, ¿creamos un repositorio nuevo para el juego (necesitará acceso para las sesiones automáticas)?
+4. **Repositorio:** este documento vive de momento en la carpeta `space-harvest/` del repositorio de Scrap Empire (separada del resto). Cuando lo apruebes, ¿creamos un repositorio nuevo para el juego (necesitará acceso para las sesiones automáticas)?
 5. **Tripulación:** ¿personajes con personalidad como los ayudantes (más trabajo de arte, más cariño) o trabajadores anónimos?
 
 ## 10. Prueba de gráficos hecha (2026-10-21)

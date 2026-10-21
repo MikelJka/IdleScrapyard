@@ -43,11 +43,11 @@ jobs:
       # Prueba de gráficos del juego espacial (PixiJS), para abrirla en el móvil: /prototipos/espacio/
       - name: Prototipo de gráficos del juego espacial
         run: |
-          cd prototipos/espacio-pixi
+          cd space-harvest/prototipos/espacio-pixi
           npm install
           npm run build
-          mkdir -p ../../dist/prototipos/espacio
-          cp -r dist/. ../../dist/prototipos/espacio/
+          mkdir -p ../../../dist/prototipos/espacio
+          cp -r dist/. ../../../dist/prototipos/espacio/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
