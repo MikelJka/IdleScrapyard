@@ -540,6 +540,7 @@ export function startApp(root: HTMLElement): void {
       if (b.dataset.claim !== undefined && claimGoal(state, Number(b.dataset.claim)) > 0) {
         play('reward');
         bumpDollars();
+        flyCoins();
       }
       if (b.dataset.change !== undefined && (await rewarded())) rerollGoal(state, Number(b.dataset.change));
       writeSave(state);
